@@ -9,6 +9,7 @@ import {
 } from './_generated/server';
 import { triggerIntermissionCountdown } from './games';
 import { generateRoomCode, isValidCode, normalizeCode } from './helpers/code';
+import { cascadeDeleteRoom } from './maintenance';
 
 const MAX_PLAYERS = 12;
 
@@ -152,8 +153,8 @@ export const leaveRoom = mutation({
     const remaining = players.filter((p) => p.clientToken !== args.clientToken);
 
     if (remaining.length === 0) {
-      // Last person out — clean the room.
-      await ctx.db.delete(room._id);
+      // Last person out — cascade the room and all child rows.
+      await cascadeDeleteRoom(ctx, room._id);
       return;
     }
 

@@ -8,11 +8,11 @@ const STALE_OWNER_THRESHOLD_MS = 60_000;
 // view the summary screen and disconnect.
 const ENDED_GRACE_MS = 30 * 60 * 1000; // 30 minutes
 // How long all players must be silent before we abandon a lobby/in-game
-// room. Heartbeat is every 15s, so 60 min is safely conservative.
-const OFFLINE_THRESHOLD_MS = 60 * 60 * 1000; // 60 minutes
+// room. Heartbeat is every 15s, so 90s = 6 missed beats of grace.
+const OFFLINE_THRESHOLD_MS = 90 * 1000; // 90 seconds
 // Empty rooms (no players, e.g. someone created and immediately closed
-// the app) get reaped sooner.
-const EMPTY_ROOM_TTL_MS = 10 * 60 * 1000; // 10 minutes
+// the app) get reaped almost immediately.
+const EMPTY_ROOM_TTL_MS = 60 * 1000; // 60 seconds
 
 /**
  * Cascade-delete every record tied to a room: players, games, rounds, the
@@ -21,7 +21,7 @@ const EMPTY_ROOM_TTL_MS = 10 * 60 * 1000; // 10 minutes
  * Idempotent: missing room is a no-op so the scheduled invocation is safe
  * even if the daily sweep already cleaned it up.
  */
-async function cascadeDeleteRoom(
+export async function cascadeDeleteRoom(
   ctx: MutationCtx,
   roomId: Id<'rooms'>,
 ): Promise<void> {
@@ -132,36 +132,30 @@ export const purgeStale = internalMutation({
  * manually removed from the dashboard without cascading). Safe to run any
  * time — it only deletes rows whose foreign-key target is gone.
  *
- * Order matters: drop assignments + secrets first (point at rounds), then
- * rounds (point at games), then games (point at rooms), then orphan
- * players.
+ * Order is top-down by ancestry so cascading orphans are caught in a
+ * single pass: a deleted `games` row in step 1 makes its `rounds` look
+ * orphaned in step 2, which in turn makes its `secrets`/`assignments`
+ * look orphaned in steps 3-4. Convex makes mid-mutation deletes visible
+ * to later `ctx.db.get` calls in the same transaction, which is what
+ * makes this work.
  */
 export const purgeOrphans = internalMutation({
   args: {},
   handler: async (ctx) => {
     let deleted = {
-      assignments: 0,
-      secrets: 0,
-      rounds: 0,
       games: 0,
+      rounds: 0,
+      secrets: 0,
+      assignments: 0,
       players: 0,
     };
 
-    const assignments = await ctx.db.query('roundAssignments').collect();
-    for (const a of assignments) {
-      const round = await ctx.db.get(a.roundId);
-      if (!round) {
-        await ctx.db.delete(a._id);
-        deleted.assignments++;
-      }
-    }
-
-    const secrets = await ctx.db.query('roundSecrets').collect();
-    for (const s of secrets) {
-      const round = await ctx.db.get(s.roundId);
-      if (!round) {
-        await ctx.db.delete(s._id);
-        deleted.secrets++;
+    const games = await ctx.db.query('games').collect();
+    for (const g of games) {
+      const room = await ctx.db.get(g.roomId);
+      if (!room) {
+        await ctx.db.delete(g._id);
+        deleted.games++;
       }
     }
 
@@ -174,12 +168,21 @@ export const purgeOrphans = internalMutation({
       }
     }
 
-    const games = await ctx.db.query('games').collect();
-    for (const g of games) {
-      const room = await ctx.db.get(g.roomId);
-      if (!room) {
-        await ctx.db.delete(g._id);
-        deleted.games++;
+    const secrets = await ctx.db.query('roundSecrets').collect();
+    for (const s of secrets) {
+      const round = await ctx.db.get(s.roundId);
+      if (!round) {
+        await ctx.db.delete(s._id);
+        deleted.secrets++;
+      }
+    }
+
+    const assignments = await ctx.db.query('roundAssignments').collect();
+    for (const a of assignments) {
+      const round = await ctx.db.get(a.roundId);
+      if (!round) {
+        await ctx.db.delete(a._id);
+        deleted.assignments++;
       }
     }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +37,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   String? _scheduledForRoundId;
   String? _notifiedEndedRoundId;
   int _lastSecondHaptic = -1;
+  Timer? _heartbeat;
 
   @override
   void initState() {
@@ -46,10 +49,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     Future.microtask(
       () => ref.read(serverTimeOffsetProvider.notifier).refresh(),
     );
+    // Keep `players.lastSeenAt` fresh during the game so the server reaper
+    // can tell a foregrounded app from a closed/killed one. Timer.periodic
+    // is naturally suspended when the OS pauses the app, which is exactly
+    // the signal we want.
+    // ignore: discarded_futures
+    ref.read(roomRepositoryProvider).heartbeat(code: widget.code);
+    _heartbeat = Timer.periodic(const Duration(seconds: 15), (_) {
+      // ignore: discarded_futures
+      ref.read(roomRepositoryProvider).heartbeat(code: widget.code);
+    });
   }
 
   @override
   void dispose() {
+    _heartbeat?.cancel();
     // ignore: discarded_futures
     WakelockPlus.disable();
     // ignore: discarded_futures
@@ -145,6 +159,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           const Positioned.fill(child: ColoredBox(color: AppColors.ink)),
           const Positioned.fill(child: GrainOverlay()),
           SafeArea(
+            bottom: false,
             child: asyncRoom.when(
               loading: () => const Center(
                 child: CircularProgressIndicator(color: AppColors.lime),
@@ -391,8 +406,28 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
     final asyncBoard = ref.watch(locationsBoardProvider(widget.room.code));
     widget.onSecondHaptic(countdown.seconds);
 
-    final viewportW = MediaQuery.of(context).size.width;
-    final heroExtent = (viewportW - 24).clamp(260.0, 380.0);
+    final mq = MediaQuery.of(context);
+    final viewportW = mq.size.width;
+    // The outer SafeArea uses bottom: false so the ink + grain background
+    // extends to the screen edge. We pad the bottom of the scroll content
+    // ourselves so interactive elements clear the iOS home indicator.
+    final bottomInset = mq.padding.bottom;
+    final safeH = mq.size.height - mq.padding.top;
+    // Reserve vertical space below the timer for: TopBar 56 +
+    // padding-top 12 + RoleCard 220 + ScrollHint 84 + padding-bottom 12
+    // + bottomInset (home indicator clearance) + (owner: 12 + 48).
+    final reservedBelowTimer = 56.0 +
+        12 +
+        220 +
+        84 +
+        12 +
+        bottomInset +
+        (widget.isOwner ? 60 : 0);
+    final heightCap = safeH - reservedBelowTimer;
+    final widthCap = viewportW - 24;
+    final heroExtent = (widthCap < heightCap ? widthCap : heightCap)
+        .clamp(140.0, 380.0)
+        .toDouble();
 
     final label = round.isActive ? 'TIME REMAINING' : 'ROUND ENDED';
     final roundLabel = 'ROUND ${round.index} OF ${widget.game.totalRounds}';
@@ -421,9 +456,10 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
             maxExtent: heroExtent,
           ),
         ),
-        SliverToBoxAdapter(
+        SliverFillRemaining(
+          hasScrollBody: false,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+            padding: EdgeInsets.fromLTRB(20, 12, 20, 12 + bottomInset),
             child: Column(
               children: [
                 asyncRole.when(
@@ -437,7 +473,7 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
                   data: (role) => RoleCard(role: role),
                 ),
                 if (widget.isOwner) ...[
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: round.isActive
                         ? () async {
@@ -451,7 +487,7 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
                     label: const Text('END ROUND NOW'),
                   ),
                 ],
-                const SizedBox(height: 8),
+                const Spacer(),
                 ScrollHint(onTap: _scrollToLocations, opacity: 1.0),
               ],
             ),
@@ -475,9 +511,10 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Played venues are crossed out.',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: AppColors.paperFaint),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: AppColors.paperFaint),
                 ),
               ],
             ),
@@ -502,7 +539,7 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
             ),
           ),
           data: (board) => SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+            padding: EdgeInsets.fromLTRB(20, 0, 20, 28 + bottomInset),
             sliver: SliverLocationGrid(board: board),
           ),
         ),

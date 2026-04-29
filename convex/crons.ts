@@ -11,21 +11,23 @@ crons.interval(
   internal.maintenance.reapStaleOwners,
 );
 
-// Hourly safety net: cascade-delete ended rooms past their grace period,
+// Minutely sweep: cascade-delete ended rooms past their grace period,
 // abandoned lobbies / in-game rooms where everyone has gone silent, and
-// empty rooms left over from failed creates.
+// empty rooms left over from failed creates. Runs often so that a room
+// dies within ~150s of all players going silent (90s offline threshold
+// + up to 60s cron lag).
 crons.interval(
   'purge stale rooms',
-  { hours: 1 },
+  { seconds: 60 },
   internal.maintenance.purgeStale,
 );
 
-// Daily belt-and-braces sweep for child rows whose parent disappeared
+// Hourly belt-and-braces sweep for child rows whose parent disappeared
 // without cascading (e.g. a manual dashboard delete, or a future schema
 // change that adds a child table the cascade forgot about).
 crons.interval(
   'purge orphan rows',
-  { hours: 24 },
+  { hours: 1 },
   internal.maintenance.purgeOrphans,
 );
 
