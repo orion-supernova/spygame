@@ -1,0 +1,19 @@
+{
+  "name": "whereami-convex",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "convex dev",
+    "deploy": "convex deploy",
+    "seed": "convex run locations:seed",
+    "logs": "convex logs",
+    "dashboard": "convex dashboard"
+  },
+  "dependencies": {
+    "convex": "^1.17.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

@@ -33,6 +33,12 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Convex
+.env.local
+.env
+node_modules/
+convex/_generated/
+
 # Symbolication related
 app.*.symbols
 
