@@ -5,8 +5,9 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/haptics.dart';
 import '../domain/role.dart';
 
-/// Long-press to reveal so a glance at someone else's screen doesn't leak
-/// the role. Releasing flips the card back face-down.
+/// Press-and-hold to reveal so a glance at someone else's screen doesn't leak
+/// the role. A ring around the fingerprint fills as the press registers;
+/// releasing flips the card back face-down.
 class RoleCard extends StatefulWidget {
   const RoleCard({super.key, required this.role});
   final Role? role;
@@ -15,30 +16,39 @@ class RoleCard extends StatefulWidget {
   State<RoleCard> createState() => _RoleCardState();
 }
 
-class _RoleCardState extends State<RoleCard>
-    with SingleTickerProviderStateMixin {
+class _RoleCardState extends State<RoleCard> with TickerProviderStateMixin {
   late final AnimationController _flip = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 360),
   );
+
+  late final AnimationController _press = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 350),
+  )..addStatusListener((s) {
+      if (s == AnimationStatus.completed && !_revealed) {
+        _revealed = true;
+        Haptics.medium();
+        _flip.forward();
+        setState(() {});
+      }
+    });
 
   bool _revealed = false;
 
   @override
   void dispose() {
     _flip.dispose();
+    _press.dispose();
     super.dispose();
   }
 
-  void _set(bool reveal) {
-    if (_revealed == reveal) return;
-    _revealed = reveal;
-    if (reveal) {
-      Haptics.medium();
-      _flip.forward();
-    } else {
+  void _release() {
+    if (_revealed) {
+      _revealed = false;
       _flip.reverse();
     }
+    _press.reverse();
     setState(() {});
   }
 
@@ -46,16 +56,9 @@ class _RoleCardState extends State<RoleCard>
   Widget build(BuildContext context) {
     final role = widget.role;
     return GestureDetector(
-      onLongPressStart: (_) => _set(true),
-      onLongPressEnd: (_) => _set(false),
-      onLongPressCancel: () => _set(false),
-      onTap: () {
-        // Quick tap also briefly reveals.
-        _set(true);
-        Future<void>.delayed(const Duration(milliseconds: 700), () {
-          if (mounted) _set(false);
-        });
-      },
+      onTapDown: (_) => _press.forward(),
+      onTapUp: (_) => _release(),
+      onTapCancel: _release,
       child: AnimatedBuilder(
         animation: _flip,
         builder: (_, __) {
@@ -73,7 +76,7 @@ class _RoleCardState extends State<RoleCard>
                     transform: Matrix4.identity()..rotateY(3.14159),
                     child: _Front(role: role),
                   )
-                : const _Back(),
+                : _Back(progress: _press),
           );
         },
       ),
@@ -82,7 +85,8 @@ class _RoleCardState extends State<RoleCard>
 }
 
 class _Back extends StatelessWidget {
-  const _Back();
+  const _Back({required this.progress});
+  final Animation<double> progress;
 
   @override
   Widget build(BuildContext context) {
@@ -97,8 +101,45 @@ class _Back extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.fingerprint_rounded,
-              size: 48, color: AppColors.paperFaint),
+          SizedBox(
+            width: 72,
+            height: 72,
+            child: AnimatedBuilder(
+              animation: progress,
+              builder: (_, __) {
+                final t = progress.value;
+                final iconColor = Color.lerp(
+                  AppColors.paperFaint,
+                  AppColors.lime,
+                  t,
+                )!;
+                final scale = 1.0 + 0.12 * t;
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 72,
+                      height: 72,
+                      child: CircularProgressIndicator(
+                        value: t,
+                        strokeWidth: 2.5,
+                        color: AppColors.lime,
+                        backgroundColor: AppColors.inkOutline,
+                      ),
+                    ),
+                    Transform.scale(
+                      scale: scale,
+                      child: Icon(
+                        Icons.fingerprint_rounded,
+                        size: 44,
+                        color: iconColor,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
           const SizedBox(height: 14),
           Text(
             'YOUR ROLE',
@@ -111,7 +152,7 @@ class _Back extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'TAP & HOLD TO REVEAL',
+            'PRESS & HOLD TO REVEAL',
             style: AppTypography.mono(
               size: 11,
               weight: FontWeight.w500,

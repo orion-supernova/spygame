@@ -27,8 +27,7 @@ class RoundEndNotifier {
   Future<void> init() async {
     if (_initialized) return;
     tz_data.initializeTimeZones();
-    const androidInit =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const darwinInit = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -43,9 +42,12 @@ class RoundEndNotifier {
   Future<bool> requestPermissionIfNeeded() async {
     if (kIsWeb) return false;
     if (Platform.isIOS || Platform.isMacOS) {
-      final ios = _plugin.resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>();
-      final granted = await ios?.requestPermissions(
+      final ios = _plugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      final granted =
+          await ios?.requestPermissions(
             alert: true,
             badge: true,
             sound: true,
@@ -54,8 +56,10 @@ class RoundEndNotifier {
       return granted;
     }
     if (Platform.isAndroid) {
-      final android = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       final granted = await android?.requestNotificationsPermission() ?? true;
       return granted;
     }
@@ -98,6 +102,35 @@ class RoundEndNotifier {
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  }
+
+  Future<void> showNow({
+    required int notificationId,
+    required String title,
+    required String body,
+  }) async {
+    if (kIsWeb) return;
+    await _plugin.show(
+      notificationId,
+      title,
+      body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _channelId,
+          _channelName,
+          channelDescription: _channelDesc,
+          importance: Importance.high,
+          priority: Priority.high,
+          category: AndroidNotificationCategory.alarm,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+          interruptionLevel: InterruptionLevel.timeSensitive,
+        ),
+      ),
     );
   }
 

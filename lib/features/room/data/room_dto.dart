@@ -8,9 +8,12 @@ class RoomMapper {
 
   static Room? fromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
+    final receivedAtLocalMs = DateTime.now().millisecondsSinceEpoch;
     return Room(
       id: json['_id']?.toString() ?? '',
       code: json['code']?.toString() ?? '',
+      serverNowMs: _asInt(json['serverNowMs'], receivedAtLocalMs),
+      receivedAtLocalMs: receivedAtLocalMs,
       status: _statusFromString(json['status']?.toString()),
       ownerToken: json['ownerToken']?.toString() ?? '',
       config: _configFromJson(json['config']),
@@ -65,8 +68,7 @@ class RoomMapper {
       id: raw['_id']?.toString() ?? '',
       status: raw['status']?.toString() ?? 'active',
       phase: phase,
-      nextRoundStartsAtMs:
-          (nextStart == null) ? null : _asInt(nextStart, 0),
+      nextRoundStartsAtMs: (nextStart == null) ? null : _asInt(nextStart, 0),
       currentRoundIndex: _asInt(raw['currentRoundIndex'], 0),
       totalRounds: _asInt(raw['totalRounds'], 0),
     );

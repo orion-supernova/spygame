@@ -12,9 +12,24 @@ import 'convex_client_provider.dart';
 /// `serverNowMs = DateTime.now().millisecondsSinceEpoch + offsetMs`.
 class ServerTimeOffsetController extends Notifier<int> {
   Completer<void>? _refreshing;
+  bool _hasSynced = false;
+  int _lastRefreshStartedAtMs = 0;
 
   @override
   int build() => 0;
+
+  void observeServerNow(int serverNowMs, {int? receivedAtLocalMs}) {
+    if (serverNowMs <= 0) return;
+    final localMs = receivedAtLocalMs ?? DateTime.now().millisecondsSinceEpoch;
+
+    // `serverNowMs` came from a live query, not a request/response clock
+    // sample. By the time it reaches this device it can be seconds old, so it
+    // must not directly become the offset. Treat it only as a nudge to take a
+    // proper midpoint sample from games:serverNow.
+    if (_hasSynced && localMs - _lastRefreshStartedAtMs < 10_000) return;
+    // ignore: discarded_futures
+    refresh();
+  }
 
   Future<void> refresh() async {
     if (_refreshing != null) return _refreshing!.future;
@@ -23,11 +38,16 @@ class ServerTimeOffsetController extends Notifier<int> {
     try {
       final client = ref.read(convexClientProvider);
       final t0 = DateTime.now().millisecondsSinceEpoch;
-      final raw = await client.query('games:serverNow', const {});
+      _lastRefreshStartedAtMs = t0;
+      final raw = await client.mutation(
+        name: 'games:serverNow',
+        args: const <String, dynamic>{},
+      );
       final t1 = DateTime.now().millisecondsSinceEpoch;
       final serverMs = _coerceMs(raw);
       final rtt = (t1 - t0) ~/ 2;
       state = serverMs - (t0 + rtt);
+      _hasSynced = true;
     } catch (_) {
       // Leave previous offset in place.
     } finally {
@@ -55,11 +75,13 @@ int _coerceMs(String raw) {
       if (v is int) return v;
       if (v is double) return v.round();
     }
-  } catch (_) {/* fall through */}
+  } catch (_) {
+    /* fall through */
+  }
   return int.tryParse(raw) ?? DateTime.now().millisecondsSinceEpoch;
 }
 
 final serverTimeOffsetProvider =
     NotifierProvider<ServerTimeOffsetController, int>(
-  ServerTimeOffsetController.new,
-);
+      ServerTimeOffsetController.new,
+    );

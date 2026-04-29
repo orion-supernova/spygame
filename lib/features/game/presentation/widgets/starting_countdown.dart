@@ -14,10 +14,14 @@ class StartingCountdown extends ConsumerStatefulWidget {
   const StartingCountdown({
     super.key,
     required this.startsAtServerMs,
+    required this.snapshotServerNowMs,
+    required this.snapshotReceivedAtLocalMs,
     required this.roundIndex,
   });
 
   final int startsAtServerMs;
+  final int snapshotServerNowMs;
+  final int snapshotReceivedAtLocalMs;
   final int roundIndex;
 
   @override
@@ -32,6 +36,12 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
   @override
   void initState() {
     super.initState();
+    // Re-sample server time when the tiny countdown appears, but render from
+    // the room snapshot immediately so a stale global offset cannot show 6.
+    // ignore: discarded_futures
+    Future.microtask(
+      () => ref.read(serverTimeOffsetProvider.notifier).refresh(),
+    );
     _ticker = createTicker((_) => setState(() {}))..start();
   }
 
@@ -44,9 +54,18 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
   @override
   Widget build(BuildContext context) {
     final offset = ref.watch(serverTimeOffsetProvider);
-    final nowServer = DateTime.now().millisecondsSinceEpoch + offset;
+    final localNow = DateTime.now().millisecondsSinceEpoch;
+    final offsetServerNow = localNow + offset;
+    final snapshotElapsedMs = (localNow - widget.snapshotReceivedAtLocalMs)
+        .clamp(0, 1 << 31);
+    final snapshotServerNow = widget.snapshotServerNowMs + snapshotElapsedMs;
+    final nowServer = offsetServerNow > snapshotServerNow
+        ? offsetServerNow
+        : snapshotServerNow;
     final remainingMs = widget.startsAtServerMs - nowServer;
-    final seconds = remainingMs <= 0 ? 0 : ((remainingMs - 1) ~/ 1000) + 1;
+    final seconds = remainingMs <= 0
+        ? 0
+        : (((remainingMs - 1) ~/ 1000) + 1).clamp(0, 3);
 
     if (seconds != _lastSecond && seconds > 0 && seconds <= 3) {
       _lastSecond = seconds;
@@ -95,8 +114,9 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
           const SizedBox(height: 14),
           Text(
             'Get ready. New role in a moment.',
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(color: AppColors.paperMuted),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.paperMuted,
+            ),
           ),
         ],
       ),

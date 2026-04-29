@@ -25,14 +25,12 @@ class CountdownState {
     return (remainingMs / totalMs).clamp(0.0, 1.0);
   }
 
-  int get seconds => (remainingMs / 1000).ceil().clamp(0, 99 * 60);
+  int get seconds =>
+      (remainingMs / 1000).ceil().clamp(0, (totalMs / 1000).ceil());
 }
 
 class CountdownArgs {
-  const CountdownArgs({
-    required this.endsAtServerMs,
-    required this.totalMs,
-  });
+  const CountdownArgs({required this.endsAtServerMs, required this.totalMs});
   final int endsAtServerMs;
   final int totalMs;
 
@@ -61,8 +59,7 @@ class CountdownController
 
   CountdownState _compute(CountdownArgs args) {
     final offset = ref.read(serverTimeOffsetProvider);
-    final nowServer =
-        DateTime.now().millisecondsSinceEpoch + offset;
+    final nowServer = DateTime.now().millisecondsSinceEpoch + offset;
     final remaining = args.endsAtServerMs - nowServer;
     return CountdownState(
       endsAtServerMs: args.endsAtServerMs,
@@ -78,5 +75,5 @@ class CountdownController
 
 final countdownControllerProvider = NotifierProvider.autoDispose
     .family<CountdownController, CountdownState, CountdownArgs>(
-  CountdownController.new,
-);
+      CountdownController.new,
+    );
