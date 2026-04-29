@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
 import '../../../core/utils/haptics.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class HowToPlayScreen extends ConsumerStatefulWidget {
   const HowToPlayScreen({super.key});
@@ -66,40 +67,37 @@ class _HowToPlayScreenState extends ConsumerState<HowToPlayScreen>
   @override
   Widget build(BuildContext context) {
     final isLast = _index == _total - 1;
+    final l10n = AppLocalizations.of(context);
 
     final cards = <_Card>[
       _Card(
-        step: 'STEP 01 · OBJECTIVE',
-        heading: 'A secret\nlocation.',
-        body: 'Everyone shares one. Except for one of you.',
+        step: l10n.htpStep1,
+        heading: l10n.htpHeading1,
+        body: l10n.htpBody1,
         visual: _DotGridVisual(pulse: _pulse),
       ),
       _Card(
-        step: 'STEP 02 · MOST OF YOU',
-        heading: 'You play\na role.',
-        body:
-            'A place. A role to play. Stay in character — vague answers smell like the spy.',
+        step: l10n.htpStep2,
+        heading: l10n.htpHeading2,
+        body: l10n.htpBody2,
         visual: const _MockRoleCard(isSpy: false),
       ),
       _Card(
-        step: 'STEP 03 · THE SPY',
-        heading: "You don't\nknow where.",
-        body:
-            'One of you sees this card. Listen, ask cunning questions, figure out the location. Or bluff.',
+        step: l10n.htpStep3,
+        heading: l10n.htpHeading3,
+        body: l10n.htpBody3,
         visual: const _MockRoleCard(isSpy: true),
       ),
       _Card(
-        step: 'STEP 04 · THE ROUND',
-        heading: 'Question\neach other.',
-        body:
-            'A few minutes per round. Specific enough to test the spy, vague enough not to hand them the location.',
+        step: l10n.htpStep4,
+        heading: l10n.htpHeading4,
+        body: l10n.htpBody4,
         visual: const _TimerRingVisual(),
       ),
       _Card(
-        step: 'STEP 05 · CALLING IT',
-        heading: 'Argue\nit out.',
-        body:
-            "Time's up — debate together. No in-app vote, just talk. Spy wins by staying hidden. Everyone else wins by exposing them.",
+        step: l10n.htpStep5,
+        heading: l10n.htpHeading5,
+        body: l10n.htpBody5,
         visual: const _CallItVisual(),
       ),
     ];
@@ -304,13 +302,13 @@ class _TopBar extends StatelessWidget {
             IconButton(
               onPressed: onClose,
               icon: const Icon(Icons.close_rounded, color: AppColors.paper),
-              tooltip: 'Close',
+              tooltip: AppLocalizations.of(context).htpClose,
             )
           else
             TextButton(
               onPressed: onSkip,
               child: Text(
-                'SKIP',
+                AppLocalizations.of(context).htpSkip,
                 style: AppTypography.mono(
                   size: 11,
                   weight: FontWeight.w600,
@@ -389,7 +387,7 @@ class _BottomBar extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: onDone,
-                    child: const Text('GOT IT'),
+                    child: Text(AppLocalizations.of(context).htpDone),
                   ),
                 )
               : Row(
@@ -403,7 +401,7 @@ class _BottomBar extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'NEXT',
+                            AppLocalizations.of(context).htpNext,
                             style: AppTypography.mono(
                               size: 11,
                               weight: FontWeight.w600,
@@ -461,7 +459,7 @@ class _SwipeHintState extends State<_SwipeHint>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'SWIPE',
+                AppLocalizations.of(context).htpSwipe,
                 style: AppTypography.mono(
                   size: 11,
                   weight: FontWeight.w500,
@@ -582,6 +580,7 @@ class _MockRoleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final accent = isSpy ? AppColors.signalRed : AppColors.lime;
     return Container(
       width: 280,
@@ -609,7 +608,7 @@ class _MockRoleCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isSpy ? 'COVER ROLE' : 'YOU ARE',
+                isSpy ? l10n.roleFrontCover : l10n.roleFrontYouAre,
                 style: AppTypography.mono(
                   size: 11,
                   weight: FontWeight.w600,
@@ -622,7 +621,7 @@ class _MockRoleCard extends StatelessWidget {
           const Spacer(),
           if (isSpy) ...[
             Text(
-              'THE SPY',
+              l10n.roleTheSpy,
               style: theme.textTheme.displaySmall?.copyWith(
                 color: AppColors.signalRed,
                 fontWeight: FontWeight.w800,
@@ -632,14 +631,14 @@ class _MockRoleCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Location: unknown.',
+              l10n.htpVisualLocationUnknown,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.paper,
               ),
             ),
           ] else ...[
             Text(
-              'Bartender',
+              l10n.htpVisualRoleExample,
               style: theme.textTheme.headlineMedium?.copyWith(
                 color: AppColors.paper,
                 fontWeight: FontWeight.w700,
@@ -648,7 +647,7 @@ class _MockRoleCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'AT',
+              l10n.roleFrontAt,
               style: AppTypography.mono(
                 size: 11,
                 weight: FontWeight.w600,
@@ -658,7 +657,7 @@ class _MockRoleCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Tiki Bar',
+              l10n.htpVisualLocationExample,
               style: theme.textTheme.titleLarge?.copyWith(
                 color: AppColors.lime,
               ),
@@ -705,7 +704,7 @@ class _TimerRingVisual extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'PER ROUND',
+                AppLocalizations.of(context).htpVisualPerRound,
                 style: AppTypography.mono(
                   size: 10,
                   weight: FontWeight.w600,
@@ -737,7 +736,7 @@ class _CallItVisual extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'NO VOTE',
+            AppLocalizations.of(context).htpVisualNoVote,
             style: AppTypography.mono(
               size: 22,
               weight: FontWeight.w700,
@@ -753,7 +752,7 @@ class _CallItVisual extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'JUST TALK',
+            AppLocalizations.of(context).htpVisualJustTalk,
             style: AppTypography.mono(
               size: 22,
               weight: FontWeight.w700,

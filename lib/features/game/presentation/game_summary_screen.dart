@@ -6,6 +6,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../room/data/room_providers.dart';
 
 class GameSummaryScreen extends ConsumerWidget {
@@ -15,6 +16,7 @@ class GameSummaryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncRoom = ref.watch(roomStreamProvider(code));
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -27,7 +29,7 @@ class GameSummaryScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'GAME OVER',
+                    l10n.summaryEyebrow,
                     style: AppTypography.mono(
                       size: 11,
                       weight: FontWeight.w600,
@@ -37,7 +39,7 @@ class GameSummaryScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'Nicely played.',
+                    l10n.summaryHeadline,
                     style:
                         Theme.of(context).textTheme.displaySmall?.copyWith(
                               color: AppColors.paper,
@@ -46,7 +48,7 @@ class GameSummaryScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Room $code is closed.',
+                    l10n.summaryRoomClosed(code),
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: AppColors.paperMuted,
                         ),
@@ -59,7 +61,7 @@ class GameSummaryScreen extends ConsumerWidget {
                   ),
                   ElevatedButton(
                     onPressed: () => context.go(AppRoute.home),
-                    child: const Text('NEW GAME'),
+                    child: Text(l10n.summaryCtaNewGame),
                   ),
                 ],
               ),

@@ -13,7 +13,7 @@ class ConvexGameRepository implements GameRepository {
   final IdentityStorage _identity;
 
   @override
-  Stream<Role?> watchMyRole(String roundId) {
+  Stream<Role?> watchMyRole(String roundId, String locale) {
     final controller = StreamController<Role?>.broadcast();
     SubscriptionHandle? handle;
     Future<void> start() async {
@@ -23,6 +23,7 @@ class ConvexGameRepository implements GameRepository {
           args: {
             'roundId': roundId,
             'clientToken': _identity.clientToken,
+            'locale': locale,
           },
           onUpdate: (raw) {
             if (controller.isClosed) return;
@@ -71,14 +72,14 @@ class ConvexGameRepository implements GameRepository {
   }
 
   @override
-  Stream<LocationsBoard> watchLocations(String code) {
+  Stream<LocationsBoard> watchLocations(String code, String locale) {
     final controller = StreamController<LocationsBoard>.broadcast();
     SubscriptionHandle? handle;
     Future<void> start() async {
       try {
         handle = await _client.subscribe(
           name: 'games:watchLocations',
-          args: {'code': code},
+          args: {'code': code, 'locale': locale},
           onUpdate: (raw) {
             if (controller.isClosed) return;
             final decoded = _decode(raw);

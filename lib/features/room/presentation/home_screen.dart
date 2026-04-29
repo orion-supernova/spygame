@@ -4,12 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/errors/app_exception.dart';
+import '../../../core/errors/error_messages.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/storage/identity_storage.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
 import '../../../core/utils/haptics.dart';
+import '../../../l10n/generated/app_localizations.dart';
+import '../../identity/presentation/widgets/language_button.dart';
 import '../data/room_providers.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -45,7 +48,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _create() async {
     if (!_nameValid) {
-      setState(() => _error = 'Type a name first.');
+      setState(
+        () => _error = AppLocalizations.of(context).homeErrorNeedName,
+      );
       return;
     }
     setState(() {
@@ -62,7 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context.go(AppRoute.lobbyFor(code));
     } on AppException catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.message);
+      setState(() => _error = e.localizedMessage(context));
       await Haptics.warning();
     } finally {
       if (mounted) setState(() => _busyAction = null);
@@ -71,12 +76,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _join() async {
     if (!_nameValid) {
-      setState(() => _error = 'Type a name first.');
+      setState(
+        () => _error = AppLocalizations.of(context).homeErrorNeedName,
+      );
       return;
     }
     final code = _codeCtrl.text.trim().toUpperCase();
     if (code.length != 4) {
-      setState(() => _error = 'Codes are 4 characters.');
+      setState(
+        () => _error = AppLocalizations.of(context).homeErrorNeedCode,
+      );
       return;
     }
     setState(() {
@@ -94,7 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context.go(AppRoute.lobbyFor(joined));
     } on AppException catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.message);
+      setState(() => _error = e.localizedMessage(context));
       await Haptics.warning();
     } finally {
       if (mounted) setState(() => _busyAction = null);
@@ -104,6 +113,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -123,24 +133,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Where am I?',
+                        l10n.homeAppName,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: AppColors.paperMuted,
                           letterSpacing: 0.4,
                         ),
                       ),
+                      const Spacer(),
+                      const LanguageButton(),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Your codename',
+                    l10n.homeCodenameTitle,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: AppColors.paper,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Used to create or join a room.',
+                    l10n.homeCodenameSubtitle,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppColors.paperFaint,
                     ),
@@ -153,8 +165,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: AppColors.paper,
                     ),
-                    decoration: const InputDecoration(
-                      hintText: 'Codename',
+                    decoration: InputDecoration(
+                      hintText: l10n.homeCodenameHint,
                       counterText: '',
                     ),
                     onChanged: (_) => setState(() {}),
@@ -169,8 +181,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         const SizedBox(width: 10),
                         Text(
                           _busyAction == _BusyAction.create
-                              ? 'PLEASE WAIT…'
-                              : 'CREATE A ROOM',
+                              ? l10n.homeCtaBusy
+                              : l10n.homeCtaCreate,
                         ),
                       ],
                     ),
@@ -182,7 +194,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
-                          'OR JOIN',
+                          l10n.homeDividerOrJoin,
                           style: AppTypography.mono(
                             size: 11,
                             weight: FontWeight.w600,
@@ -212,8 +224,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       letterSpacing: 14,
                       color: AppColors.paper,
                     ),
-                    decoration: const InputDecoration(
-                      hintText: '— — — —',
+                    decoration: InputDecoration(
+                      hintText: l10n.homeJoinCodeHint,
                       counterText: '',
                     ),
                     onChanged: (_) => setState(() {}),
@@ -223,7 +235,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Text(
-                        'Add a codename above to join.',
+                        l10n.homeHintNeedCodename,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: AppColors.paperFaint,
@@ -241,8 +253,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         const SizedBox(width: 10),
                         Text(
                           _busyAction == _BusyAction.join
-                              ? 'PLEASE WAIT…'
-                              : 'JOIN ROOM',
+                              ? l10n.homeCtaBusy
+                              : l10n.homeCtaJoin,
                         ),
                       ],
                     ),

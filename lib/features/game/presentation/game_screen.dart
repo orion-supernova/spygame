@@ -14,6 +14,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
 import '../../../core/utils/haptics.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../room/data/room_providers.dart';
 import '../../room/domain/room.dart';
 import '../data/game_providers.dart';
@@ -77,11 +78,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     await RoundEndNotifier.instance.cancelAll();
     final offset = ref.read(serverTimeOffsetProvider);
     final endsLocalMs = round.endsAtMs - offset;
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
     await RoundEndNotifier.instance.scheduleAt(
       notificationId: round.index,
       endsAtLocalMs: endsLocalMs,
-      title: 'Time\'s up',
-      body: 'Round ${round.index} just ended. Open the app.',
+      title: l10n.notifRoundEndTitle,
+      body: l10n.notifRoundEndBody(round.index),
     );
   }
 
@@ -98,12 +101,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   Future<void> _notifyRoundEnded(RoundSnapshot round) async {
     if (_notifiedEndedRoundId == round.id) return;
     _notifiedEndedRoundId = round.id;
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
     await RoundEndNotifier.instance.showNow(
       notificationId: 10_000 + round.index,
-      title: 'Round ended',
+      title: l10n.notifRoundEndedTitle,
       body: round.endedReason == 'manual'
-          ? 'Round ${round.index} was ended by the host.'
-          : 'Round ${round.index} just ended.',
+          ? l10n.notifRoundEndedBodyManual(round.index)
+          : l10n.notifRoundEndedBodyTimer(round.index),
     );
   }
 
@@ -176,7 +181,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
               data: (room) {
                 if (room == null) {
-                  return const Center(child: Text('Room ended.'));
+                  return Center(
+                    child: Text(AppLocalizations.of(context).gameRoomEnded),
+                  );
                 }
                 return _GameBody(
                   room: room,
@@ -210,9 +217,10 @@ class _GameBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final game = room.currentGame;
     if (game == null) {
-      return const Center(child: Text('Setting up round…'));
+      return Center(child: Text(l10n.gameSettingUp));
     }
 
     final isOwner = room.isOwner(myToken);
@@ -238,7 +246,7 @@ class _GameBody extends ConsumerWidget {
         _TopBar(
           room: room,
           isOwner: isOwner,
-          label: _headerLabel(phase, game, round?.index),
+          label: _headerLabel(l10n, phase, game, round?.index),
         ),
         const SizedBox(height: 16),
         if (phase == GamePhase.between)
@@ -266,7 +274,7 @@ class _GameBody extends ConsumerWidget {
           ),
         const SizedBox(height: 24),
         Text(
-          'LOCATIONS',
+          l10n.gameLocationsEyebrow,
           style: AppTypography.mono(
             size: 11,
             letterSpacing: 2,
@@ -275,7 +283,7 @@ class _GameBody extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Played venues are crossed out.',
+          l10n.gameLocationsHint,
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: AppColors.paperFaint),
@@ -297,16 +305,27 @@ class _GameBody extends ConsumerWidget {
   }
 }
 
-String _headerLabel(GamePhase phase, GameSnapshot game, int? roundIndex) {
+String _headerLabel(
+  AppLocalizations l10n,
+  GamePhase phase,
+  GameSnapshot game,
+  int? roundIndex,
+) {
   switch (phase) {
     case GamePhase.between:
-      return 'INTERMISSION · ROUND ${roundIndex ?? 0} OF ${game.totalRounds}';
+      return l10n.gameIntermissionXOfY(roundIndex ?? 0, game.totalRounds);
     case GamePhase.starting:
-      return 'GET READY · ROUND ${game.currentRoundIndex + 1} OF ${game.totalRounds}';
+      return l10n.gameGetReadyXOfY(
+        game.currentRoundIndex + 1,
+        game.totalRounds,
+      );
     case GamePhase.ended:
-      return 'GAME OVER';
+      return l10n.gameOverEyebrow;
     case GamePhase.playing:
-      return 'ROUND ${roundIndex ?? game.currentRoundIndex} OF ${game.totalRounds}';
+      return l10n.gameRoundXOfY(
+        roundIndex ?? game.currentRoundIndex,
+        game.totalRounds,
+      );
   }
 }
 
@@ -395,6 +414,7 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final round = widget.round;
     final totalMs = (round.endsAtMs - round.startedAtMs).clamp(1, 1 << 30);
     final args = CountdownArgs(
@@ -429,8 +449,8 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
         .clamp(140.0, 380.0)
         .toDouble();
 
-    final label = round.isActive ? 'TIME REMAINING' : 'ROUND ENDED';
-    final roundLabel = 'ROUND ${round.index} OF ${widget.game.totalRounds}';
+    final label = round.isActive ? l10n.gameTimeRemaining : l10n.gameRoundEnded;
+    final roundLabel = l10n.gameRoundXOfY(round.index, widget.game.totalRounds);
 
     return CustomScrollView(
       controller: _scroll,
@@ -484,11 +504,15 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
                           }
                         : null,
                     icon: const Icon(Icons.stop_circle_outlined),
-                    label: const Text('END ROUND NOW'),
+                    label: Text(l10n.gameCtaEndRound),
                   ),
                 ],
                 const Spacer(),
-                ScrollHint(onTap: _scrollToLocations, opacity: 1.0),
+                ScrollHint(
+                  onTap: _scrollToLocations,
+                  opacity: 1.0,
+                  label: l10n.gameScrollHintLocations,
+                ),
               ],
             ),
           ),
@@ -501,7 +525,7 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'LOCATIONS',
+                  l10n.gameLocationsEyebrow,
                   style: AppTypography.mono(
                     size: 11,
                     letterSpacing: 2,
@@ -510,7 +534,7 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Played venues are crossed out.',
+                  l10n.gameLocationsHint,
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
@@ -552,28 +576,26 @@ Future<bool> _confirmLeave(
   BuildContext context, {
   required bool isOwner,
 }) async {
+  final l10n = AppLocalizations.of(context);
   final result = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
       backgroundColor: AppColors.inkRaised,
-      title: const Text('Leave game?'),
+      title: Text(l10n.gameLeaveDialogTitle),
       content: Text(
         isOwner
-            ? 'You\'ll leave the round in progress. The game continues '
-                  'for everyone else and host duties pass to another player. '
-                  'You can\'t rejoin afterwards.'
-            : 'You\'ll leave the round in progress. The game continues '
-                  'for everyone else, and you can\'t rejoin afterwards.',
+            ? l10n.gameLeaveDialogBodyOwner
+            : l10n.gameLeaveDialogBodyPlayer,
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(false),
-          child: const Text('STAY'),
+          child: Text(l10n.gameLeaveStay),
         ),
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(true),
           style: TextButton.styleFrom(foregroundColor: AppColors.signalRed),
-          child: const Text('LEAVE'),
+          child: Text(l10n.gameLeaveLeave),
         ),
       ],
     ),

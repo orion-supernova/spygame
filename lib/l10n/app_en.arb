@@ -1,0 +1,389 @@
+{
+  "@@locale": "en",
+
+  "welcomeEyebrow": "A PARTY GAME",
+  "@welcomeEyebrow": { "description": "Welcome screen kicker label, all-caps mono. Above the title." },
+
+  "welcomeTitle": "Where am\nI?",
+  "@welcomeTitle": { "description": "Welcome screen brand title. KEEP IDENTICAL across locales — this is the wordmark. Newline preserved." },
+
+  "welcomeSubtitle": "Everyone shares a secret location.\nOne of you doesn't. Find them — or blend in.",
+  "@welcomeSubtitle": { "description": "Tagline under the welcome title. Two-line summary of how the game works. Plays it as a mystery." },
+
+  "welcomeCtaGetStarted": "GET STARTED",
+  "@welcomeCtaGetStarted": { "description": "Primary call-to-action on welcome screen. All-caps." },
+
+  "welcomeCtaHowToPlay": "HOW TO PLAY",
+  "@welcomeCtaHowToPlay": { "description": "Secondary text button on welcome screen. Opens tutorial. All-caps." },
+
+  "welcomeFootnote": "3 to 12 players. No accounts. Pass-and-play friendly.",
+  "@welcomeFootnote": { "description": "Small mono footnote under the welcome CTAs." },
+
+  "welcomeConfigBannerTitle": "CONVEX_URL not set",
+  "@welcomeConfigBannerTitle": { "description": "Dev banner shown only when the build is missing the backend URL. CONVEX_URL is a literal env-var name; do not translate it." },
+
+  "welcomeConfigBannerBody": "Provision a Convex deployment, then run:",
+  "@welcomeConfigBannerBody": { "description": "Dev banner instruction. Followed by a code snippet." },
+
+  "homeAppName": "Where am I?",
+  "@homeAppName": { "description": "App name shown next to back arrow on home screen. Brand wordmark." },
+
+  "homeCodenameTitle": "Your codename",
+  "@homeCodenameTitle": { "description": "Section title above the name input on home screen." },
+
+  "homeCodenameSubtitle": "Used to create or join a room.",
+  "@homeCodenameSubtitle": { "description": "Helper text under the name section title." },
+
+  "homeCodenameHint": "Codename",
+  "@homeCodenameHint": { "description": "Placeholder text inside the name input field." },
+
+  "homeCtaCreate": "CREATE A ROOM",
+  "@homeCtaCreate": { "description": "Button: create a new game room. All-caps." },
+
+  "homeCtaJoin": "JOIN ROOM",
+  "@homeCtaJoin": { "description": "Button: join an existing room. All-caps." },
+
+  "homeCtaBusy": "PLEASE WAIT…",
+  "@homeCtaBusy": { "description": "Replaces the create/join button label while the request is in flight. Includes ellipsis." },
+
+  "homeDividerOrJoin": "OR JOIN",
+  "@homeDividerOrJoin": { "description": "Divider label between create and join sections. Mono caps." },
+
+  "homeJoinCodeHint": "— — — —",
+  "@homeJoinCodeHint": { "description": "Placeholder for the 4-character room-code input. Em-dashes separated by spaces. Identical across locales." },
+
+  "homeErrorNeedName": "Type a name first.",
+  "@homeErrorNeedName": { "description": "Error shown if user taps create/join without a codename." },
+
+  "homeErrorNeedCode": "Codes are 4 characters.",
+  "@homeErrorNeedCode": { "description": "Error shown if the join code isn't exactly 4 chars." },
+
+  "homeHintNeedCodename": "Add a codename above to join.",
+  "@homeHintNeedCodename": { "description": "Hint shown above the join button when there's no codename. Soft, not an error." },
+
+  "lobbyEyebrow": "LOBBY",
+  "@lobbyEyebrow": { "description": "Header label on the lobby screen. Mono caps." },
+
+  "roomCodeLabel": "ROOM CODE",
+  "@roomCodeLabel": { "description": "Mono caps label above the big 4-character room-code on the room-code chip." },
+
+  "roomCodeCopyHint": "TAP TO COPY",
+  "@roomCodeCopyHint": { "description": "Mono caps hint under the room-code, telling the user the chip is tappable to copy. Idle state." },
+
+  "roomCodeCopied": "COPIED",
+  "@roomCodeCopied": { "description": "Mono caps confirmation that flashes briefly after the user taps the chip and the code lands in the clipboard." },
+
+  "lobbyShareHint": "Tell friends the code or tap share.",
+  "@lobbyShareHint": { "description": "Subtitle under the room-code chip in the lobby." },
+
+  "lobbyPlayersLabel": "PLAYERS",
+  "@lobbyPlayersLabel": { "description": "Section label above the player list in the lobby. Mono caps." },
+
+  "lobbyPlayersCount": "· {current}/12",
+  "@lobbyPlayersCount": {
+    "description": "Player count next to the PLAYERS label. Format like '· 4/12'. The bullet · is decorative.",
+    "placeholders": { "current": { "type": "int", "example": "4" } }
+  },
+
+  "lobbyShareMessage": "Join my \"Where am I?\" room. Code: {code}",
+  "@lobbyShareMessage": {
+    "description": "Body of the share-sheet message when host shares the room. \"Where am I?\" is the brand name (keep identical).",
+    "placeholders": { "code": { "type": "String", "example": "ABCD" } }
+  },
+
+  "lobbyShareSubject": "Where am I? — Room {code}",
+  "@lobbyShareSubject": {
+    "description": "Subject line for the share-sheet (e.g. email subject). Brand name kept identical.",
+    "placeholders": { "code": { "type": "String", "example": "ABCD" } }
+  },
+
+  "lobbyCtaStart": "START GAME",
+  "@lobbyCtaStart": { "description": "Host-only button to start the game from the lobby. All-caps." },
+
+  "lobbyCtaStarting": "STARTING…",
+  "@lobbyCtaStarting": { "description": "Replaces the START GAME label while the start request is in flight." },
+
+  "lobbyStatusAllReady": "Everyone is ready. You're good to go.",
+  "@lobbyStatusAllReady": { "description": "Status under the START GAME button when everyone is ready and there are enough players." },
+
+  "lobbyStatusNeedPlayers": "At least 3 players needed.",
+  "@lobbyStatusNeedPlayers": { "description": "Status under START GAME when not enough players have joined." },
+
+  "lobbyStatusWaitingReady": "Waiting for everyone to mark ready.",
+  "@lobbyStatusWaitingReady": { "description": "Status under START GAME when at least one player hasn't tapped Ready." },
+
+  "lobbyErrorRoomGone": "This room is gone.",
+  "@lobbyErrorRoomGone": { "description": "Error shown when the room no longer exists (e.g. host left, server purged it)." },
+
+  "lobbyCtaGoHome": "GO HOME",
+  "@lobbyCtaGoHome": { "description": "Outlined button on the lobby error view that returns to the home screen. All-caps." },
+
+  "readyYes": "I'M READY",
+  "@readyYes": { "description": "Big toggle button label when the player has marked themself ready. All-caps." },
+
+  "readyNo": "TAP WHEN READY",
+  "@readyNo": { "description": "Big toggle button label inviting the player to mark themself ready. All-caps." },
+
+  "configEyebrow": "GAME SETTINGS",
+  "@configEyebrow": { "description": "Header on the configuration panel inside the lobby. Mono caps." },
+
+  "configHostOnly": "· host only",
+  "@configHostOnly": { "description": "Suffix shown in the config header for non-host players to indicate the controls are read-only. Bullet is decorative." },
+
+  "configLabelSpies": "Spies",
+  "@configLabelSpies": { "description": "Setting label: number of spies in the round." },
+
+  "configLabelRoundMinutes": "Round minutes",
+  "@configLabelRoundMinutes": { "description": "Setting label: duration of a round in minutes." },
+
+  "configLabelRounds": "Rounds",
+  "@configLabelRounds": { "description": "Setting label: how many rounds in the game." },
+
+  "playerHostBadge": "HOST",
+  "@playerHostBadge": { "description": "Tiny badge next to the host's name in the player list. All-caps." },
+
+  "playerSelfBadge": "YOU",
+  "@playerSelfBadge": { "description": "Tiny badge next to the current player's name. All-caps." },
+
+  "playerReady": "Ready",
+  "@playerReady": { "description": "Status under a player tile when that player is ready." },
+
+  "playerStandby": "Standing by…",
+  "@playerStandby": { "description": "Status under a player tile when they have not tapped ready yet." },
+
+  "gameRoundXOfY": "ROUND {current} OF {total}",
+  "@gameRoundXOfY": {
+    "description": "Header label during gameplay. e.g. 'ROUND 2 OF 5'. All-caps.",
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total": { "type": "int", "example": "5" }
+    }
+  },
+
+  "gameIntermissionXOfY": "INTERMISSION · ROUND {current} OF {total}",
+  "@gameIntermissionXOfY": {
+    "description": "Header during the between-rounds break. All-caps.",
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total": { "type": "int", "example": "5" }
+    }
+  },
+
+  "gameGetReadyXOfY": "GET READY · ROUND {current} OF {total}",
+  "@gameGetReadyXOfY": {
+    "description": "Header during the 3-second countdown before the next round starts. All-caps.",
+    "placeholders": {
+      "current": { "type": "int", "example": "3" },
+      "total": { "type": "int", "example": "5" }
+    }
+  },
+
+  "gameOverEyebrow": "GAME OVER",
+  "@gameOverEyebrow": { "description": "Header label when the entire game has ended (mid-flow, before navigation to summary). All-caps." },
+
+  "gameTimeRemaining": "TIME REMAINING",
+  "@gameTimeRemaining": { "description": "Label above the countdown timer during an active round. Mono caps." },
+
+  "gameRoundEnded": "ROUND ENDED",
+  "@gameRoundEnded": { "description": "Replaces TIME REMAINING when the round has finished but the screen is still showing the timer at zero. Mono caps." },
+
+  "gameRoundStartsIn": "ROUND {round} STARTS IN",
+  "@gameRoundStartsIn": {
+    "description": "Mono caps label inside the 3-second pre-round countdown box. Mono caps.",
+    "placeholders": { "round": { "type": "int", "example": "2" } }
+  },
+
+  "gameStartingGo": "GO",
+  "@gameStartingGo": { "description": "Replaces the countdown number when seconds reach 0. Big mono caps." },
+
+  "gameStartingGetReady": "Get ready. New role in a moment.",
+  "@gameStartingGetReady": { "description": "Subtitle under the GO/3/2/1 number on the pre-round countdown box. Reassuring, casual." },
+
+  "gameScrollHintLocations": "See locations",
+  "@gameScrollHintLocations": { "description": "Tappable hint label below the role card prompting the user to scroll down to the location grid. Sentence case in source; the widget upper-cases at render." },
+
+  "gameLocationsEyebrow": "LOCATIONS",
+  "@gameLocationsEyebrow": { "description": "Header above the location grid during play. Mono caps." },
+
+  "gameLocationsHint": "Played venues are crossed out.",
+  "@gameLocationsHint": { "description": "Helper text above the location grid explaining the strikethrough state." },
+
+  "gameCtaEndRound": "END ROUND NOW",
+  "@gameCtaEndRound": { "description": "Host-only outlined button during play to end the active round early. All-caps." },
+
+  "gameSettingUp": "Setting up round…",
+  "@gameSettingUp": { "description": "Loading text shown briefly while a round is being created on the server." },
+
+  "gameRoomEnded": "Room ended.",
+  "@gameRoomEnded": { "description": "Fallback shown when the game screen is open but the room has been cleared." },
+
+  "gameLeaveDialogTitle": "Leave game?",
+  "@gameLeaveDialogTitle": { "description": "Confirmation dialog title when a player taps the close icon during play." },
+
+  "gameLeaveDialogBodyOwner": "You'll leave the round in progress. The game continues for everyone else and host duties pass to another player. You can't rejoin afterwards.",
+  "@gameLeaveDialogBodyOwner": { "description": "Confirmation body for the host. Warns that host duties transfer and rejoin is not possible." },
+
+  "gameLeaveDialogBodyPlayer": "You'll leave the round in progress. The game continues for everyone else, and you can't rejoin afterwards.",
+  "@gameLeaveDialogBodyPlayer": { "description": "Confirmation body for a non-host. Warns that rejoin is not possible." },
+
+  "gameLeaveStay": "STAY",
+  "@gameLeaveStay": { "description": "Confirmation dialog button: keep playing. All-caps." },
+
+  "gameLeaveLeave": "LEAVE",
+  "@gameLeaveLeave": { "description": "Confirmation dialog button: leave the game. All-caps. Destructive." },
+
+  "roleBackEyebrow": "YOUR ROLE",
+  "@roleBackEyebrow": { "description": "Label on the back of the role card (face-down state). Mono caps." },
+
+  "roleBackHint": "PRESS & HOLD TO REVEAL",
+  "@roleBackHint": { "description": "Instruction on the back of the role card. Mono caps. The reveal is press-and-hold." },
+
+  "roleFrontCover": "COVER ROLE",
+  "@roleFrontCover": { "description": "Label on the front of the role card when the player is the SPY. Hint that 'THE SPY' is the cover, not a normal role. Mono caps." },
+
+  "roleFrontYouAre": "YOU ARE",
+  "@roleFrontYouAre": { "description": "Label on the front of the role card for non-spy players, above the role name. Mono caps." },
+
+  "roleFrontAt": "AT",
+  "@roleFrontAt": { "description": "Tiny label between the role name and the location name on the role card. Mono caps." },
+
+  "roleReleaseToHide": "release to hide",
+  "@roleReleaseToHide": { "description": "Tiny lowercase mono hint at the bottom of the revealed role card." },
+
+  "roleTheSpy": "THE SPY",
+  "@roleTheSpy": { "description": "Big headline shown to the player who has been assigned the spy role. All-caps. Dramatic." },
+
+  "roleSpySubtitle": "You don't know the location.\nAsk questions, blend in, figure it out.",
+  "@roleSpySubtitle": { "description": "Subtitle under THE SPY headline explaining the spy's job. Two lines." },
+
+  "summaryEyebrow": "GAME OVER",
+  "@summaryEyebrow": { "description": "Header label on the post-game summary screen. Mono caps." },
+
+  "summaryHeadline": "Nicely played.",
+  "@summaryHeadline": { "description": "Friendly post-game headline. Casual, congratulatory, not victorious (we don't know who won — there's no in-app vote)." },
+
+  "summaryRoomClosed": "Room {code} is closed.",
+  "@summaryRoomClosed": {
+    "description": "Subtitle confirming the room has been ended.",
+    "placeholders": { "code": { "type": "String", "example": "ABCD" } }
+  },
+
+  "summaryCtaNewGame": "NEW GAME",
+  "@summaryCtaNewGame": { "description": "Primary button on the summary screen, returns to home. All-caps." },
+
+  "notifRoundEndTitle": "Time's up",
+  "@notifRoundEndTitle": { "description": "Local notification title fired when a round timer ends and the app isn't in the foreground." },
+
+  "notifRoundEndBody": "Round {round} just ended. Open the app.",
+  "@notifRoundEndBody": {
+    "description": "Local notification body fired by the timer.",
+    "placeholders": { "round": { "type": "int", "example": "2" } }
+  },
+
+  "notifRoundEndedTitle": "Round ended",
+  "@notifRoundEndedTitle": { "description": "Notification title when the round was ended (manually by host or by timer) while the app was backgrounded." },
+
+  "notifRoundEndedBodyManual": "Round {round} was ended by the host.",
+  "@notifRoundEndedBodyManual": {
+    "description": "Notification body when the host ended the round early.",
+    "placeholders": { "round": { "type": "int", "example": "2" } }
+  },
+
+  "notifRoundEndedBodyTimer": "Round {round} just ended.",
+  "@notifRoundEndedBodyTimer": {
+    "description": "Notification body when the round ended via timer.",
+    "placeholders": { "round": { "type": "int", "example": "2" } }
+  },
+
+  "htpStep1": "STEP 01 · OBJECTIVE",
+  "@htpStep1": { "description": "Tutorial card 1 step label. Mono caps." },
+  "htpHeading1": "A secret\nlocation.",
+  "@htpHeading1": { "description": "Tutorial card 1 large heading. Two-line, ends with period." },
+  "htpBody1": "Everyone shares one. Except for one of you.",
+  "@htpBody1": { "description": "Tutorial card 1 body. Sets up the central twist." },
+
+  "htpStep2": "STEP 02 · MOST OF YOU",
+  "@htpStep2": { "description": "Tutorial card 2 step label." },
+  "htpHeading2": "You play\na role.",
+  "@htpHeading2": { "description": "Tutorial card 2 heading." },
+  "htpBody2": "A place. A role to play. Stay in character — vague answers smell like the spy.",
+  "@htpBody2": { "description": "Tutorial card 2 body. Tells civilians how to play." },
+
+  "htpStep3": "STEP 03 · THE SPY",
+  "@htpStep3": { "description": "Tutorial card 3 step label." },
+  "htpHeading3": "You don't\nknow where.",
+  "@htpHeading3": { "description": "Tutorial card 3 heading. Casual contraction." },
+  "htpBody3": "One of you sees this card. Listen, ask cunning questions, figure out the location. Or bluff.",
+  "@htpBody3": { "description": "Tutorial card 3 body. Tells the spy how to play." },
+
+  "htpStep4": "STEP 04 · THE ROUND",
+  "@htpStep4": { "description": "Tutorial card 4 step label." },
+  "htpHeading4": "Question\neach other.",
+  "@htpHeading4": { "description": "Tutorial card 4 heading." },
+  "htpBody4": "A few minutes per round. Specific enough to test the spy, vague enough not to hand them the location.",
+  "@htpBody4": { "description": "Tutorial card 4 body. The art of asking good questions." },
+
+  "htpStep5": "STEP 05 · CALLING IT",
+  "@htpStep5": { "description": "Tutorial card 5 step label." },
+  "htpHeading5": "Argue\nit out.",
+  "@htpHeading5": { "description": "Tutorial card 5 heading. Casual, two lines." },
+  "htpBody5": "Time's up — debate together. No in-app vote, just talk. Spy wins by staying hidden. Everyone else wins by exposing them.",
+  "@htpBody5": { "description": "Tutorial card 5 body. Resolution. Note: the app deliberately has no voting flow — the players debate themselves." },
+
+  "htpSkip": "SKIP",
+  "@htpSkip": { "description": "Top-right button on tutorial cards 1–4. All-caps." },
+
+  "htpNext": "NEXT",
+  "@htpNext": { "description": "Bottom-right button on tutorial cards 1–4. All-caps." },
+
+  "htpSwipe": "SWIPE",
+  "@htpSwipe": { "description": "Bottom-left hint on tutorial cards 1–4 with an animated chevron. All-caps." },
+
+  "htpDone": "GOT IT",
+  "@htpDone": { "description": "Final tutorial CTA on card 5. All-caps. Dismisses the tutorial." },
+
+  "htpVisualLocationUnknown": "Location: unknown.",
+  "@htpVisualLocationUnknown": { "description": "Text shown inside the mock spy role card on tutorial card 3." },
+
+  "htpVisualRoleExample": "Bartender",
+  "@htpVisualRoleExample": { "description": "Example role shown inside the mock civilian role card on tutorial card 2. Pick any natural everyday role for the locale." },
+
+  "htpVisualLocationExample": "Tiki Bar",
+  "@htpVisualLocationExample": { "description": "Example location shown inside the mock civilian role card on tutorial card 2. Pick any fun, slightly unusual venue for the locale." },
+
+  "htpVisualPerRound": "PER ROUND",
+  "@htpVisualPerRound": { "description": "Caption inside the timer ring on tutorial card 4. Mono caps." },
+
+  "htpVisualNoVote": "NO VOTE",
+  "@htpVisualNoVote": { "description": "Big mono caps text on tutorial card 5 visual. Emphasizes there's no voting flow." },
+
+  "htpVisualJustTalk": "JUST TALK",
+  "@htpVisualJustTalk": { "description": "Big mono caps text on tutorial card 5 visual. The resolution is conversation." },
+
+  "htpClose": "Close",
+  "@htpClose": { "description": "Tooltip for the close icon on the last tutorial card." },
+
+  "errorNetwork": "Connection lost. Please retry.",
+  "@errorNetwork": { "description": "Generic network failure shown to the user when the request couldn't reach the server." },
+
+  "errorRoomNotFound": "No room with that code. Check it and try again.",
+  "@errorRoomNotFound": { "description": "Shown after a join attempt with a code the server doesn't recognize." },
+
+  "errorRoomFull": "That room is no longer accepting players.",
+  "@errorRoomFull": { "description": "Shown when joining a room that has already started or is at capacity." },
+
+  "errorOnlyHost": "Only the host can do that.",
+  "@errorOnlyHost": { "description": "Shown when a non-host attempts a host-only action (start game, end round, etc.)." },
+
+  "errorUnknown": "Something went wrong.",
+  "@errorUnknown": { "description": "Generic last-resort fallback when no more specific error mapping applies." },
+
+  "langSelectorLabel": "LANGUAGE",
+  "@langSelectorLabel": { "description": "Header inside the language picker bottom sheet. Mono caps." },
+
+  "langNameEn": "English",
+  "@langNameEn": { "description": "Display name for the English locale, in its own language. Stays 'English'." },
+
+  "langNameTr": "Türkçe",
+  "@langNameTr": { "description": "Display name for the Turkish locale, in its own language. Stays 'Türkçe'." }
+}

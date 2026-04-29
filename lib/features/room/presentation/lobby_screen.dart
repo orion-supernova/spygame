@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../core/convex/server_time_provider.dart';
 import '../../../core/errors/app_exception.dart';
+import '../../../core/errors/error_messages.dart';
 import '../../../core/notifications/round_end_notifier.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/storage/identity_storage.dart';
@@ -14,6 +15,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
 import '../../../core/utils/haptics.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../data/room_providers.dart';
 import '../domain/room.dart';
 import 'widgets/config_panel.dart';
@@ -63,7 +65,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           .read(roomRepositoryProvider)
           .setReady(code: widget.code, ready: !current);
     } on AppException catch (e) {
-      _showError(e.message);
+      if (!mounted) return;
+      _showError(e.localizedMessage(context));
     }
   }
 
@@ -74,7 +77,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       await ref.read(roomRepositoryProvider).startGame(code: widget.code);
       await Haptics.success();
     } on AppException catch (e) {
-      _showError(e.message);
+      if (mounted) _showError(e.localizedMessage(context));
       await Haptics.warning();
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -96,10 +99,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     final origin = box != null
         ? box.localToGlobal(Offset.zero) & box.size
         : null;
+    final l10n = AppLocalizations.of(context);
     await Haptics.light();
     await Share.share(
-      'Join my "Where am I?" room. Code: ${widget.code}',
-      subject: 'Where am I? — Room ${widget.code}',
+      l10n.lobbyShareMessage(widget.code),
+      subject: l10n.lobbyShareSubject(widget.code),
       sharePositionOrigin: origin,
     );
   }
@@ -118,7 +122,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           .updateConfig(code: widget.code, config: next);
       await Haptics.selection();
     } on AppException catch (e) {
-      _showError(e.message);
+      if (!mounted) return;
+      _showError(e.localizedMessage(context));
     }
   }
 
@@ -150,13 +155,15 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 child: CircularProgressIndicator(color: AppColors.lime),
               ),
               error: (e, _) => _ErrorView(
-                message: e is AppException ? e.message : e.toString(),
+                message: e is AppException
+                    ? e.localizedMessage(context)
+                    : e.toString(),
                 onLeave: _leave,
               ),
               data: (room) {
                 if (room == null) {
                   return _ErrorView(
-                    message: 'This room is gone.',
+                    message: AppLocalizations.of(context).lobbyErrorRoomGone,
                     onLeave: _leave,
                   );
                 }
@@ -206,6 +213,7 @@ class _LobbyBody extends StatelessWidget {
     final isOwner = room.isOwner(myToken);
     final me = room.playerFor(myToken);
     final canStart = isOwner && room.allReady && room.players.length >= 3;
+    final l10n = AppLocalizations.of(context);
 
     final bottomPanelBuffer = isOwner ? 220.0 : 110.0;
 
@@ -226,7 +234,7 @@ class _LobbyBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'LOBBY',
+                        l10n.lobbyEyebrow,
                         style: AppTypography.mono(
                           size: 11,
                           weight: FontWeight.w600,
@@ -254,7 +262,7 @@ class _LobbyBody extends StatelessWidget {
                       RoomCodeChip(code: room.code),
                       const SizedBox(height: 12),
                       Text(
-                        'Tell friends the code or tap share.',
+                        l10n.lobbyShareHint,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.paperFaint,
                         ),
@@ -269,7 +277,7 @@ class _LobbyBody extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        'PLAYERS',
+                        l10n.lobbyPlayersLabel,
                         style: AppTypography.mono(
                           size: 11,
                           weight: FontWeight.w600,
@@ -279,7 +287,7 @@ class _LobbyBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '· ${room.players.length}/12',
+                        l10n.lobbyPlayersCount(room.players.length),
                         style: AppTypography.mono(
                           size: 11,
                           weight: FontWeight.w500,
@@ -353,15 +361,17 @@ class _LobbyBody extends StatelessWidget {
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: canStart && !busy ? onStart : null,
-                        child: Text(busy ? 'STARTING…' : 'START GAME'),
+                        child: Text(
+                          busy ? l10n.lobbyCtaStarting : l10n.lobbyCtaStart,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         canStart
-                            ? 'Everyone is ready. You\'re good to go.'
+                            ? l10n.lobbyStatusAllReady
                             : room.players.length < 3
-                            ? 'At least 3 players needed.'
-                            : 'Waiting for everyone to mark ready.',
+                            ? l10n.lobbyStatusNeedPlayers
+                            : l10n.lobbyStatusWaitingReady,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.paperFaint,
@@ -403,7 +413,10 @@ class _ErrorView extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 22),
-          OutlinedButton(onPressed: onLeave, child: const Text('GO HOME')),
+          OutlinedButton(
+            onPressed: onLeave,
+            child: Text(AppLocalizations.of(context).lobbyCtaGoHome),
+          ),
         ],
       ),
     );
