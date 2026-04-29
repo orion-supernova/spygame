@@ -198,136 +198,169 @@ class _LobbyBody extends StatelessWidget {
     final me = room.playerFor(myToken);
     final canStart = isOwner && room.allReady && room.players.length >= 3;
 
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: onLeave,
-                  icon: const Icon(Icons.close, color: AppColors.paper),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'LOBBY',
-                  style: AppTypography.mono(
-                    size: 11,
-                    weight: FontWeight.w600,
-                    letterSpacing: 2.4,
-                    color: AppColors.paperFaint,
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: onShare,
-                  icon: const Icon(Icons.ios_share, color: AppColors.paper),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-            child: Column(
-              children: [
-                RoomCodeChip(code: room.code),
-                const SizedBox(height: 12),
-                Text(
-                  'Tell friends the code or tap share.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.paperFaint,
+    final bottomPanelBuffer = isOwner ? 220.0 : 110.0;
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: onLeave,
+                        icon: const Icon(Icons.close, color: AppColors.paper),
                       ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          sliver: SliverToBoxAdapter(
-            child: Row(
-              children: [
-                Text(
-                  'PLAYERS',
-                  style: AppTypography.mono(
-                    size: 11,
-                    weight: FontWeight.w600,
-                    letterSpacing: 2,
-                    color: AppColors.paperFaint,
+                      const SizedBox(width: 4),
+                      Text(
+                        'LOBBY',
+                        style: AppTypography.mono(
+                          size: 11,
+                          weight: FontWeight.w600,
+                          letterSpacing: 2.4,
+                          color: AppColors.paperFaint,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: onShare,
+                        icon: const Icon(Icons.ios_share, color: AppColors.paper),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  '· ${room.players.length}/12',
-                  style: AppTypography.mono(
-                    size: 11,
-                    weight: FontWeight.w500,
-                    letterSpacing: 1.4,
-                    color: AppColors.paperFaint,
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                  child: Column(
+                    children: [
+                      RoomCodeChip(code: room.code),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Tell friends the code or tap share.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.paperFaint,
+                            ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                sliver: SliverToBoxAdapter(
+                  child: Row(
+                    children: [
+                      Text(
+                        'PLAYERS',
+                        style: AppTypography.mono(
+                          size: 11,
+                          weight: FontWeight.w600,
+                          letterSpacing: 2,
+                          color: AppColors.paperFaint,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '· ${room.players.length}/12',
+                        style: AppTypography.mono(
+                          size: 11,
+                          weight: FontWeight.w500,
+                          letterSpacing: 1.4,
+                          color: AppColors.paperFaint,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                sliver: SliverList.separated(
+                  itemBuilder: (context, i) {
+                    final p = room.players[i];
+                    return PlayerTile(player: p, isSelf: p.clientToken == myToken);
+                  },
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemCount: room.players.length,
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                  child: ConfigPanel(
+                    config: room.config,
+                    editable: isOwner,
+                    onChanged: onConfigChanged,
+                  ),
+                ),
+              ),
+              // Spacer so the last bit of content can scroll above the
+              // pinned action panel below.
+              SliverToBoxAdapter(child: SizedBox(height: bottomPanelBuffer)),
+            ],
           ),
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 12)),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          sliver: SliverList.separated(
-            itemBuilder: (context, i) {
-              final p = room.players[i];
-              return PlayerTile(player: p, isSelf: p.clientToken == myToken);
-            },
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemCount: room.players.length,
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
-            child: ConfigPanel(
-              config: room.config,
-              editable: isOwner,
-              onChanged: onConfigChanged,
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-            child: Column(
-              children: [
-                if (me != null)
-                  ReadyButton(
-                    ready: me.isReady,
-                    onToggle: onToggleReady,
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Fade signals that scrollable content extends below.
+              IgnorePointer(
+                child: Container(
+                  height: 32,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0x000B0D12), AppColors.ink],
+                    ),
                   ),
-                if (isOwner) ...[
-                  const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed: canStart && !busy ? onStart : null,
-                    child: Text(busy ? 'STARTING…' : 'START GAME'),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    canStart
-                        ? 'Everyone is ready. You\'re good to go.'
-                        : room.players.length < 3
-                            ? 'At least 3 players needed.'
-                            : 'Waiting for everyone to mark ready.',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: AppColors.paperFaint),
-                  ),
-                ],
-              ],
-            ),
+                ),
+              ),
+              Container(
+                color: AppColors.ink,
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                child: Column(
+                  children: [
+                    if (me != null)
+                      ReadyButton(
+                        ready: me.isReady,
+                        onToggle: onToggleReady,
+                      ),
+                    if (isOwner) ...[
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: canStart && !busy ? onStart : null,
+                        child: Text(busy ? 'STARTING…' : 'START GAME'),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        canStart
+                            ? 'Everyone is ready. You\'re good to go.'
+                            : room.players.length < 3
+                                ? 'At least 3 players needed.'
+                                : 'Waiting for everyone to mark ready.',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: AppColors.paperFaint),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],

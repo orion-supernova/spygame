@@ -24,8 +24,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     text: IdentityStorage.instance.lastDisplayName ?? '',
   );
   final _codeCtrl = TextEditingController();
-  bool _busy = false;
+  _BusyAction? _busyAction;
   String? _error;
+
+  bool get _busy => _busyAction != null;
 
   @override
   void dispose() {
@@ -39,13 +41,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return t.isNotEmpty && t.length <= 24;
   }
 
+  bool get _codeValid => _codeCtrl.text.trim().length == 4;
+
   Future<void> _create() async {
     if (!_nameValid) {
       setState(() => _error = 'Type a name first.');
       return;
     }
     setState(() {
-      _busy = true;
+      _busyAction = _BusyAction.create;
       _error = null;
     });
     final name = _nameCtrl.text.trim();
@@ -61,7 +65,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       setState(() => _error = e.message);
       await Haptics.warning();
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) setState(() => _busyAction = null);
     }
   }
 
@@ -76,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return;
     }
     setState(() {
-      _busy = true;
+      _busyAction = _BusyAction.join;
       _error = null;
     });
     final name = _nameCtrl.text.trim();
@@ -93,7 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       setState(() => _error = e.message);
       await Haptics.warning();
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) setState(() => _busyAction = null);
     }
   }
 
@@ -129,9 +133,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Pick a name',
+                    'Your codename',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: AppColors.paper,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Used to create or join a room.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.paperFaint,
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -156,7 +167,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         const Icon(Icons.add, size: 22),
                         const SizedBox(width: 10),
-                        Text(_busy ? 'PLEASE WAIT…' : 'CREATE A ROOM'),
+                        Text(
+                          _busyAction == _BusyAction.create
+                              ? 'PLEASE WAIT…'
+                              : 'CREATE A ROOM',
+                        ),
                       ],
                     ),
                   ),
@@ -204,9 +219,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onChanged: (_) => setState(() {}),
                   ),
                   const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: _busy || !_nameValid ? null : _join,
-                    child: const Text('JOIN ROOM'),
+                  if (!_nameValid)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        'Add a codename above to join.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.paperFaint,
+                        ),
+                      ),
+                    ),
+                  ElevatedButton(
+                    onPressed: _busy || !_nameValid || !_codeValid
+                        ? null
+                        : _join,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.login, size: 22),
+                        const SizedBox(width: 10),
+                        Text(
+                          _busyAction == _BusyAction.join
+                              ? 'PLEASE WAIT…'
+                              : 'JOIN ROOM',
+                        ),
+                      ],
+                    ),
                   ),
                   if (_error != null) ...[
                     const SizedBox(height: 18),
@@ -227,6 +266,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
+enum _BusyAction { create, join }
 
 class _UpperCaseFormatter extends TextInputFormatter {
   @override
