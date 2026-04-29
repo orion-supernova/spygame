@@ -132,6 +132,7 @@ export const startGame = mutation({
     const gameId = await ctx.db.insert('games', {
       roomId: room._id,
       status: 'active',
+      phase: 'playing',
       currentRoundIndex: 0,
       totalRounds: room.config.roundCount,
       usedLocationIds: [],
@@ -229,6 +230,7 @@ async function endRoundCore(
   if (nextIndex > game.totalRounds) {
     await ctx.db.patch(game._id, {
       status: 'ended',
+      phase: 'ended',
       currentRoundId: undefined,
     });
     await ctx.db.patch(room._id, { status: 'ended' });
@@ -243,13 +245,83 @@ async function endRoundCore(
     return;
   }
 
-  const endsAtMs = Date.now() + room.config.roundMinutes * 60_000;
-  await startNewRound({
-    ctx,
-    gameId: game._id,
-    index: nextIndex,
-    endsAtMs,
+  // Enter intermission: everyone needs to debrief and tap Ready before the
+  // next round starts. setReady (in rooms.ts) detects all-ready and
+  // transitions the game into 'starting' with a 3-second countdown.
+  await ctx.db.patch(game._id, {
+    phase: 'between',
+    nextRoundStartsAtMs: undefined,
   });
+  const allPlayers = await ctx.db
+    .query('players')
+    .withIndex('by_room', (q) => q.eq('roomId', game.roomId))
+    .collect();
+  for (const p of allPlayers) {
+    if (p.isReady) {
+      await ctx.db.patch(p._id, { isReady: false });
+    }
+  }
+}
+
+/**
+ * Called by the scheduler 3 seconds after `triggerIntermissionCountdown`
+ * flips the game into `phase='starting'`. Verifies the game is still in
+ * the expected state, then actually creates the next round.
+ */
+export const startNextQueuedRound = internalMutation({
+  args: {
+    gameId: v.id('games'),
+    expectedStartAtMs: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) return;
+    if (game.phase !== 'starting') return;
+    if (game.nextRoundStartsAtMs !== args.expectedStartAtMs) return;
+    const room = await ctx.db.get(game.roomId);
+    if (!room) return;
+
+    const endsAtMs = Date.now() + room.config.roundMinutes * 60_000;
+    await startNewRound({
+      ctx,
+      gameId: game._id,
+      index: game.currentRoundIndex + 1,
+      endsAtMs,
+    });
+    // startNewRound patches currentRoundId/currentRoundIndex; flip phase
+    // back to 'playing' and clear the countdown stamp.
+    await ctx.db.patch(game._id, {
+      phase: 'playing',
+      nextRoundStartsAtMs: undefined,
+    });
+  },
+});
+
+/**
+ * Called from `setReady` in rooms.ts when the last unreadied player flips
+ * their ready bit during the 'between' phase. Sets the 3-second countdown
+ * and schedules `startNextQueuedRound` to fire when it expires.
+ *
+ * Exported as a regular helper (not a mutation) so it can run inside the
+ * setReady mutation's transaction.
+ */
+export async function triggerIntermissionCountdown(
+  ctx: MutationCtx,
+  gameId: Id<'games'>,
+): Promise<void> {
+  const game = await ctx.db.get(gameId);
+  if (!game) return;
+  if (game.phase !== 'between') return;
+  const startsAtMs = Date.now() + 3_000;
+  await ctx.db.patch(gameId, {
+    phase: 'starting',
+    nextRoundStartsAtMs: startsAtMs,
+  });
+  await ctx.scheduler.runAfter(
+    3_000,
+    internal.games.startNextQueuedRound,
+    { gameId, expectedStartAtMs: startsAtMs },
+  );
 }
 
 export const endRoundInternal = internalMutation({

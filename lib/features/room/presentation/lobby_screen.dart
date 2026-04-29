@@ -81,17 +81,19 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   Future<void> _share() async {
-    await Haptics.light();
     // iOS requires a non-zero `sharePositionOrigin` rect within the source
     // view's coordinate space (iPad popover anchor; modern iOS enforces it
-    // on iPhone too). We use the screen's render box as a sane default.
+    // on iPhone too). Capture the box BEFORE the await to avoid using
+    // `context` across an async gap.
     final box = context.findRenderObject() as RenderBox?;
+    final origin = box != null
+        ? box.localToGlobal(Offset.zero) & box.size
+        : null;
+    await Haptics.light();
     await Share.share(
       'Join my "Where am I?" room. Code: ${widget.code}',
       subject: 'Where am I? — Room ${widget.code}',
-      sharePositionOrigin: box != null
-          ? box.localToGlobal(Offset.zero) & box.size
-          : null,
+      sharePositionOrigin: origin,
     );
   }
 

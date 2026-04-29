@@ -79,10 +79,6 @@ export const purgeRoom = internalMutation({
   handler: async (ctx, args) => {
     const room = await ctx.db.get(args.roomId);
     if (!room) return;
-    // Don't delete if a brand new game somehow used this room's id — won't
-    // happen with our flow (we never reset status from `ended`), but cheap
-    // safety check.
-    if (room.status !== 'ended') return;
     await cascadeDeleteRoom(ctx, args.roomId);
   },
 });
@@ -128,6 +124,75 @@ export const purgeStale = internalMutation({
         await cascadeDeleteRoom(ctx, room._id);
       }
     }
+  },
+});
+
+/**
+ * Sweep stranded child rows whose parent has been deleted (e.g. a room was
+ * manually removed from the dashboard without cascading). Safe to run any
+ * time — it only deletes rows whose foreign-key target is gone.
+ *
+ * Order matters: drop assignments + secrets first (point at rounds), then
+ * rounds (point at games), then games (point at rooms), then orphan
+ * players.
+ */
+export const purgeOrphans = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    let deleted = {
+      assignments: 0,
+      secrets: 0,
+      rounds: 0,
+      games: 0,
+      players: 0,
+    };
+
+    const assignments = await ctx.db.query('roundAssignments').collect();
+    for (const a of assignments) {
+      const round = await ctx.db.get(a.roundId);
+      if (!round) {
+        await ctx.db.delete(a._id);
+        deleted.assignments++;
+      }
+    }
+
+    const secrets = await ctx.db.query('roundSecrets').collect();
+    for (const s of secrets) {
+      const round = await ctx.db.get(s.roundId);
+      if (!round) {
+        await ctx.db.delete(s._id);
+        deleted.secrets++;
+      }
+    }
+
+    const rounds = await ctx.db.query('rounds').collect();
+    for (const r of rounds) {
+      const game = await ctx.db.get(r.gameId);
+      if (!game) {
+        await ctx.db.delete(r._id);
+        deleted.rounds++;
+      }
+    }
+
+    const games = await ctx.db.query('games').collect();
+    for (const g of games) {
+      const room = await ctx.db.get(g.roomId);
+      if (!room) {
+        await ctx.db.delete(g._id);
+        deleted.games++;
+      }
+    }
+
+    const players = await ctx.db.query('players').collect();
+    for (const p of players) {
+      const room = await ctx.db.get(p.roomId);
+      if (!room) {
+        await ctx.db.delete(p._id);
+        deleted.players++;
+      }
+    }
+
+    return deleted;
   },
 });
 

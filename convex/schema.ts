@@ -43,6 +43,21 @@ export default defineSchema({
   games: defineTable({
     roomId: v.id('rooms'),
     status: v.union(v.literal('active'), v.literal('ended')),
+    // Sub-state of an active game. Optional for backward-compat with rows
+    // created before this field existed; treat undefined as 'playing'.
+    //  - 'playing'   — a round is in progress
+    //  - 'between'   — round just ended; waiting for everyone to tap Ready
+    //  - 'starting'  — all ready, 3-second countdown until the next round
+    //  - 'ended'     — game is over (mirrors status='ended')
+    phase: v.optional(
+      v.union(
+        v.literal('playing'),
+        v.literal('between'),
+        v.literal('starting'),
+        v.literal('ended'),
+      ),
+    ),
+    nextRoundStartsAtMs: v.optional(v.number()),
     currentRoundIndex: v.number(),
     totalRounds: v.number(),
     usedLocationIds: v.array(v.id('locations')),

@@ -19,6 +19,8 @@ import 'controllers/countdown_controller.dart';
 import 'countdown_ring.dart';
 import 'location_grid.dart';
 import 'role_card.dart';
+import 'widgets/intermission_panel.dart';
+import 'widgets/starting_countdown.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key, required this.code});
@@ -173,23 +175,15 @@ class _GameBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final round = room.currentRound;
     final game = room.currentGame;
-    if (round == null || game == null) {
+    if (game == null) {
       return const Center(child: Text('Setting up round…'));
     }
 
     final isOwner = room.isOwner(myToken);
-    final totalMs = (round.endsAtMs - round.startedAtMs).clamp(1, 1 << 30);
-    final args = CountdownArgs(
-      endsAtServerMs: round.endsAtMs,
-      totalMs: totalMs,
-    );
-    final countdown = ref.watch(countdownControllerProvider(args));
-    final asyncRole = ref.watch(myRoleProvider(round.id));
+    final phase = game.phase;
+    final round = room.currentRound;
     final asyncBoard = ref.watch(locationsBoardProvider(room.code));
-
-    onSecondHaptic(countdown.seconds);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
@@ -199,6 +193,11 @@ class _GameBody extends ConsumerWidget {
           children: [
             IconButton(
               onPressed: () async {
+                final confirmed = await _confirmLeave(
+                  context,
+                  isOwner: isOwner,
+                );
+                if (!confirmed) return;
                 await ref
                     .read(roomRepositoryProvider)
                     .leaveRoom(code: room.code);
@@ -209,7 +208,7 @@ class _GameBody extends ConsumerWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              'ROUND ${round.index} OF ${game.totalRounds}',
+              _headerLabel(phase, game, round?.index),
               style: AppTypography.mono(
                 size: 11,
                 weight: FontWeight.w600,
@@ -220,41 +219,37 @@ class _GameBody extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: CountdownRing(
-            progress: countdown.progress,
-            seconds: countdown.seconds,
-            totalSeconds: (totalMs / 1000).round(),
-            label: round.isActive ? 'TIME REMAINING' : 'ROUND ENDED',
+        if (phase == GamePhase.between)
+          IntermissionPanel(
+            room: room,
+            myToken: myToken,
+            lastRoundIndex: round?.index ?? game.currentRoundIndex,
+            totalRounds: game.totalRounds,
+            onToggleReady: () async {
+              final me = room.playerFor(myToken);
+              await Haptics.selection();
+              await ref.read(roomRepositoryProvider).setReady(
+                    code: room.code,
+                    ready: !(me?.isReady ?? false),
+                  );
+            },
+          )
+        else if (phase == GamePhase.starting &&
+            game.nextRoundStartsAtMs != null)
+          StartingCountdown(
+            startsAtServerMs: game.nextRoundStartsAtMs!,
+            roundIndex: game.currentRoundIndex + 1,
+          )
+        else if (round != null) ...[
+          _PlayingBody(
+            room: room,
+            myToken: myToken,
+            round: round,
+            isOwner: isOwner,
+            onSecondHaptic: onSecondHaptic,
           ),
-        ),
-        const SizedBox(height: 24),
-        asyncRole.when(
-          loading: () => const SizedBox(
-            height: 220,
-            child: Center(
-                child: CircularProgressIndicator(color: AppColors.lime)),
-          ),
-          error: (_, __) => const RoleCard(role: null),
-          data: (role) => RoleCard(role: role),
-        ),
-        const SizedBox(height: 24),
-        if (isOwner) ...[
-          OutlinedButton.icon(
-            onPressed: round.isActive
-                ? () async {
-                    await Haptics.warning();
-                    await ref
-                        .read(roomRepositoryProvider)
-                        .endRoundManual(code: room.code);
-                  }
-                : null,
-            icon: const Icon(Icons.stop_circle_outlined),
-            label: const Text('END ROUND NOW'),
-          ),
-          const SizedBox(height: 24),
         ],
+        const SizedBox(height: 24),
         Text(
           'LOCATIONS',
           style: AppTypography.mono(
@@ -288,4 +283,118 @@ class _GameBody extends ConsumerWidget {
       ],
     );
   }
+
+  String _headerLabel(GamePhase phase, GameSnapshot game, int? roundIndex) {
+    switch (phase) {
+      case GamePhase.between:
+        return 'INTERMISSION · ROUND ${roundIndex ?? 0} OF ${game.totalRounds}';
+      case GamePhase.starting:
+        return 'GET READY · ROUND ${game.currentRoundIndex + 1} OF ${game.totalRounds}';
+      case GamePhase.ended:
+        return 'GAME OVER';
+      case GamePhase.playing:
+        return 'ROUND ${roundIndex ?? game.currentRoundIndex} OF ${game.totalRounds}';
+    }
+  }
+}
+
+class _PlayingBody extends ConsumerWidget {
+  const _PlayingBody({
+    required this.room,
+    required this.myToken,
+    required this.round,
+    required this.isOwner,
+    required this.onSecondHaptic,
+  });
+
+  final Room room;
+  final String myToken;
+  final RoundSnapshot round;
+  final bool isOwner;
+  final ValueChanged<int> onSecondHaptic;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final totalMs = (round.endsAtMs - round.startedAtMs).clamp(1, 1 << 30);
+    final args = CountdownArgs(
+      endsAtServerMs: round.endsAtMs,
+      totalMs: totalMs,
+    );
+    final countdown = ref.watch(countdownControllerProvider(args));
+    final asyncRole = ref.watch(myRoleProvider(round.id));
+    onSecondHaptic(countdown.seconds);
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: CountdownRing(
+            progress: countdown.progress,
+            seconds: countdown.seconds,
+            totalSeconds: (totalMs / 1000).round(),
+            label: round.isActive ? 'TIME REMAINING' : 'ROUND ENDED',
+          ),
+        ),
+        const SizedBox(height: 24),
+        asyncRole.when(
+          loading: () => const SizedBox(
+            height: 220,
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.lime),
+            ),
+          ),
+          error: (_, _) => const RoleCard(role: null),
+          data: (role) => RoleCard(role: role),
+        ),
+        if (isOwner) ...[
+          const SizedBox(height: 24),
+          OutlinedButton.icon(
+            onPressed: round.isActive
+                ? () async {
+                    await Haptics.warning();
+                    await ref
+                        .read(roomRepositoryProvider)
+                        .endRoundManual(code: room.code);
+                  }
+                : null,
+            icon: const Icon(Icons.stop_circle_outlined),
+            label: const Text('END ROUND NOW'),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+Future<bool> _confirmLeave(
+  BuildContext context, {
+  required bool isOwner,
+}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AppColors.inkRaised,
+      title: const Text('Leave game?'),
+      content: Text(
+        isOwner
+            ? 'You\'ll leave the round in progress. The game continues '
+                'for everyone else and host duties pass to another player. '
+                'You can\'t rejoin afterwards.'
+            : 'You\'ll leave the round in progress. The game continues '
+                'for everyone else, and you can\'t rejoin afterwards.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: const Text('STAY'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          style: TextButton.styleFrom(foregroundColor: AppColors.signalRed),
+          child: const Text('LEAVE'),
+        ),
+      ],
+    ),
+  );
+  return result ?? false;
 }

@@ -20,4 +20,13 @@ crons.interval(
   internal.maintenance.purgeStale,
 );
 
+// Daily belt-and-braces sweep for child rows whose parent disappeared
+// without cascading (e.g. a manual dashboard delete, or a future schema
+// change that adds a child table the cascade forgot about).
+crons.interval(
+  'purge orphan rows',
+  { hours: 24 },
+  internal.maintenance.purgeOrphans,
+);
+
 export default crons;

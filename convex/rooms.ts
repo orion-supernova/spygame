@@ -7,6 +7,7 @@ import {
   mutation,
   query,
 } from './_generated/server';
+import { triggerIntermissionCountdown } from './games';
 import { generateRoomCode, isValidCode, normalizeCode } from './helpers/code';
 
 const MAX_PLAYERS = 12;
@@ -174,7 +175,20 @@ export const setReady = mutation({
     const code = normalizeCode(args.code);
     const room = await findRoomByCode(ctx, code);
     if (!room) throw new ConvexError('Room not found.');
-    if (room.status !== 'lobby') return;
+
+    // Ready toggling is allowed in the lobby AND during between-rounds
+    // intermission. It's a no-op while a round is in flight (no UI for it
+    // anyway) and after the game has ended.
+    let inIntermission = false;
+    if (room.status === 'lobby') {
+      // ok
+    } else if (room.status === 'inGame' && room.currentGameId) {
+      const game = await ctx.db.get(room.currentGameId);
+      if (game?.phase !== 'between') return;
+      inIntermission = true;
+    } else {
+      return;
+    }
 
     const player = await ctx.db
       .query('players')
@@ -187,6 +201,16 @@ export const setReady = mutation({
       isReady: args.ready,
       lastSeenAt: Date.now(),
     });
+
+    // If we just flipped to ready during a between-rounds intermission AND
+    // every player is now ready, kick off the 3-second start countdown.
+    if (args.ready && inIntermission && room.currentGameId) {
+      const players = await getPlayers(ctx, room._id);
+      const allReady = players.every((p) => p.isReady);
+      if (allReady) {
+        await triggerIntermissionCountdown(ctx, room.currentGameId);
+      }
+    }
   },
 });
 
@@ -269,6 +293,8 @@ export const watchRoom = query({
         currentGame = {
           _id: game._id,
           status: game.status,
+          phase: game.phase ?? 'playing',
+          nextRoundStartsAtMs: game.nextRoundStartsAtMs ?? null,
           currentRoundIndex: game.currentRoundIndex,
           totalRounds: game.totalRounds,
           usedLocationIds: game.usedLocationIds,

@@ -59,12 +59,31 @@ class RoomMapper {
 
   static GameSnapshot? _gameFromJson(Object? raw) {
     if (raw is! Map) return null;
+    final phase = _phaseFromString(raw['phase']?.toString());
+    final nextStart = raw['nextRoundStartsAtMs'];
     return GameSnapshot(
       id: raw['_id']?.toString() ?? '',
       status: raw['status']?.toString() ?? 'active',
+      phase: phase,
+      nextRoundStartsAtMs:
+          (nextStart == null) ? null : _asInt(nextStart, 0),
       currentRoundIndex: _asInt(raw['currentRoundIndex'], 0),
       totalRounds: _asInt(raw['totalRounds'], 0),
     );
+  }
+
+  static GamePhase _phaseFromString(String? raw) {
+    switch (raw) {
+      case 'between':
+        return GamePhase.between;
+      case 'starting':
+        return GamePhase.starting;
+      case 'ended':
+        return GamePhase.ended;
+      case 'playing':
+      default:
+        return GamePhase.playing;
+    }
   }
 
   static RoundSnapshot? _roundFromJson(Object? raw) {

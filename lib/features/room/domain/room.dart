@@ -2,6 +2,10 @@ import 'package:meta/meta.dart';
 
 enum RoomStatus { lobby, inGame, ended }
 
+/// Sub-state of a game when `RoomStatus.inGame`. Drives which screen the
+/// game UI renders (round in progress vs intermission vs 3s countdown).
+enum GamePhase { playing, between, starting, ended }
+
 @immutable
 class GameConfig {
   const GameConfig({
@@ -77,12 +81,16 @@ class GameSnapshot {
   const GameSnapshot({
     required this.id,
     required this.status,
+    required this.phase,
+    required this.nextRoundStartsAtMs,
     required this.currentRoundIndex,
     required this.totalRounds,
   });
 
   final String id;
   final String status;
+  final GamePhase phase;
+  final int? nextRoundStartsAtMs;
   final int currentRoundIndex;
   final int totalRounds;
 }
