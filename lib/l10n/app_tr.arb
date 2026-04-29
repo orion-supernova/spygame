@@ -62,6 +62,11 @@
   "gameOverEyebrow": "OYUN BİTTİ",
   "gameTimeRemaining": "KALAN SÜRE",
   "gameRoundEnded": "TUR BİTTİ",
+  "intermissionRoundDone": "{round}. TUR BİTTİ",
+  "intermissionHeadline": "Mola. Hep birlikte konuşun.",
+  "intermissionPrompt": "{total} turluk oyunun {next}. turuna hazır olunca dokun.",
+  "intermissionReadyLabel": "HAZIR",
+
   "gameRoundStartsIn": "{round}. TUR BAŞLIYOR",
   "gameStartingGo": "BAŞLA",
   "gameStartingGetReady": "Hazır ol. Yeni rolün birazdan.",

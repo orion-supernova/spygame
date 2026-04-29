@@ -187,6 +187,27 @@
   "gameRoundEnded": "ROUND ENDED",
   "@gameRoundEnded": { "description": "Replaces TIME REMAINING when the round has finished but the screen is still showing the timer at zero. Mono caps." },
 
+  "intermissionRoundDone": "ROUND {round} DONE",
+  "@intermissionRoundDone": {
+    "description": "Mono caps eyebrow inside the between-rounds debrief panel. Mono caps.",
+    "placeholders": { "round": { "type": "int", "example": "2" } }
+  },
+
+  "intermissionHeadline": "Take a beat. Talk it out.",
+  "@intermissionHeadline": { "description": "Headline inside the intermission panel. Encourages players to debrief together before the next round." },
+
+  "intermissionPrompt": "Tap ready when you're set for round {next} of {total}.",
+  "@intermissionPrompt": {
+    "description": "Subtitle under the intermission headline. Tells players what to do next.",
+    "placeholders": {
+      "next": { "type": "int", "example": "3" },
+      "total": { "type": "int", "example": "5" }
+    }
+  },
+
+  "intermissionReadyLabel": "READY",
+  "@intermissionReadyLabel": { "description": "Mono caps label on the row that shows the running ready-count, e.g. 'READY  4 / 6'." },
+
   "gameRoundStartsIn": "ROUND {round} STARTS IN",
   "@gameRoundStartsIn": {
     "description": "Mono caps label inside the 3-second pre-round countdown box. Mono caps.",
