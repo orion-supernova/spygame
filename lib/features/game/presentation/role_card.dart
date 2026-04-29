@@ -26,16 +26,33 @@ class _RoleCardState extends State<RoleCard> with TickerProviderStateMixin {
   late final AnimationController _press = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 350),
-  )..addStatusListener((s) {
+  )
+    ..addStatusListener((s) {
       if (s == AnimationStatus.completed && !_revealed) {
         _revealed = true;
         Haptics.medium();
         _flip.forward();
         setState(() {});
       }
-    });
+    })
+    ..addListener(_tickHaptic);
 
   bool _revealed = false;
+  int _hapticStep = 0;
+
+  void _tickHaptic() {
+    if (_revealed) return;
+    // Convex curve so clicks bunch near completion — feels like a ratchet
+    // tightening as the ring fills.
+    final v = _press.value;
+    final step = (v * v * 12).floor();
+    if (step > _hapticStep) {
+      _hapticStep = step;
+      Haptics.selection();
+    } else if (step < _hapticStep) {
+      _hapticStep = step;
+    }
+  }
 
   @override
   void dispose() {
@@ -50,6 +67,7 @@ class _RoleCardState extends State<RoleCard> with TickerProviderStateMixin {
       _flip.reverse();
     }
     _press.reverse();
+    _hapticStep = 0;
     setState(() {});
   }
 
