@@ -319,6 +319,7 @@ export const watchRoom = query({
     return {
       _id: room._id,
       code: room.code,
+      serverNowMs: Date.now(),
       status: room.status,
       ownerToken: room.ownerToken,
       config: publicConfig(room),

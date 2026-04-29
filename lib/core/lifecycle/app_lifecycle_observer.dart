@@ -19,6 +19,13 @@ class _AppLifecycleHostState extends ConsumerState<AppLifecycleHost>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Warm the shared server-clock offset as soon as the app mounts. The
+    // lobby/game countdowns are short enough that waiting until navigation can
+    // expose device clock skew.
+    // ignore: discarded_futures
+    Future.microtask(
+      () => ref.read(serverTimeOffsetProvider.notifier).refresh(),
+    );
   }
 
   @override
@@ -41,5 +48,6 @@ class _AppLifecycleHostState extends ConsumerState<AppLifecycleHost>
   Widget build(BuildContext context) => widget.child;
 }
 
-final appLifecycleProvider =
-    StateProvider<AppLifecycleState>((_) => AppLifecycleState.resumed);
+final appLifecycleProvider = StateProvider<AppLifecycleState>(
+  (_) => AppLifecycleState.resumed,
+);

@@ -100,6 +100,8 @@ class Room {
   const Room({
     required this.id,
     required this.code,
+    required this.serverNowMs,
+    required this.receivedAtLocalMs,
     required this.status,
     required this.ownerToken,
     required this.config,
@@ -110,6 +112,8 @@ class Room {
 
   final String id;
   final String code;
+  final int serverNowMs;
+  final int receivedAtLocalMs;
   final RoomStatus status;
   final String ownerToken;
   final GameConfig config;
@@ -122,8 +126,7 @@ class Room {
 
   bool isOwner(String clientToken) => ownerToken == clientToken;
 
-  bool get allReady =>
-      players.isNotEmpty && players.every((p) => p.isReady);
+  bool get allReady => players.isNotEmpty && players.every((p) => p.isReady);
 }
 
 extension _FirstOrNull<T> on Iterable<T> {

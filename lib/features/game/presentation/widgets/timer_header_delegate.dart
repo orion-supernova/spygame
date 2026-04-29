@@ -33,22 +33,22 @@ class TimerHeaderDelegate extends SliverPersistentHeaderDelegate {
     final range = (maxExtent - minExtent).clamp(1.0, double.infinity);
     final t = (shrinkOffset / range).clamp(0.0, 1.0).toDouble();
 
-    final heroOpacity = (1 - t * 1.4).clamp(0.0, 1.0);
-    final chipOpacity = ((t - 0.35) / 0.65).clamp(0.0, 1.0);
+    final heroOpacity = (1 - (t / 0.35)).clamp(0.0, 1.0);
+    final chipOpacity = ((t - 0.35) / 0.35).clamp(0.0, 1.0);
 
-    return Container(
-      // Solid background so the chip reads cleanly over scrolling content.
-      color: const Color(0xFF0B0D12),
-      child: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          if (heroOpacity > 0)
+    return ClipRect(
+      child: Container(
+        // Solid background so the chip reads cleanly over scrolling content.
+        color: const Color(0xFF0B0D12),
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
             Positioned.fill(
               child: IgnorePointer(
                 child: Opacity(
                   opacity: heroOpacity,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Center(
                       child: CountdownRing(
                         progress: progress,
@@ -61,7 +61,6 @@ class TimerHeaderDelegate extends SliverPersistentHeaderDelegate {
                 ),
               ),
             ),
-          if (chipOpacity > 0)
             Positioned(
               left: 0,
               right: 0,
@@ -79,7 +78,8 @@ class TimerHeaderDelegate extends SliverPersistentHeaderDelegate {
                 ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

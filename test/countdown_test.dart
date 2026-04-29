@@ -8,11 +8,21 @@ import 'package:flutter_test/flutter_test.dart';
   required int serverNowMs,
 }) {
   final remaining = endsAtServerMs - serverNowMs;
-  final progress = totalMs <= 0
-      ? 0.0
-      : (remaining / totalMs).clamp(0.0, 1.0);
-  final seconds = (remaining / 1000).ceil().clamp(0, 99 * 60);
+  final progress = totalMs <= 0 ? 0.0 : (remaining / totalMs).clamp(0.0, 1.0);
+  final seconds = (remaining / 1000).ceil().clamp(0, (totalMs / 1000).ceil());
   return (remainingMs: remaining, progress: progress, seconds: seconds);
+}
+
+int deriveStartingSeconds({
+  required int startsAtServerMs,
+  required int offsetServerNowMs,
+  required int snapshotServerNowMs,
+}) {
+  final nowServer = offsetServerNowMs > snapshotServerNowMs
+      ? offsetServerNowMs
+      : snapshotServerNowMs;
+  final remainingMs = startsAtServerMs - nowServer;
+  return remainingMs <= 0 ? 0 : (((remainingMs - 1) ~/ 1000) + 1).clamp(0, 3);
 }
 
 void main() {
@@ -90,6 +100,28 @@ void main() {
         ).progress,
         0.0,
       );
+    });
+
+    test('never displays more than the configured round length', () {
+      const total = 60_000;
+      final r = deriveCountdown(
+        endsAtServerMs: 160_000,
+        totalMs: total,
+        serverNowMs: 97_000,
+      );
+      expect(r.remainingMs, 63_000);
+      expect(r.seconds, 60);
+    });
+  });
+
+  group('starting countdown derivation', () {
+    test('stale offset cannot inflate the 3 second intermission countdown', () {
+      final seconds = deriveStartingSeconds(
+        startsAtServerMs: 103_000,
+        offsetServerNowMs: 97_000,
+        snapshotServerNowMs: 100_000,
+      );
+      expect(seconds, 3);
     });
   });
 }

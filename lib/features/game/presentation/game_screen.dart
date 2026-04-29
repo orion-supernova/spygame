@@ -19,7 +19,6 @@ import 'controllers/countdown_controller.dart';
 import 'location_grid.dart';
 import 'role_card.dart';
 import 'widgets/intermission_panel.dart';
-import 'widgets/parallax_fade.dart';
 import 'widgets/scroll_hint.dart';
 import 'widgets/starting_countdown.dart';
 import 'widgets/timer_header_delegate.dart';
@@ -34,6 +33,7 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   String? _scheduledForRoundId;
+  String? _notifiedEndedRoundId;
   int _lastSecondHaptic = -1;
 
   @override
@@ -75,11 +75,22 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final offset = ref.read(serverTimeOffsetProvider);
     final nowServer = DateTime.now().millisecondsSinceEpoch + offset;
     if (nowServer >= round.endsAtMs && round.isActive) {
-      await ref.read(gameRepositoryProvider).endRoundIfDue(
-            roundId: round.id,
-            expectedEndsAtMs: round.endsAtMs,
-          );
+      await ref
+          .read(gameRepositoryProvider)
+          .endRoundIfDue(roundId: round.id, expectedEndsAtMs: round.endsAtMs);
     }
+  }
+
+  Future<void> _notifyRoundEnded(RoundSnapshot round) async {
+    if (_notifiedEndedRoundId == round.id) return;
+    _notifiedEndedRoundId = round.id;
+    await RoundEndNotifier.instance.showNow(
+      notificationId: 10_000 + round.index,
+      title: 'Round ended',
+      body: round.endedReason == 'manual'
+          ? 'Round ${round.index} was ended by the host.'
+          : 'Round ${round.index} just ended.',
+    );
   }
 
   @override
@@ -101,8 +112,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     });
 
     ref.listen(roomStreamProvider(widget.code), (prev, next) {
+      final previousRound = prev?.valueOrNull?.currentRound;
       next.whenData((room) async {
         if (room == null) return;
+        ref
+            .read(serverTimeOffsetProvider.notifier)
+            .observeServerNow(room.serverNowMs);
         if (room.status == RoomStatus.ended && mounted) {
           context.go(AppRoute.summaryFor(room.code));
           return;
@@ -111,8 +126,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         if (round != null && round.isActive) {
           await _scheduleEndNotification(round);
         } else if (round != null && !round.isActive) {
+          final shouldNotifyEnded =
+              _scheduledForRoundId == round.id ||
+              (previousRound?.id == round.id &&
+                  previousRound?.isActive == true);
           await RoundEndNotifier.instance.cancelAll();
           _scheduledForRoundId = null;
+          if (shouldNotifyEnded) {
+            await _notifyRoundEnded(round);
+          }
         }
       });
     });
@@ -213,16 +235,18 @@ class _GameBody extends ConsumerWidget {
             onToggleReady: () async {
               final me = room.playerFor(myToken);
               await Haptics.selection();
-              await ref.read(roomRepositoryProvider).setReady(
-                    code: room.code,
-                    ready: !(me?.isReady ?? false),
-                  );
+              await ref.read(serverTimeOffsetProvider.notifier).refresh();
+              await ref
+                  .read(roomRepositoryProvider)
+                  .setReady(code: room.code, ready: !(me?.isReady ?? false));
             },
           )
         else if (phase == GamePhase.starting &&
             game.nextRoundStartsAtMs != null)
           StartingCountdown(
             startsAtServerMs: game.nextRoundStartsAtMs!,
+            snapshotServerNowMs: room.serverNowMs,
+            snapshotReceivedAtLocalMs: room.receivedAtLocalMs,
             roundIndex: game.currentRoundIndex + 1,
           ),
         const SizedBox(height: 24),
@@ -237,10 +261,9 @@ class _GameBody extends ConsumerWidget {
         const SizedBox(height: 8),
         Text(
           'Played venues are crossed out.',
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(color: AppColors.paperFaint),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.paperFaint),
         ),
         const SizedBox(height: 14),
         asyncBoard.when(
@@ -250,10 +273,8 @@ class _GameBody extends ConsumerWidget {
               child: CircularProgressIndicator(color: AppColors.lime),
             ),
           ),
-          error: (e, _) => Text(
-            e.toString(),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          error: (e, _) =>
+              Text(e.toString(), style: Theme.of(context).textTheme.bodyMedium),
           data: (board) => LocationGrid(board: board),
         ),
       ],
@@ -293,9 +314,7 @@ class _TopBar extends ConsumerWidget {
           onPressed: () async {
             final confirmed = await _confirmLeave(context, isOwner: isOwner);
             if (!confirmed) return;
-            await ref
-                .read(roomRepositoryProvider)
-                .leaveRoom(code: room.code);
+            await ref.read(roomRepositoryProvider).leaveRoom(code: room.code);
             if (!context.mounted) return;
             context.go(AppRoute.home);
           },
@@ -339,8 +358,6 @@ class _PlayingScreen extends ConsumerStatefulWidget {
 class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
   final ScrollController _scroll = ScrollController();
   final GlobalKey _locationsHeaderKey = GlobalKey();
-  static const double _timerMinExtent = 64;
-  bool _snapping = false;
 
   @override
   void dispose() {
@@ -361,33 +378,6 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
     );
   }
 
-  /// Snap the scroll to either fully-hero (offset 0) or fully-collapsed
-  /// (offset = morphRange) so users never end up parked mid-transition.
-  bool _maybeSnap(double heroExtent) {
-    if (_snapping || !_scroll.hasClients) return false;
-    final offset = _scroll.offset;
-    final morphRange = heroExtent - _timerMinExtent;
-    if (offset <= 0.5 || offset >= morphRange - 0.5) return false;
-    final target = offset < morphRange / 2 ? 0.0 : morphRange;
-    _snapping = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!_scroll.hasClients) {
-        _snapping = false;
-        return;
-      }
-      try {
-        await _scroll.animateTo(
-          target,
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-        );
-      } finally {
-        _snapping = false;
-      }
-    });
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
     final round = widget.round;
@@ -401,20 +391,13 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
     final asyncBoard = ref.watch(locationsBoardProvider(widget.room.code));
     widget.onSecondHaptic(countdown.seconds);
 
-    final viewportH = MediaQuery.of(context).size.height;
-    final heroExtent = (viewportH * 0.32).clamp(220.0, 300.0);
+    final viewportW = MediaQuery.of(context).size.width;
+    final heroExtent = (viewportW - 24).clamp(260.0, 380.0);
 
-    final label =
-        round.isActive ? 'TIME REMAINING' : 'ROUND ENDED';
-    final roundLabel =
-        'ROUND ${round.index} OF ${widget.game.totalRounds}';
+    final label = round.isActive ? 'TIME REMAINING' : 'ROUND ENDED';
+    final roundLabel = 'ROUND ${round.index} OF ${widget.game.totalRounds}';
 
-    return NotificationListener<ScrollEndNotification>(
-      onNotification: (n) {
-        _maybeSnap(heroExtent);
-        return false;
-      },
-      child: CustomScrollView(
+    return CustomScrollView(
       controller: _scroll,
       physics: const BouncingScrollPhysics(),
       slivers: [
@@ -439,47 +422,38 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
           ),
         ),
         SliverToBoxAdapter(
-          child: ParallaxFade(
-            controller: _scroll,
-            fadeRange: heroExtent * 0.7,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-              child: Column(
-                children: [
-                  asyncRole.when(
-                    loading: () => const SizedBox(
-                      height: 220,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.lime,
-                        ),
-                      ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+            child: Column(
+              children: [
+                asyncRole.when(
+                  loading: () => const SizedBox(
+                    height: 220,
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.lime),
                     ),
-                    error: (_, _) => const RoleCard(role: null),
-                    data: (role) => RoleCard(role: role),
                   ),
-                  if (widget.isOwner) ...[
-                    const SizedBox(height: 20),
-                    OutlinedButton.icon(
-                      onPressed: round.isActive
-                          ? () async {
-                              await Haptics.warning();
-                              await ref
-                                  .read(roomRepositoryProvider)
-                                  .endRoundManual(code: widget.room.code);
-                            }
-                          : null,
-                      icon: const Icon(Icons.stop_circle_outlined),
-                      label: const Text('END ROUND NOW'),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  ScrollHint(
-                    onTap: _scrollToLocations,
-                    opacity: 1.0,
+                  error: (_, _) => const RoleCard(role: null),
+                  data: (role) => RoleCard(role: role),
+                ),
+                if (widget.isOwner) ...[
+                  const SizedBox(height: 20),
+                  OutlinedButton.icon(
+                    onPressed: round.isActive
+                        ? () async {
+                            await Haptics.warning();
+                            await ref
+                                .read(roomRepositoryProvider)
+                                .endRoundManual(code: widget.room.code);
+                          }
+                        : null,
+                    icon: const Icon(Icons.stop_circle_outlined),
+                    label: const Text('END ROUND NOW'),
                   ),
                 ],
-              ),
+                const SizedBox(height: 8),
+                ScrollHint(onTap: _scrollToLocations, opacity: 1.0),
+              ],
             ),
           ),
         ),
@@ -501,10 +475,9 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Played venues are crossed out.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: AppColors.paperFaint),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.paperFaint),
                 ),
               ],
             ),
@@ -534,7 +507,6 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
           ),
         ),
       ],
-      ),
     );
   }
 }
@@ -551,10 +523,10 @@ Future<bool> _confirmLeave(
       content: Text(
         isOwner
             ? 'You\'ll leave the round in progress. The game continues '
-                'for everyone else and host duties pass to another player. '
-                'You can\'t rejoin afterwards.'
+                  'for everyone else and host duties pass to another player. '
+                  'You can\'t rejoin afterwards.'
             : 'You\'ll leave the round in progress. The game continues '
-                'for everyone else, and you can\'t rejoin afterwards.',
+                  'for everyone else, and you can\'t rejoin afterwards.',
       ),
       actions: [
         TextButton(

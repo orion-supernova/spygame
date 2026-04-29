@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/convex/server_time_provider.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../core/notifications/round_end_notifier.dart';
 import '../../../core/router/app_router.dart';
@@ -38,6 +39,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     // Lazy permission ask once we're inside a room.
     // ignore: discarded_futures
     RoundEndNotifier.instance.requestPermissionIfNeeded();
+    // ignore: discarded_futures
+    Future.microtask(
+      () => ref.read(serverTimeOffsetProvider.notifier).refresh(),
+    );
     _heartbeat = Timer.periodic(const Duration(seconds: 15), (_) {
       // ignore: discarded_futures
       ref.read(roomRepositoryProvider).heartbeat(code: widget.code);
@@ -53,6 +58,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   Future<void> _toggleReady(bool current) async {
     await Haptics.selection();
     try {
+      await ref.read(serverTimeOffsetProvider.notifier).refresh();
       await ref
           .read(roomRepositoryProvider)
           .setReady(code: widget.code, ready: !current);
@@ -64,6 +70,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   Future<void> _start() async {
     setState(() => _busy = true);
     try {
+      await ref.read(serverTimeOffsetProvider.notifier).refresh();
       await ref.read(roomRepositoryProvider).startGame(code: widget.code);
       await Haptics.success();
     } on AppException catch (e) {
@@ -99,9 +106,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   void _showError(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _onConfigChanged(GameConfig next) async {
@@ -123,6 +130,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     ref.listen(roomStreamProvider(widget.code), (prev, next) {
       next.whenData((room) {
         if (room == null) return;
+        ref
+            .read(serverTimeOffsetProvider.notifier)
+            .observeServerNow(room.serverNowMs);
         if (room.status == RoomStatus.inGame && mounted) {
           context.go(AppRoute.gameFor(room.code));
         }
@@ -154,9 +164,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   room: room,
                   myToken: myToken,
                   busy: _busy,
-                  onToggleReady: () => _toggleReady(
-                    room.playerFor(myToken)?.isReady ?? false,
-                  ),
+                  onToggleReady: () =>
+                      _toggleReady(room.playerFor(myToken)?.isReady ?? false),
                   onStart: _start,
                   onShare: _share,
                   onLeave: _leave,
@@ -228,7 +237,10 @@ class _LobbyBody extends StatelessWidget {
                       const Spacer(),
                       IconButton(
                         onPressed: onShare,
-                        icon: const Icon(Icons.ios_share, color: AppColors.paper),
+                        icon: const Icon(
+                          Icons.ios_share,
+                          color: AppColors.paper,
+                        ),
                       ),
                     ],
                   ),
@@ -244,8 +256,8 @@ class _LobbyBody extends StatelessWidget {
                       Text(
                         'Tell friends the code or tap share.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.paperFaint,
-                            ),
+                          color: AppColors.paperFaint,
+                        ),
                       ),
                     ],
                   ),
@@ -285,7 +297,10 @@ class _LobbyBody extends StatelessWidget {
                 sliver: SliverList.separated(
                   itemBuilder: (context, i) {
                     final p = room.players[i];
-                    return PlayerTile(player: p, isSelf: p.clientToken == myToken);
+                    return PlayerTile(
+                      player: p,
+                      isSelf: p.clientToken == myToken,
+                    );
                   },
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemCount: room.players.length,
@@ -333,10 +348,7 @@ class _LobbyBody extends StatelessWidget {
                 child: Column(
                   children: [
                     if (me != null)
-                      ReadyButton(
-                        ready: me.isReady,
-                        onToggle: onToggleReady,
-                      ),
+                      ReadyButton(ready: me.isReady, onToggle: onToggleReady),
                     if (isOwner) ...[
                       const SizedBox(height: 12),
                       ElevatedButton(
@@ -348,13 +360,12 @@ class _LobbyBody extends StatelessWidget {
                         canStart
                             ? 'Everyone is ready. You\'re good to go.'
                             : room.players.length < 3
-                                ? 'At least 3 players needed.'
-                                : 'Waiting for everyone to mark ready.',
+                            ? 'At least 3 players needed.'
+                            : 'Waiting for everyone to mark ready.',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(color: AppColors.paperFaint),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.paperFaint,
+                        ),
                       ),
                     ],
                   ],
@@ -380,8 +391,11 @@ class _ErrorView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.report_gmailerrorred,
-              color: AppColors.signalRed, size: 36),
+          const Icon(
+            Icons.report_gmailerrorred,
+            color: AppColors.signalRed,
+            size: 36,
+          ),
           const SizedBox(height: 12),
           Text(
             message,
