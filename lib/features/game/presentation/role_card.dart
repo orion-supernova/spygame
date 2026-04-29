@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/haptics.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../domain/role.dart';
 
 /// Press-and-hold to reveal so a glance at someone else's screen doesn't leak
@@ -25,16 +26,33 @@ class _RoleCardState extends State<RoleCard> with TickerProviderStateMixin {
   late final AnimationController _press = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 350),
-  )..addStatusListener((s) {
+  )
+    ..addStatusListener((s) {
       if (s == AnimationStatus.completed && !_revealed) {
         _revealed = true;
         Haptics.medium();
         _flip.forward();
         setState(() {});
       }
-    });
+    })
+    ..addListener(_tickHaptic);
 
   bool _revealed = false;
+  int _hapticStep = 0;
+
+  void _tickHaptic() {
+    if (_revealed) return;
+    // Convex curve so clicks bunch near completion — feels like a ratchet
+    // tightening as the ring fills.
+    final v = _press.value;
+    final step = (v * v * 12).floor();
+    if (step > _hapticStep) {
+      _hapticStep = step;
+      Haptics.selection();
+    } else if (step < _hapticStep) {
+      _hapticStep = step;
+    }
+  }
 
   @override
   void dispose() {
@@ -49,6 +67,7 @@ class _RoleCardState extends State<RoleCard> with TickerProviderStateMixin {
       _flip.reverse();
     }
     _press.reverse();
+    _hapticStep = 0;
     setState(() {});
   }
 
@@ -142,7 +161,7 @@ class _Back extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            'YOUR ROLE',
+            AppLocalizations.of(context).roleBackEyebrow,
             style: AppTypography.mono(
               size: 12,
               weight: FontWeight.w600,
@@ -152,7 +171,7 @@ class _Back extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'PRESS & HOLD TO REVEAL',
+            AppLocalizations.of(context).roleBackHint,
             style: AppTypography.mono(
               size: 11,
               weight: FontWeight.w500,
@@ -172,6 +191,7 @@ class _Front extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (role == null) {
       return Container(
         height: 220,
@@ -210,7 +230,7 @@ class _Front extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isSpy ? 'COVER ROLE' : 'YOU ARE',
+                isSpy ? l10n.roleFrontCover : l10n.roleFrontYouAre,
                 style: AppTypography.mono(
                   size: 11,
                   weight: FontWeight.w600,
@@ -223,7 +243,7 @@ class _Front extends StatelessWidget {
           const Spacer(),
           if (isSpy) ...[
             Text(
-              'THE SPY',
+              l10n.roleTheSpy,
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
                     color: AppColors.signalRed,
                     fontWeight: FontWeight.w800,
@@ -232,7 +252,7 @@ class _Front extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'You don\'t know the location.\nAsk questions, blend in, figure it out.',
+              l10n.roleSpySubtitle,
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -248,7 +268,7 @@ class _Front extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'AT',
+              l10n.roleFrontAt,
               style: AppTypography.mono(
                 size: 11,
                 weight: FontWeight.w600,
@@ -266,7 +286,7 @@ class _Front extends StatelessWidget {
           ],
           const Spacer(),
           Text(
-            'release to hide',
+            l10n.roleReleaseToHide,
             style: AppTypography.mono(
               size: 10,
               weight: FontWeight.w500,

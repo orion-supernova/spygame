@@ -16,6 +16,35 @@ const MIN_PLAYERS_TO_START = 3;
 
 type AnyCtx = QueryCtx | MutationCtx;
 
+// Locale projection — the only locales the server ever talks. Optional on
+// public queries so legacy clients without the arg keep working (English).
+const LOCALE_VALIDATOR = v.optional(v.union(v.literal('en'), v.literal('tr')));
+type Locale = 'en' | 'tr';
+
+function localizeLocation(
+  loc: Doc<'locations'>,
+  locale: Locale | undefined,
+): { name: string; roles: string[] } {
+  if (locale === 'tr' && loc.translations?.tr) {
+    return loc.translations.tr;
+  }
+  return { name: loc.name, roles: loc.roles };
+}
+
+// English role string is the stable key we store in `roundAssignments`.
+// Find it by index in `loc.roles`, then read the same index from the
+// localized roles array. Falls back to English for any mismatch.
+function localizeRole(
+  loc: Doc<'locations'>,
+  englishRole: string,
+  locale: Locale | undefined,
+): string {
+  if (locale !== 'tr' || !loc.translations?.tr) return englishRole;
+  const idx = loc.roles.indexOf(englishRole);
+  if (idx < 0) return englishRole;
+  return loc.translations.tr.roles[idx] ?? englishRole;
+}
+
 async function findRoomByCode(
   ctx: AnyCtx,
   code: string,
@@ -356,6 +385,7 @@ export const getMyRole = query({
   args: {
     roundId: v.id('rounds'),
     clientToken: v.string(),
+    locale: LOCALE_VALIDATOR,
   },
   handler: async (ctx, args) => {
     const round = await ctx.db.get(args.roundId);
@@ -381,9 +411,18 @@ export const getMyRole = query({
       .first();
     if (!secret) return null;
     const location = await ctx.db.get(secret.locationId);
+    if (!location) {
+      return {
+        role: assignment.role,
+        location: null,
+        roundIndex: round.index,
+      };
+    }
+    const localizedName = localizeLocation(location, args.locale).name;
+    const localizedRole = localizeRole(location, assignment.role, args.locale);
     return {
-      role: assignment.role,
-      location: location ? { _id: location._id, name: location.name } : null,
+      role: localizedRole,
+      location: { _id: location._id, name: localizedName },
       roundIndex: round.index,
     };
   },
@@ -395,14 +434,17 @@ export const getMyRole = query({
  * trivially expose the current location to the spy).
  */
 export const watchLocations = query({
-  args: { code: v.string() },
+  args: { code: v.string(), locale: LOCALE_VALIDATOR },
   handler: async (ctx, args) => {
     const code = normalizeCode(args.code);
     const room = await findRoomByCode(ctx, code);
     if (!room || !room.currentGameId) {
       const locs = await ctx.db.query('locations').collect();
       return {
-        locations: locs.map((l) => ({ _id: l._id, name: l.name })),
+        locations: locs.map((l) => ({
+          _id: l._id,
+          name: localizeLocation(l, args.locale).name,
+        })),
         playedIds: [] as Id<'locations'>[],
       };
     }
@@ -432,7 +474,10 @@ export const watchLocations = query({
 
     const locs = await ctx.db.query('locations').collect();
     return {
-      locations: locs.map((l) => ({ _id: l._id, name: l.name })),
+      locations: locs.map((l) => ({
+        _id: l._id,
+        name: localizeLocation(l, args.locale).name,
+      })),
       playedIds,
     };
   },

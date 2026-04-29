@@ -92,8 +92,22 @@ export default defineSchema({
   })
     .index('by_round_and_token', ['roundId', 'clientToken']),
 
+  // `name` and `roles` are the canonical English values. `translations` is
+  // optional and added per locale; missing entries fall back to English on
+  // read. Role array length and ORDER must match `roles` exactly — server
+  // looks up role index in English to project the localized variant.
   locations: defineTable({
     name: v.string(),
     roles: v.array(v.string()),
+    translations: v.optional(
+      v.object({
+        tr: v.optional(
+          v.object({
+            name: v.string(),
+            roles: v.array(v.string()),
+          }),
+        ),
+      }),
+    ),
   }),
 });

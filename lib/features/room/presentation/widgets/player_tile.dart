@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/room.dart';
 import 'avatar_glyph.dart';
 
@@ -17,6 +18,7 @@ class PlayerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 240),
       curve: Curves.easeOutCubic,
@@ -63,7 +65,7 @@ class PlayerTile extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'HOST',
+                          l10n.playerHostBadge,
                           style: AppTypography.mono(
                             size: 9,
                             weight: FontWeight.w700,
@@ -76,7 +78,7 @@ class PlayerTile extends StatelessWidget {
                     if (isSelf) ...[
                       const SizedBox(width: 6),
                       Text(
-                        'YOU',
+                        l10n.playerSelfBadge,
                         style: AppTypography.mono(
                           size: 9,
                           weight: FontWeight.w700,
@@ -89,7 +91,7 @@ class PlayerTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  player.isReady ? 'Ready' : 'Standing by…',
+                  player.isReady ? l10n.playerReady : l10n.playerStandby,
                   style: AppTypography.mono(
                     size: 11,
                     weight: FontWeight.w500,

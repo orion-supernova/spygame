@@ -8,6 +8,8 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
+import '../../../l10n/generated/app_localizations.dart';
+import 'widgets/language_button.dart';
 
 class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
@@ -32,6 +34,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final configured =
         AppConvexConfig.isConfigured && ConvexBootstrap.isInitialized;
 
@@ -48,7 +51,14 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _Eyebrow(text: 'A PARTY GAME'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _Eyebrow(text: l10n.welcomeEyebrow),
+                      const LanguageButton(),
+                    ],
+                  ),
                   const SizedBox(height: 18),
                   FadeTransition(
                     opacity: _intro,
@@ -63,7 +73,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                         ),
                       ),
                       child: Text(
-                        'Where am\nI?',
+                        l10n.welcomeTitle,
                         style: theme.textTheme.displayLarge?.copyWith(
                           fontSize: 76,
                           height: 0.95,
@@ -74,7 +84,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                   ),
                   const SizedBox(height: 22),
                   Text(
-                    'Everyone shares a secret location.\nOne of you doesn\'t. Find them — or blend in.',
+                    l10n.welcomeSubtitle,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: AppColors.paperMuted,
                     ),
@@ -87,7 +97,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                       children: [
                         ElevatedButton(
                           onPressed: () => context.go(AppRoute.home),
-                          child: const Text('GET STARTED'),
+                          child: Text(l10n.welcomeCtaGetStarted),
                         ),
                         const SizedBox(height: 6),
                         TextButton(
@@ -96,7 +106,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'HOW TO PLAY',
+                                l10n.welcomeCtaHowToPlay,
                                 style: AppTypography.mono(
                                   size: 11,
                                   weight: FontWeight.w600,
@@ -115,7 +125,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '3 to 12 players. No accounts. Pass-and-play friendly.',
+                          l10n.welcomeFootnote,
                           textAlign: TextAlign.center,
                           style: AppTypography.mono(
                             size: 11,
@@ -167,6 +177,7 @@ class _Eyebrow extends StatelessWidget {
 class _ConfigBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -183,7 +194,7 @@ class _ConfigBanner extends StatelessWidget {
                   color: AppColors.amber, size: 20),
               const SizedBox(width: 8),
               Text(
-                'CONVEX_URL not set',
+                l10n.welcomeConfigBannerTitle,
                 style: AppTypography.mono(
                   size: 12,
                   weight: FontWeight.w600,
@@ -195,7 +206,7 @@ class _ConfigBanner extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Provision a Convex deployment, then run:',
+            l10n.welcomeConfigBannerBody,
             style: Theme.of(context)
                 .textTheme
                 .bodyMedium

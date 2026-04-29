@@ -6,6 +6,7 @@ import '../../../../core/convex/server_time_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/haptics.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 /// Big "Starting in 3..." number, server-time driven so every device
 /// counts down to the same instant. Uses the shared serverTimeOffset so
@@ -75,6 +76,7 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
     }
 
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
@@ -86,7 +88,7 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
       child: Column(
         children: [
           Text(
-            'ROUND ${widget.roundIndex} STARTS IN',
+            l10n.gameRoundStartsIn(widget.roundIndex),
             style: AppTypography.mono(
               size: 11,
               weight: FontWeight.w600,
@@ -102,7 +104,7 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
               child: FadeTransition(opacity: anim, child: child),
             ),
             child: Text(
-              seconds == 0 ? 'GO' : '$seconds',
+              seconds == 0 ? l10n.gameStartingGo : '$seconds',
               key: ValueKey<int>(seconds),
               style: AppTypography.mono(
                 size: 96,
@@ -113,7 +115,7 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
           ),
           const SizedBox(height: 14),
           Text(
-            'Get ready. New role in a moment.',
+            l10n.gameStartingGetReady,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.paperMuted,
             ),

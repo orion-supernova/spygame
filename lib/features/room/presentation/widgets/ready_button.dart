@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 class ReadyButton extends StatelessWidget {
   const ReadyButton({
@@ -43,7 +44,11 @@ class ReadyButton extends StatelessWidget {
               if (ready)
                 const Icon(Icons.check_rounded, color: AppColors.ink),
               if (ready) const SizedBox(width: 8),
-              Text(ready ? "I'M READY" : 'TAP WHEN READY'),
+              Text(
+                ready
+                    ? AppLocalizations.of(context).readyYes
+                    : AppLocalizations.of(context).readyNo,
+              ),
             ],
           ),
         ),

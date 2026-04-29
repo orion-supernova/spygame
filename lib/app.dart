@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/lifecycle/app_lifecycle_observer.dart';
+import 'core/providers/locale_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'l10n/generated/app_localizations.dart';
 
 class WhereAmIApp extends ConsumerWidget {
   const WhereAmIApp({super.key});
@@ -11,6 +13,7 @@ class WhereAmIApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    final locale = ref.watch(localeProvider);
     return AppLifecycleHost(
       child: MaterialApp.router(
         title: 'Where am I?',
@@ -18,6 +21,9 @@ class WhereAmIApp extends ConsumerWidget {
         theme: AppTheme.dark(),
         darkTheme: AppTheme.dark(),
         themeMode: ThemeMode.dark,
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
         routerConfig: router,
       ),
     );

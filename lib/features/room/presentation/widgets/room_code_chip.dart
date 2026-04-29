@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/haptics.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 class RoomCodeChip extends StatefulWidget {
   const RoomCodeChip({super.key, required this.code});
@@ -28,6 +29,7 @@ class _RoomCodeChipState extends State<RoomCodeChip>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTap: _copy,
       child: AnimatedContainer(
@@ -47,7 +49,7 @@ class _RoomCodeChipState extends State<RoomCodeChip>
         child: Column(
           children: [
             Text(
-              'ROOM CODE',
+              l10n.roomCodeLabel,
               style: AppTypography.mono(
                 size: 11,
                 weight: FontWeight.w600,
@@ -77,7 +79,7 @@ class _RoomCodeChipState extends State<RoomCodeChip>
                             size: 16, color: AppColors.lime),
                         const SizedBox(width: 6),
                         Text(
-                          'COPIED',
+                          l10n.roomCodeCopied,
                           style: AppTypography.mono(
                             size: 11,
                             weight: FontWeight.w600,
@@ -95,7 +97,7 @@ class _RoomCodeChipState extends State<RoomCodeChip>
                             size: 14, color: AppColors.paperFaint),
                         const SizedBox(width: 6),
                         Text(
-                          'TAP TO COPY',
+                          l10n.roomCodeCopyHint,
                           style: AppTypography.mono(
                             size: 11,
                             weight: FontWeight.w600,

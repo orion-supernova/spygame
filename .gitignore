@@ -39,6 +39,9 @@ migrate_working_dir/
 node_modules/
 convex/_generated/
 
+# Flutter generated localizations
+lib/l10n/generated/
+
 # Symbolication related
 app.*.symbols
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../room/domain/room.dart';
 import '../../../room/presentation/widgets/player_tile.dart';
 import '../../../room/presentation/widgets/ready_button.dart';
@@ -30,6 +31,8 @@ class IntermissionPanel extends StatelessWidget {
     final me = room.playerFor(myToken);
     final readyCount = room.players.where((p) => p.isReady).length;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final shownTotal = totalRounds > 0 ? totalRounds : lastRoundIndex + 1;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -43,7 +46,7 @@ class IntermissionPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'ROUND $lastRoundIndex DONE',
+            l10n.intermissionRoundDone(lastRoundIndex),
             style: AppTypography.mono(
               size: 11,
               weight: FontWeight.w600,
@@ -53,14 +56,13 @@ class IntermissionPanel extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Take a beat. Talk it out.',
+            l10n.intermissionHeadline,
             style: theme.textTheme.headlineSmall
                 ?.copyWith(color: AppColors.paper, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
           Text(
-            'Tap ready when you\'re set for round ${lastRoundIndex + 1}'
-            '${totalRounds > 0 ? ' of $totalRounds' : ''}.',
+            l10n.intermissionPrompt(lastRoundIndex + 1, shownTotal),
             style: theme.textTheme.bodyMedium
                 ?.copyWith(color: AppColors.paperMuted),
           ),
@@ -75,7 +77,7 @@ class IntermissionPanel extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'READY',
+                  l10n.intermissionReadyLabel,
                   style: AppTypography.mono(
                     size: 10,
                     weight: FontWeight.w600,

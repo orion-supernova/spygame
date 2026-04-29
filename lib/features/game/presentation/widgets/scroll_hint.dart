@@ -11,7 +11,7 @@ class ScrollHint extends StatefulWidget {
     super.key,
     required this.onTap,
     required this.opacity,
-    this.label = 'See locations',
+    required this.label,
   });
 
   final VoidCallback onTap;

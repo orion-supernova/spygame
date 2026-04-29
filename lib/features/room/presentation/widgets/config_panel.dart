@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/haptics.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/room.dart';
 
 class ConfigPanel extends StatelessWidget {
@@ -19,6 +20,7 @@ class ConfigPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -32,7 +34,7 @@ class ConfigPanel extends StatelessWidget {
           Row(
             children: [
               Text(
-                'GAME SETTINGS',
+                l10n.configEyebrow,
                 style: AppTypography.mono(
                   size: 11,
                   weight: FontWeight.w600,
@@ -43,7 +45,7 @@ class ConfigPanel extends StatelessWidget {
               const SizedBox(width: 8),
               if (!editable)
                 Text(
-                  '· host only',
+                  l10n.configHostOnly,
                   style: AppTypography.mono(
                     size: 11,
                     weight: FontWeight.w500,
@@ -55,7 +57,7 @@ class ConfigPanel extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           _Row(
-            label: 'Spies',
+            label: l10n.configLabelSpies,
             value: '${config.spyCount}',
             onMinus: editable && config.spyCount > 1
                 ? () => onChanged(
@@ -70,7 +72,7 @@ class ConfigPanel extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _Row(
-            label: 'Round minutes',
+            label: l10n.configLabelRoundMinutes,
             value: '${config.roundMinutes}',
             onMinus: editable && config.roundMinutes > 1
                 ? () => onChanged(
@@ -85,7 +87,7 @@ class ConfigPanel extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _Row(
-            label: 'Rounds',
+            label: l10n.configLabelRounds,
             value: '${config.roundCount}',
             onMinus: editable && config.roundCount > 1
                 ? () => onChanged(
