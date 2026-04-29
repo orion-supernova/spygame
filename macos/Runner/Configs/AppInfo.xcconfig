@@ -8,7 +8,7 @@
 PRODUCT_NAME = spygame
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.spygame
+PRODUCT_BUNDLE_IDENTIFIER = com.walhallaa.spygame.v202604
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.

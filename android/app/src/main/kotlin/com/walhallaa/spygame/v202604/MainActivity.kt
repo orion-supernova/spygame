@@ -1,4 +1,4 @@
-package com.example.spygame
+package com.walhallaa.spygame.v202604
 
 import io.flutter.embedding.android.FlutterActivity
 
