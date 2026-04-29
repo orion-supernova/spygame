@@ -293,12 +293,15 @@ run_with_spinner "Exporting IPA" \
         -exportOptionsPlist ios/ExportOptions.plist \
         -allowProvisioningUpdates
 
-if [ ! -f "./build/ios/Runner.ipa" ]; then
-    echo "❌ Expected IPA not found at ./build/ios/Runner.ipa"
+# The IPA is named after CFBundleName, not PRODUCT_NAME, so we glob for it
+# rather than hardcoding "Runner.ipa".
+IPA_PATH="$(find build/ios -maxdepth 1 -type f -name '*.ipa' | head -n 1)"
+if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
+    echo "❌ No .ipa found in build/ios/ after export"
     ls -la build/ios/ || true
     exit 1
 fi
-echo "  ✅ IPA at ./build/ios/Runner.ipa"
+echo "  ✅ IPA at $IPA_PATH"
 
 # ----- Upload -----
 IOS_SUCCESS=false
@@ -306,7 +309,7 @@ if [ "$RUN_UPLOAD" = true ]; then
     run_with_spinner "Uploading to App Store Connect" \
         xcrun altool --upload-app \
             --type ios \
-            --file ./build/ios/Runner.ipa \
+            --file "$IPA_PATH" \
             --apiKey "$APP_STORE_CONNECT_KEY_ID" \
             --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
             --apiKeyPath "$P8_FILE_PATH"
@@ -348,7 +351,7 @@ echo ""
 echo "✨ Deploy complete"
 echo "  📱 Version:        $NEW_VERSION"
 [ "$RUN_UPLOAD" = true ] && echo "  🍎 Uploaded to:    App Store Connect (TestFlight will show the build in a few minutes)"
-[ "$RUN_UPLOAD" = false ] && echo "  📦 IPA available:  ./build/ios/Runner.ipa"
+[ "$RUN_UPLOAD" = false ] && echo "  📦 IPA available:  $IPA_PATH"
 echo ""
 echo "⏱️  Timing:"
 echo "  🍎 iOS build:      ${IOS_BUILD_TIME}s"
