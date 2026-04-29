@@ -1,0 +1,66 @@
+workflows:
+  ios-release:
+    name: iOS Release (TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    integrations:
+      # TODO: replace with the NAME of your App Store Connect integration in Codemagic.
+      # Find it at: top-right avatar → Teams → (your team) → Integrations → App Store Connect.
+      # Whatever label appears next to the API key you already added — paste that here.
+      app_store_connect: XcodeAdminAPIKeyTeamMCK
+
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.walhallaa.spygame.v02202404
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+
+    scripts:
+      - name: Install Rust toolchain (cargokit needs it for convex_flutter)
+        script: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
+          source "$HOME/.cargo/env"
+          rustup target add aarch64-apple-ios
+          echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$CM_ENV"
+
+      - name: Flutter pub get
+        script: flutter pub get
+
+      - name: Codegen (freezed / riverpod / json_serializable)
+        script: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+
+      - name: Pod install
+        script: |
+          cd ios
+          pod install
+
+      - name: Flutter build ipa
+        script: |
+          flutter build ipa --release \
+            --export-options-plist=/Users/builder/export_options.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        # Optional: auto-add to a TestFlight beta group.
+        # beta_groups:
+        #   - Internal Testers
