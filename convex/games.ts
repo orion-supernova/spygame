@@ -339,7 +339,10 @@ export const endRoundInternal = internalMutation({
   },
 });
 
-export const serverNow = query({
+// Must be a mutation (not a query) — Convex caches query results by
+// (name, args), so a no-arg `() => Date.now()` query freezes at first
+// call and never refreshes. Mutations always execute fresh.
+export const serverNow = mutation({
   args: {},
   handler: async () => Date.now(),
 });

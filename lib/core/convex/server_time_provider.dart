@@ -23,7 +23,10 @@ class ServerTimeOffsetController extends Notifier<int> {
     try {
       final client = ref.read(convexClientProvider);
       final t0 = DateTime.now().millisecondsSinceEpoch;
-      final raw = await client.query('games:serverNow', const {});
+      final raw = await client.mutation(
+        name: 'games:serverNow',
+        args: const <String, dynamic>{},
+      );
       final t1 = DateTime.now().millisecondsSinceEpoch;
       final serverMs = _coerceMs(raw);
       final rtt = (t1 - t0) ~/ 2;

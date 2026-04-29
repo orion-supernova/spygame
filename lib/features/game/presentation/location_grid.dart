@@ -4,6 +4,13 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../domain/role.dart';
 
+const _kLocationGridDelegate = SliverGridDelegateWithFixedCrossAxisCount(
+  crossAxisCount: 2,
+  mainAxisSpacing: 8,
+  crossAxisSpacing: 8,
+  childAspectRatio: 3.4,
+);
+
 class LocationGrid extends StatelessWidget {
   const LocationGrid({super.key, required this.board});
   final LocationsBoard board;
@@ -15,17 +22,32 @@ class LocationGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: board.locations.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childAspectRatio: 3.4,
-      ),
+      gridDelegate: _kLocationGridDelegate,
       itemBuilder: (context, i) {
         final loc = board.locations[i];
         final played = board.isPlayed(loc.id);
         return _LocationCell(name: loc.name, played: played);
       },
+    );
+  }
+}
+
+class SliverLocationGrid extends StatelessWidget {
+  const SliverLocationGrid({super.key, required this.board});
+  final LocationsBoard board;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverGrid(
+      gridDelegate: _kLocationGridDelegate,
+      delegate: SliverChildBuilderDelegate(
+        (context, i) {
+          final loc = board.locations[i];
+          final played = board.isPlayed(loc.id);
+          return _LocationCell(name: loc.name, played: played);
+        },
+        childCount: board.locations.length,
+      ),
     );
   }
 }
