@@ -89,7 +89,31 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                           onPressed: () => context.go(AppRoute.home),
                           child: const Text('GET STARTED'),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 6),
+                        TextButton(
+                          onPressed: () => context.push(AppRoute.howToPlay),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'HOW TO PLAY',
+                                style: AppTypography.mono(
+                                  size: 11,
+                                  weight: FontWeight.w600,
+                                  letterSpacing: 2.2,
+                                  color: AppColors.lime,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              const Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 14,
+                                color: AppColors.lime,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
                         Text(
                           '3 to 12 players. No accounts. Pass-and-play friendly.',
                           textAlign: TextAlign.center,

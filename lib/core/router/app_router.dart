@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/game/presentation/game_screen.dart';
 import '../../features/game/presentation/game_summary_screen.dart';
+import '../../features/identity/presentation/how_to_play_screen.dart';
 import '../../features/identity/presentation/welcome_screen.dart';
 import '../../features/room/presentation/home_screen.dart';
 import '../../features/room/presentation/lobby_screen.dart';
@@ -12,6 +13,7 @@ class AppRoute {
   AppRoute._();
   static const welcome = '/';
   static const home = '/home';
+  static const howToPlay = '/how-to-play';
   static const lobby = '/lobby/:code';
   static const game = '/game/:code';
   static const summary = '/summary/:code';
@@ -67,6 +69,33 @@ CustomTransitionPage<void> _slidePage({
   );
 }
 
+// Modal-style entrance for tutorials / overlays pushed on top of the
+// regular hierarchy. Slides up from the bottom and back down on dismiss.
+CustomTransitionPage<void> _slideUpPage({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: key,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 360),
+    reverseTransitionDuration: const Duration(milliseconds: 240),
+    transitionsBuilder: (context, animation, _, page) {
+      final slide = Tween<Offset>(
+        begin: const Offset(0, 1),
+        end: Offset.zero,
+      ).animate(
+        CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        ),
+      );
+      return SlideTransition(position: slide, child: page);
+    },
+  );
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoute.welcome,
@@ -85,6 +114,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           key: state.pageKey,
           reverse: _consumeReverse(state.uri.path),
           child: const HomeScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.howToPlay,
+        pageBuilder: (_, state) => _slideUpPage(
+          key: state.pageKey,
+          child: const HowToPlayScreen(),
         ),
       ),
       GoRoute(
