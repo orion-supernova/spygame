@@ -36,37 +36,65 @@ class CountdownRing extends StatelessWidget {
     final accent = countdownAccent(seconds);
     return AspectRatio(
       aspectRatio: 1,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            painter: RingPainter(progress: progress, color: accent),
-            size: Size.infinite,
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final diameter = math.min(
+            constraints.maxWidth,
+            constraints.maxHeight,
+          );
+          // Constrain content to a safe horizontal chord inside the ring so
+          // digits never collide with the stroke on narrow devices.
+          final innerWidth = diameter * 0.72;
+          final spacing = (diameter * 0.05).clamp(6.0, 14.0).toDouble();
+          return Stack(
+            alignment: Alignment.center,
             children: [
-              Text(
-                label,
-                style: AppTypography.mono(
-                  size: 11,
-                  letterSpacing: 2.4,
-                  color: AppColors.paperFaint,
-                ),
+              CustomPaint(
+                painter: RingPainter(progress: progress, color: accent),
+                size: Size.infinite,
               ),
-              const SizedBox(height: 14),
-              Text(
-                formatCountdown(seconds),
-                style: AppTypography.mono(
-                  size: 80,
-                  weight: FontWeight.w700,
-                  letterSpacing: -2,
-                  color: accent,
-                ).copyWith(height: 1),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: innerWidth,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        softWrap: false,
+                        style: AppTypography.mono(
+                          size: 11,
+                          letterSpacing: 2.4,
+                          color: AppColors.paperFaint,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: spacing),
+                  SizedBox(
+                    width: innerWidth,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        formatCountdown(seconds),
+                        maxLines: 1,
+                        softWrap: false,
+                        style: AppTypography.mono(
+                          size: 80,
+                          weight: FontWeight.w700,
+                          letterSpacing: -2,
+                          color: accent,
+                        ).copyWith(height: 1),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
