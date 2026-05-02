@@ -230,7 +230,7 @@ class _Front extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isSpy ? l10n.roleFrontCover : l10n.roleFrontYouAre,
+                l10n.roleYourRole,
                 style: AppTypography.mono(
                   size: 11,
                   weight: FontWeight.w600,

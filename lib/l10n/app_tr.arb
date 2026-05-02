@@ -6,7 +6,7 @@
   "welcomeSubtitle": "Herkesin ortak bir gizli mekânı vardır.\nBirinizin yoktur. Onu bulun — ya da kim olduğunuzu belli etmeyin.",
   "welcomeCtaGetStarted": "BAŞLAYALIM",
   "welcomeCtaHowToPlay": "NASIL OYNANIR",
-  "welcomeFootnote": "3 ila 12 oyuncu. Hesap yok. Tek telefonla oynanabilir.",
+  "welcomeFootnote": "3 ila 12 oyuncu. Aranızda casuslar var. Kimseye güvenme.",
   "welcomeConfigBannerTitle": "CONVEX_URL ayarlı değil",
   "welcomeConfigBannerBody": "Bir Convex deployment kur ve şunu çalıştır:",
 
@@ -39,6 +39,7 @@
   "lobbyStatusAllReady": "Herkes hazır. Başlayabilirsin.",
   "lobbyStatusNeedPlayers": "En az 3 oyuncu gerekiyor.",
   "lobbyStatusWaitingReady": "Herkesin hazır olması bekleniyor.",
+  "lobbyStatusTooManySpies": "Bu oyuncu sayısı için çok fazla casus.",
   "lobbyErrorRoomGone": "Bu oda artık yok.",
   "lobbyCtaGoHome": "ANA EKRANA DÖN",
 
@@ -85,8 +86,7 @@
 
   "roleBackEyebrow": "ROLÜN",
   "roleBackHint": "BASILI TUT, GÖSTER",
-  "roleFrontCover": "GÖRÜNEN ROL",
-  "roleFrontYouAre": "SEN BİR",
+  "roleYourRole": "ROLÜN",
   "roleFrontAt": "MEKÂN",
   "roleReleaseToHide": "bırak, gizlensin",
   "roleTheSpy": "CASUSSUN",

@@ -16,8 +16,8 @@
   "welcomeCtaHowToPlay": "HOW TO PLAY",
   "@welcomeCtaHowToPlay": { "description": "Secondary text button on welcome screen. Opens tutorial. All-caps." },
 
-  "welcomeFootnote": "3 to 12 players. No accounts. Pass-and-play friendly.",
-  "@welcomeFootnote": { "description": "Small mono footnote under the welcome CTAs." },
+  "welcomeFootnote": "3 to 12 players. Spies among you. Trust no one.",
+  "@welcomeFootnote": { "description": "Small mono footnote under the welcome CTAs. Three short clauses, spy-noir tone. The third clause is a wink at the spy/social-deduction premise." },
 
   "welcomeConfigBannerTitle": "CONVEX_URL not set",
   "@welcomeConfigBannerTitle": { "description": "Dev banner shown only when the build is missing the backend URL. CONVEX_URL is a literal env-var name; do not translate it." },
@@ -111,6 +111,9 @@
 
   "lobbyStatusWaitingReady": "Waiting for everyone to mark ready.",
   "@lobbyStatusWaitingReady": { "description": "Status under START GAME when at least one player hasn't tapped Ready." },
+
+  "lobbyStatusTooManySpies": "Too many spies for this player count.",
+  "@lobbyStatusTooManySpies": { "description": "Status under START GAME when the configured spy count is too high relative to the number of players." },
 
   "lobbyErrorRoomGone": "This room is gone.",
   "@lobbyErrorRoomGone": { "description": "Error shown when the room no longer exists (e.g. host left, server purged it)." },
@@ -259,11 +262,8 @@
   "roleBackHint": "PRESS & HOLD TO REVEAL",
   "@roleBackHint": { "description": "Instruction on the back of the role card. Mono caps. The reveal is press-and-hold." },
 
-  "roleFrontCover": "COVER ROLE",
-  "@roleFrontCover": { "description": "Label on the front of the role card when the player is the SPY. Hint that 'THE SPY' is the cover, not a normal role. Mono caps." },
-
-  "roleFrontYouAre": "YOU ARE",
-  "@roleFrontYouAre": { "description": "Label on the front of the role card for non-spy players, above the role name. Mono caps." },
+  "roleYourRole": "YOUR ROLE",
+  "@roleYourRole": { "description": "Label on the front of the role card for non-spy players, above the role name. Mono caps. Noun-phrase label (not a sentence fragment) so it works for any role name in any locale." },
 
   "roleFrontAt": "AT",
   "@roleFrontAt": { "description": "Tiny label between the role name and the location name on the role card. Mono caps." },

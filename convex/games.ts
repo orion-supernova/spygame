@@ -14,6 +14,14 @@ import { normalizeCode } from './helpers/code';
 
 const MIN_PLAYERS_TO_START = 3;
 
+// Solo-test escape hatch. Set `TESTING_MODE=true` on the dev Convex
+// deployment to allow 1-player games (and a spy count equal to the player
+// count). Leave unset in prod. Convex exposes env vars via `process.env`
+// at runtime; the local `declare` keeps the types clean without pulling
+// in @types/node (the convex tsconfig sets `types: []`).
+declare const process: { env: Record<string, string | undefined> };
+const TESTING_MODE = process.env.TESTING_MODE === 'true';
+
 type AnyCtx = QueryCtx | MutationCtx;
 
 // Locale projection — the only locales the server ever talks. Optional on
@@ -146,7 +154,7 @@ export const startGame = mutation({
       .query('players')
       .withIndex('by_room', (q) => q.eq('roomId', room._id))
       .collect();
-    if (players.length < MIN_PLAYERS_TO_START) {
+    if (!TESTING_MODE && players.length < MIN_PLAYERS_TO_START) {
       throw new ConvexError(
         `Need at least ${MIN_PLAYERS_TO_START} players to start.`,
       );
@@ -154,7 +162,10 @@ export const startGame = mutation({
     if (!players.every((p) => p.isReady)) {
       throw new ConvexError('All players must tap Ready first.');
     }
-    if (room.config.spyCount >= players.length) {
+    const spyOverflow = TESTING_MODE
+      ? room.config.spyCount > players.length
+      : room.config.spyCount >= players.length;
+    if (spyOverflow) {
       throw new ConvexError('Spy count must be fewer than total players.');
     }
 

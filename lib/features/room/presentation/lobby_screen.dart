@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/config/debug_config.dart';
 import '../../../core/convex/server_time_provider.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../core/errors/error_messages.dart';
@@ -212,7 +213,13 @@ class _LobbyBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final isOwner = room.isOwner(myToken);
     final me = room.playerFor(myToken);
-    final canStart = isOwner && room.allReady && room.players.length >= 3;
+    final tooFewPlayers = room.players.length < minPlayersToStart;
+    final tooManySpies = spyCountExceedsPlayers(
+      spyCount: room.config.spyCount,
+      playerCount: room.players.length,
+    );
+    final canStart =
+        isOwner && room.allReady && !tooFewPlayers && !tooManySpies;
     final l10n = AppLocalizations.of(context);
 
     final bottomPanelBuffer = isOwner ? 220.0 : 110.0;
@@ -369,8 +376,10 @@ class _LobbyBody extends StatelessWidget {
                       Text(
                         canStart
                             ? l10n.lobbyStatusAllReady
-                            : room.players.length < 3
+                            : tooFewPlayers
                             ? l10n.lobbyStatusNeedPlayers
+                            : tooManySpies
+                            ? l10n.lobbyStatusTooManySpies
                             : l10n.lobbyStatusWaitingReady,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
