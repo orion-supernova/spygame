@@ -100,12 +100,13 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                           child: Text(l10n.welcomeCtaGetStarted),
                         ),
                         const SizedBox(height: 6),
-                        TextButton(
-                          onPressed: () => context.push(AppRoute.howToPlay),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () =>
+                                  context.push(AppRoute.howToPlay),
+                              child: Text(
                                 l10n.welcomeCtaHowToPlay,
                                 style: AppTypography.mono(
                                   size: 11,
@@ -114,14 +115,28 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                                   color: AppColors.lime,
                                 ),
                               ),
-                              const SizedBox(width: 6),
-                              const Icon(
-                                Icons.arrow_forward_rounded,
-                                size: 14,
-                                color: AppColors.lime,
+                            ),
+                            Container(
+                              width: 1,
+                              height: 12,
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              color: AppColors.inkOutline,
+                            ),
+                            TextButton(
+                              onPressed: () =>
+                                  context.push(AppRoute.marketplace),
+                              child: Text(
+                                l10n.welcomeCtaMarketplace,
+                                style: AppTypography.mono(
+                                  size: 11,
+                                  weight: FontWeight.w600,
+                                  letterSpacing: 2.2,
+                                  color: AppColors.amber,
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 6),
                         Text(

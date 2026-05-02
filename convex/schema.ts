@@ -62,6 +62,12 @@ export default defineSchema({
     totalRounds: v.number(),
     usedLocationIds: v.array(v.id('locations')),
     currentRoundId: v.optional(v.id('rounds')),
+    // Bundle slugs the host claimed to own at game-start. Snapshotted so
+    // the location pool stays stable across rounds even if mid-game
+    // mutations would change the host's ownership. Optional for
+    // backward-compat with games created before this field existed; the
+    // server treats `undefined` as "free locations only".
+    ownedBundleSlugs: v.optional(v.array(v.string())),
   })
     .index('by_room', ['roomId']),
 
@@ -96,9 +102,14 @@ export default defineSchema({
   // optional and added per locale; missing entries fall back to English on
   // read. Role array length and ORDER must match `roles` exactly — server
   // looks up role index in English to project the localized variant.
+  //
+  // `bundleSlug` is undefined for the free location set and set to a
+  // bundle's slug for paid-pack locations. The location pool at game start
+  // = free + locations whose bundleSlug is in the host's owned set.
   locations: defineTable({
     name: v.string(),
     roles: v.array(v.string()),
+    bundleSlug: v.optional(v.string()),
     translations: v.optional(
       v.object({
         tr: v.optional(
@@ -109,5 +120,23 @@ export default defineSchema({
         ),
       }),
     ),
-  }),
+  }).index('by_bundle', ['bundleSlug']),
+
+  // Static catalog of paid location packs. Server is the source of truth
+  // for which slugs exist and which locations belong to each. Real
+  // ownership is tracked client-side (SharedPreferences) and will move to
+  // RevenueCat entitlements later — server does not validate ownership
+  // claims because there are no accounts.
+  bundles: defineTable({
+    slug: v.string(),
+    category: v.union(v.literal('city'), v.literal('theme')),
+    sortOrder: v.number(),
+    priceUsd: v.string(), // display only, e.g. "$1.99"
+    accentHex: v.string(), // tile/accent color, e.g. "#FFB02E"
+    iconKey: v.string(), // client maps this to a Material icon
+    translations: v.object({
+      en: v.object({ title: v.string(), tagline: v.string() }),
+      tr: v.object({ title: v.string(), tagline: v.string() }),
+    }),
+  }).index('by_slug', ['slug']),
 });

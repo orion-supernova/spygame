@@ -6,6 +6,8 @@ import '../../features/game/presentation/game_screen.dart';
 import '../../features/game/presentation/game_summary_screen.dart';
 import '../../features/identity/presentation/how_to_play_screen.dart';
 import '../../features/identity/presentation/welcome_screen.dart';
+import '../../features/marketplace/presentation/bundle_detail_screen.dart';
+import '../../features/marketplace/presentation/marketplace_screen.dart';
 import '../../features/room/presentation/home_screen.dart';
 import '../../features/room/presentation/lobby_screen.dart';
 
@@ -14,6 +16,8 @@ class AppRoute {
   static const welcome = '/';
   static const home = '/home';
   static const howToPlay = '/how-to-play';
+  static const marketplace = '/marketplace';
+  static const bundleDetail = '/marketplace/:slug';
   static const lobby = '/lobby/:code';
   static const game = '/game/:code';
   static const summary = '/summary/:code';
@@ -21,6 +25,7 @@ class AppRoute {
   static String lobbyFor(String code) => '/lobby/$code';
   static String gameFor(String code) => '/game/$code';
   static String summaryFor(String code) => '/summary/$code';
+  static String bundleDetailFor(String slug) => '/marketplace/$slug';
 }
 
 // Tracks route depth so transitions can play in reverse when navigating
@@ -121,6 +126,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => _slideUpPage(
           key: state.pageKey,
           child: const HowToPlayScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.marketplace,
+        pageBuilder: (_, state) => _slideUpPage(
+          key: state.pageKey,
+          child: const MarketplaceScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.bundleDetail,
+        pageBuilder: (_, state) => _slideUpPage(
+          key: state.pageKey,
+          child: BundleDetailScreen(
+            slug: state.pathParameters['slug'] ?? '',
+          ),
         ),
       ),
       GoRoute(

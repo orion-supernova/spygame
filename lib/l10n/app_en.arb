@@ -16,6 +16,60 @@
   "welcomeCtaHowToPlay": "HOW TO PLAY",
   "@welcomeCtaHowToPlay": { "description": "Secondary text button on welcome screen. Opens tutorial. All-caps." },
 
+  "welcomeCtaMarketplace": "MARKETPLACE",
+  "@welcomeCtaMarketplace": { "description": "Tertiary text button on welcome screen. Opens the location-pack store. All-caps." },
+
+  "marketplaceTitle": "Marketplace",
+  "@marketplaceTitle": { "description": "Marketplace screen title." },
+
+  "marketplaceSubtitle": "Add new locations and roles to your games.",
+  "@marketplaceSubtitle": { "description": "One-line marketplace screen subtitle." },
+
+  "marketplaceSectionPopularCities": "POPULAR CITIES",
+  "@marketplaceSectionPopularCities": { "description": "Section header for city-themed bundles. All-caps mono." },
+
+  "marketplaceSectionThemed": "THEMED PACKS",
+  "@marketplaceSectionThemed": { "description": "Section header for genre/theme bundles. All-caps mono." },
+
+  "marketplaceComingSoon": "COMING SOON",
+  "@marketplaceComingSoon": { "description": "Badge on placeholder bundle cards that don't exist on the server yet. All-caps." },
+
+  "marketplaceComingSoonBody": "We're still cooking this one. Check back soon.",
+  "@marketplaceComingSoonBody": { "description": "Body of the bottom sheet shown when the user taps a Coming Soon bundle." },
+
+  "marketplaceOwnedBadge": "OWNED",
+  "@marketplaceOwnedBadge": { "description": "Badge on bundle cards the user has unlocked. All-caps." },
+
+  "marketplaceBuy": "BUY",
+  "@marketplaceBuy": { "description": "Mock-purchase button label on bundle detail screen. All-caps." },
+
+  "marketplaceBuyMockNotice": "Mock purchase. Real billing comes later.",
+  "@marketplaceBuyMockNotice": { "description": "Small print under the Buy button in this pre-RevenueCat phase." },
+
+  "marketplaceRemoveMock": "REMOVE (MOCK)",
+  "@marketplaceRemoveMock": { "description": "Button shown instead of Buy on already-owned bundles, lets the user toggle ownership off in this mock phase. All-caps." },
+
+  "marketplaceBundleLocationsLabel": "LOCATIONS",
+  "@marketplaceBundleLocationsLabel": { "description": "Section label above the location list on bundle detail screen. All-caps mono." },
+
+  "marketplaceBundleRolesMore": "+ {count} more",
+  "@marketplaceBundleRolesMore": {
+    "description": "Suffix after the visible sample roles, hinting how many additional roles a location has.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "marketplaceLocationCount": "{count, plural, one{1 location} other{{count} locations}}",
+  "@marketplaceLocationCount": {
+    "description": "How many locations a bundle contains, shown on bundle cards.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "configActivePacksLabel": "ACTIVE PACKS",
+  "@configActivePacksLabel": { "description": "Eyebrow label above the chip row in ConfigPanel showing which bundles are feeding the game. All-caps mono." },
+
+  "configActivePackFree": "Free",
+  "@configActivePackFree": { "description": "Chip label for the always-included free location set in the ACTIVE PACKS row." },
+
   "welcomeFootnote": "3 to 12 players. Spies among you. Trust no one.",
   "@welcomeFootnote": { "description": "Small mono footnote under the welcome CTAs. Three short clauses, spy-noir tone. The third clause is a wink at the spy/social-deduction premise." },
 

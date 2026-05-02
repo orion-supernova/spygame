@@ -72,14 +72,22 @@ class ConvexGameRepository implements GameRepository {
   }
 
   @override
-  Stream<LocationsBoard> watchLocations(String code, String locale) {
+  Stream<LocationsBoard> watchLocations(
+    String code,
+    String locale, {
+    List<String> ownedBundleSlugs = const [],
+  }) {
     final controller = StreamController<LocationsBoard>.broadcast();
     SubscriptionHandle? handle;
     Future<void> start() async {
       try {
         handle = await _client.subscribe(
           name: 'games:watchLocations',
-          args: {'code': code, 'locale': locale},
+          args: {
+            'code': code,
+            'locale': locale,
+            'ownedBundleSlugs': ownedBundleSlugs,
+          },
           onUpdate: (raw) {
             if (controller.isClosed) return;
             final decoded = _decode(raw);

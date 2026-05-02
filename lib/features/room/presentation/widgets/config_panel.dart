@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../../marketplace/data/marketplace_providers.dart';
 import '../../domain/room.dart';
 
-class ConfigPanel extends StatelessWidget {
+class ConfigPanel extends ConsumerWidget {
   const ConfigPanel({
     super.key,
     required this.config,
@@ -19,8 +21,17 @@ class ConfigPanel extends StatelessWidget {
   final ValueChanged<GameConfig> onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final ownedSlugs = ref.watch(ownedBundlesProvider);
+    final bundlesAsync = ref.watch(bundlesProvider);
+    final ownedTitles = bundlesAsync.maybeWhen(
+      data: (bundles) => bundles
+          .where((b) => ownedSlugs.contains(b.slug))
+          .map((b) => b.title)
+          .toList(),
+      orElse: () => const <String>[],
+    );
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -100,7 +111,58 @@ class ConfigPanel extends StatelessWidget {
                     )
                 : null,
           ),
+          const SizedBox(height: 18),
+          Container(
+            height: 1,
+            color: AppColors.inkOutline,
+          ),
+          const SizedBox(height: 14),
+          Text(
+            l10n.configActivePacksLabel,
+            style: AppTypography.mono(
+              size: 11,
+              weight: FontWeight.w600,
+              letterSpacing: 2,
+              color: AppColors.paperFaint,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              _PackChip(text: l10n.configActivePackFree),
+              for (final t in ownedTitles) _PackChip(text: t, accent: true),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _PackChip extends StatelessWidget {
+  const _PackChip({required this.text, this.accent = false});
+  final String text;
+  final bool accent;
+  @override
+  Widget build(BuildContext context) {
+    final color = accent ? AppColors.lime : AppColors.paperMuted;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        text,
+        style: AppTypography.mono(
+          size: 11,
+          weight: FontWeight.w600,
+          letterSpacing: 1.2,
+          color: color,
+        ),
       ),
     );
   }

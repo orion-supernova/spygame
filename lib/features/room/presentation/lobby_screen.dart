@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../core/config/debug_config.dart';
 import '../../../core/convex/server_time_provider.dart';
+import '../../marketplace/data/marketplace_providers.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../core/errors/error_messages.dart';
 import '../../../core/notifications/round_end_notifier.dart';
@@ -75,7 +76,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     setState(() => _busy = true);
     try {
       await ref.read(serverTimeOffsetProvider.notifier).refresh();
-      await ref.read(roomRepositoryProvider).startGame(code: widget.code);
+      final ownedSlugs = ref.read(ownedBundlesProvider).toList();
+      await ref.read(roomRepositoryProvider).startGame(
+            code: widget.code,
+            ownedBundleSlugs: ownedSlugs,
+          );
       await Haptics.success();
     } on AppException catch (e) {
       if (mounted) _showError(e.localizedMessage(context));

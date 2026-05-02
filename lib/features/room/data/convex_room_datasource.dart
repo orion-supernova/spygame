@@ -128,13 +128,17 @@ class ConvexRoomRepository implements RoomRepository {
   }
 
   @override
-  Future<void> startGame({required String code}) async {
+  Future<void> startGame({
+    required String code,
+    required List<String> ownedBundleSlugs,
+  }) async {
     try {
       await _client.mutation(
         name: 'games:startGame',
         args: {
           'code': code,
           'clientToken': _identity.clientToken,
+          'ownedBundleSlugs': ownedBundleSlugs,
         },
       );
     } catch (e) {

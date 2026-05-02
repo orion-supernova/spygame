@@ -66,14 +66,21 @@ async function findRoomByCode(
 async function pickNextLocation(
   ctx: MutationCtx,
   used: Id<'locations'>[],
+  ownedBundleSlugs: Set<string>,
 ): Promise<Doc<'locations'>> {
   const all = await ctx.db.query('locations').collect();
-  if (all.length === 0) {
+  // Filter to free locations + owned bundles. Server doesn't validate
+  // ownership claims (no accounts) — RevenueCat-backed validation is a
+  // future task. For now we trust the client's claim.
+  const eligible = all.filter(
+    (l) => l.bundleSlug == null || ownedBundleSlugs.has(l.bundleSlug),
+  );
+  if (eligible.length === 0) {
     throw new ConvexError('No locations seeded — run locations:seed.');
   }
   const usedSet = new Set(used.map((id) => id.toString()));
-  const remaining = all.filter((l) => !usedSet.has(l._id.toString()));
-  const pool = remaining.length > 0 ? remaining : all;
+  const remaining = eligible.filter((l) => !usedSet.has(l._id.toString()));
+  const pool = remaining.length > 0 ? remaining : eligible;
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -89,7 +96,12 @@ async function startNewRound(args: {
   const room = await ctx.db.get(game.roomId);
   if (!room) throw new ConvexError('Room vanished.');
 
-  const location = await pickNextLocation(ctx, game.usedLocationIds);
+  const ownedBundleSlugs = new Set(game.ownedBundleSlugs ?? []);
+  const location = await pickNextLocation(
+    ctx,
+    game.usedLocationIds,
+    ownedBundleSlugs,
+  );
   const roundId = await ctx.db.insert('rounds', {
     gameId,
     index,
@@ -139,6 +151,10 @@ export const startGame = mutation({
   args: {
     code: v.string(),
     clientToken: v.string(),
+    // Bundle slugs the host claims to own. Server does not validate the
+    // claim because there are no accounts; trust the client. Free
+    // locations are always included regardless of this list.
+    ownedBundleSlugs: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const code = normalizeCode(args.code);
@@ -176,6 +192,7 @@ export const startGame = mutation({
       currentRoundIndex: 0,
       totalRounds: room.config.roundCount,
       usedLocationIds: [],
+      ownedBundleSlugs: args.ownedBundleSlugs ?? [],
     });
     await ctx.db.patch(room._id, {
       status: 'inGame',
@@ -445,14 +462,27 @@ export const getMyRole = query({
  * trivially expose the current location to the spy).
  */
 export const watchLocations = query({
-  args: { code: v.string(), locale: LOCALE_VALIDATOR },
+  args: {
+    code: v.string(),
+    locale: LOCALE_VALIDATOR,
+    // Used pre-game (no active game yet) to scope the preview pool to
+    // free + owned bundles. During an active game the snapshot stored on
+    // `game.ownedBundleSlugs` takes precedence so all clients see the
+    // same grid regardless of their own ownership state.
+    ownedBundleSlugs: v.optional(v.array(v.string())),
+  },
   handler: async (ctx, args) => {
     const code = normalizeCode(args.code);
     const room = await findRoomByCode(ctx, code);
+    const all = await ctx.db.query('locations').collect();
+
     if (!room || !room.currentGameId) {
-      const locs = await ctx.db.query('locations').collect();
+      const owned = new Set(args.ownedBundleSlugs ?? []);
+      const eligible = all.filter(
+        (l) => l.bundleSlug == null || owned.has(l.bundleSlug),
+      );
       return {
-        locations: locs.map((l) => ({
+        locations: eligible.map((l) => ({
           _id: l._id,
           name: localizeLocation(l, args.locale).name,
         })),
@@ -483,9 +513,12 @@ export const watchLocations = query({
       if (secret) playedIds.push(secret.locationId);
     }
 
-    const locs = await ctx.db.query('locations').collect();
+    const gameOwned = new Set(game.ownedBundleSlugs ?? []);
+    const eligible = all.filter(
+      (l) => l.bundleSlug == null || gameOwned.has(l.bundleSlug),
+    );
     return {
-      locations: locs.map((l) => ({
+      locations: eligible.map((l) => ({
         _id: l._id,
         name: localizeLocation(l, args.locale).name,
       })),
