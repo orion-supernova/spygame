@@ -19,38 +19,53 @@
   "welcomeCtaMarketplace": "MARKETPLACE",
   "@welcomeCtaMarketplace": { "description": "Tertiary text button on welcome screen. Opens the location-pack store. All-caps." },
 
-  "marketplaceTitle": "Marketplace",
-  "@marketplaceTitle": { "description": "Marketplace screen title." },
+  "marketplaceEyebrow": "PACKS",
+  "@marketplaceEyebrow": { "description": "Small lime mono eyebrow at the top of the marketplace screen. Single-word category label, matches the welcome screen's 'A PARTY GAME' eyebrow tone." },
 
-  "marketplaceSubtitle": "Add new locations and roles to your games.",
-  "@marketplaceSubtitle": { "description": "One-line marketplace screen subtitle." },
+  "marketplaceTitle": "More to\nplay.",
+  "@marketplaceTitle": { "description": "Marketplace screen display title. Two short lines, mirrors the wordmark cadence of the welcome screen ('Where am\\nI?')." },
+
+  "marketplaceSubtitle": "Unlock new locations and characters for your games.",
+  "@marketplaceSubtitle": { "description": "One-line marketplace screen subtitle. Friendly, conversational." },
 
   "marketplaceSectionPopularCities": "POPULAR CITIES",
-  "@marketplaceSectionPopularCities": { "description": "Section header for city-themed bundles. All-caps mono." },
+  "@marketplaceSectionPopularCities": { "description": "Section header for city-themed bundles. Small mono caps, used as a quiet category label above the list." },
 
   "marketplaceSectionThemed": "THEMED PACKS",
-  "@marketplaceSectionThemed": { "description": "Section header for genre/theme bundles. All-caps mono." },
+  "@marketplaceSectionThemed": { "description": "Section header for genre/theme bundles. Small mono caps." },
 
   "marketplaceComingSoon": "COMING SOON",
-  "@marketplaceComingSoon": { "description": "Badge on placeholder bundle cards that don't exist on the server yet. All-caps." },
+  "@marketplaceComingSoon": { "description": "Small mono pill on placeholder bundle cards." },
 
-  "marketplaceComingSoonBody": "We're still cooking this one. Check back soon.",
+  "marketplaceComingSoonHeading": "Coming soon.",
+  "@marketplaceComingSoonHeading": { "description": "Display-font heading on the bottom sheet shown when tapping a placeholder bundle." },
+
+  "marketplaceComingSoonBody": "We're still cooking this one. Check back later.",
   "@marketplaceComingSoonBody": { "description": "Body of the bottom sheet shown when the user taps a Coming Soon bundle." },
 
   "marketplaceOwnedBadge": "OWNED",
-  "@marketplaceOwnedBadge": { "description": "Badge on bundle cards the user has unlocked. All-caps." },
+  "@marketplaceOwnedBadge": { "description": "Small lime mono pill on bundle cards the user has unlocked." },
 
-  "marketplaceBuy": "BUY",
-  "@marketplaceBuy": { "description": "Mock-purchase button label on bundle detail screen. All-caps." },
+  "marketplaceCategoryCity": "CITY PACK",
+  "@marketplaceCategoryCity": { "description": "Eyebrow on the bundle detail screen for city-category bundles." },
 
-  "marketplaceBuyMockNotice": "Mock purchase. Real billing comes later.",
-  "@marketplaceBuyMockNotice": { "description": "Small print under the Buy button in this pre-RevenueCat phase." },
+  "marketplaceCategoryTheme": "THEMED PACK",
+  "@marketplaceCategoryTheme": { "description": "Eyebrow on the bundle detail screen for theme-category bundles." },
 
-  "marketplaceRemoveMock": "REMOVE (MOCK)",
-  "@marketplaceRemoveMock": { "description": "Button shown instead of Buy on already-owned bundles, lets the user toggle ownership off in this mock phase. All-caps." },
+  "marketplaceUnlock": "UNLOCK",
+  "@marketplaceUnlock": { "description": "Big rounded lime CTA on bundle detail screen for not-yet-owned bundles. Pairs with the price, e.g. 'UNLOCK · $1.99'. All-caps. Mirrors GET STARTED energy." },
 
-  "marketplaceBundleLocationsLabel": "LOCATIONS",
-  "@marketplaceBundleLocationsLabel": { "description": "Section label above the location list on bundle detail screen. All-caps mono." },
+  "marketplaceBuyMockNotice": "Mock purchase — real billing coming later.",
+  "@marketplaceBuyMockNotice": { "description": "Small print under the Unlock button in this pre-RevenueCat phase." },
+
+  "marketplaceRemoveMock": "Remove (mock)",
+  "@marketplaceRemoveMock": { "description": "Quiet text button shown on already-owned bundles to toggle the mock ownership flag back off." },
+
+  "marketplaceOwnedBanner": "You own this pack.",
+  "@marketplaceOwnedBanner": { "description": "Confirmation line shown on bundle detail when the user owns the pack — replaces the buy CTA." },
+
+  "marketplaceBundleContentsLabel": "WHAT'S INSIDE",
+  "@marketplaceBundleContentsLabel": { "description": "Small lime mono eyebrow above the location list on bundle detail. Friendly, not 'CONTENTS'." },
 
   "marketplaceBundleRolesMore": "+ {count} more",
   "@marketplaceBundleRolesMore": {
@@ -58,9 +73,18 @@
     "placeholders": { "count": { "type": "int" } }
   },
 
+  "marketplaceLocationsAndRoles": "{locations} locations · {roles} roles each",
+  "@marketplaceLocationsAndRoles": {
+    "description": "Friendly meta line on bundle detail summarising the pack contents. Used right under the tagline.",
+    "placeholders": {
+      "locations": { "type": "int" },
+      "roles": { "type": "int" }
+    }
+  },
+
   "marketplaceLocationCount": "{count, plural, one{1 location} other{{count} locations}}",
   "@marketplaceLocationCount": {
-    "description": "How many locations a bundle contains, shown on bundle cards.",
+    "description": "How many locations a bundle contains. Used on bundle cards and the lobby ACTIVE PACKS tooltip.",
     "placeholders": { "count": { "type": "int" } }
   },
 

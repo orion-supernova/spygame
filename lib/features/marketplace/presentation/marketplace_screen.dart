@@ -50,37 +50,41 @@ class MarketplaceScreen extends ConsumerWidget {
                   slivers: [
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                        padding: const EdgeInsets.fromLTRB(8, 4, 16, 0),
                         child: Row(
                           children: [
                             IconButton(
-                              onPressed: () => context.go(AppRoute.welcome),
+                              onPressed: () => context.pop(),
                               icon: const Icon(
-                                Icons.close,
+                                Icons.close_rounded,
                                 color: AppColors.paper,
                               ),
                             ),
+                            const Spacer(),
                           ],
                         ),
                       ),
                     ),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(28, 8, 28, 8),
+                        padding: const EdgeInsets.fromLTRB(28, 18, 28, 28),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            _Eyebrow(text: l10n.marketplaceEyebrow),
+                            const SizedBox(height: 18),
                             Text(
                               l10n.marketplaceTitle,
-                              style: theme.textTheme.displaySmall?.copyWith(
+                              style: theme.textTheme.displayLarge?.copyWith(
+                                fontSize: 60,
+                                height: 0.95,
                                 color: AppColors.paper,
-                                fontWeight: FontWeight.w800,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 22),
                             Text(
                               l10n.marketplaceSubtitle,
-                              style: theme.textTheme.bodyMedium?.copyWith(
+                              style: theme.textTheme.bodyLarge?.copyWith(
                                 color: AppColors.paperMuted,
                               ),
                             ),
@@ -100,7 +104,7 @@ class MarketplaceScreen extends ConsumerWidget {
                         bundles: themed,
                         owned: owned,
                       ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 40)),
                   ],
                 );
               },
@@ -125,19 +129,19 @@ class _Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      padding: const EdgeInsets.fromLTRB(28, 14, 28, 0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, i) {
             if (i == 0) {
               return Padding(
-                padding: const EdgeInsets.only(left: 8, bottom: 12),
+                padding: const EdgeInsets.fromLTRB(0, 8, 0, 18),
                 child: Text(
                   label,
                   style: AppTypography.mono(
                     size: 11,
                     weight: FontWeight.w600,
-                    letterSpacing: 2.2,
+                    letterSpacing: 2.4,
                     color: AppColors.paperFaint,
                   ),
                 ),
@@ -169,6 +173,7 @@ class _Section extends StatelessWidget {
 
   void _showComingSoon(BuildContext context, Bundle bundle) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.inkRaised,
@@ -176,44 +181,77 @@ class _Section extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
+        padding: const EdgeInsets.fromLTRB(28, 22, 28, 36),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Icon(bundle.icon, size: 28, color: bundle.accentColor),
-                const SizedBox(width: 12),
-                Text(
-                  bundle.title,
-                  style: Theme.of(ctx).textTheme.headlineSmall?.copyWith(
-                        color: AppColors.paper,
-                        fontWeight: FontWeight.w800,
-                      ),
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.inkOutline,
+                  borderRadius: BorderRadius.circular(2),
                 ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Text(
-              l10n.marketplaceComingSoon,
-              style: AppTypography.mono(
-                size: 11,
-                weight: FontWeight.w700,
-                letterSpacing: 2,
-                color: AppColors.lime,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
+            _Eyebrow(text: l10n.marketplaceComingSoon),
+            const SizedBox(height: 14),
+            Text(
+              bundle.title,
+              style: theme.textTheme.displaySmall?.copyWith(
+                color: AppColors.paper,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.6,
+                height: 1.05,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              bundle.tagline,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: AppColors.paperMuted,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            const SizedBox(height: 18),
             Text(
               l10n.marketplaceComingSoonBody,
-              style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.paperMuted,
-                  ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.paperMuted,
+                height: 1.5,
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _Eyebrow extends StatelessWidget {
+  const _Eyebrow({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 28, height: 2, color: AppColors.lime),
+        const SizedBox(width: 10),
+        Text(
+          text,
+          style: AppTypography.mono(
+            size: 11,
+            weight: FontWeight.w600,
+            letterSpacing: 2.2,
+            color: AppColors.lime,
+          ),
+        ),
+      ],
     );
   }
 }

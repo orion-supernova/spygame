@@ -45,41 +45,10 @@ final ownedBundlesProvider =
 
 /// Coming-soon placeholders rendered alongside real bundles to make the
 /// storefront feel populated. Pure client-side data — no server entry.
+/// Paris/Tokyo/Stockholm graduated to real server-backed bundles; Sci-Fi
+/// stays here until it's authored.
 final placeholderBundlesProvider = Provider<List<Bundle>>((ref) {
   return const [
-    Bundle(
-      slug: '_coming_paris',
-      title: 'Paris',
-      tagline: 'Cafés, métro, and museum heists.',
-      priceDisplay: '—',
-      locationCount: 0,
-      category: BundleCategory.city,
-      accentColor: Color(0xFF4CC9F0),
-      icon: Icons.local_cafe_rounded,
-      isPlaceholder: true,
-    ),
-    Bundle(
-      slug: '_coming_tokyo',
-      title: 'Tokyo',
-      tagline: 'Karaoke, capsule hotels, and code.',
-      priceDisplay: '—',
-      locationCount: 0,
-      category: BundleCategory.city,
-      accentColor: Color(0xFFF15BB5),
-      icon: Icons.ramen_dining_rounded,
-      isPlaceholder: true,
-    ),
-    Bundle(
-      slug: '_coming_stockholm',
-      title: 'Stockholm',
-      tagline: 'Saunas, Vasa, and herring.',
-      priceDisplay: '—',
-      locationCount: 0,
-      category: BundleCategory.city,
-      accentColor: Color(0xFF00B4D8),
-      icon: Icons.sailing_rounded,
-      isPlaceholder: true,
-    ),
     Bundle(
       slug: '_coming_scifi',
       title: 'Sci-Fi',

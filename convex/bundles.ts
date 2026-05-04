@@ -46,6 +46,60 @@ const SEED: SeedBundle[] = [
     },
   },
   {
+    slug: 'paris',
+    category: 'city',
+    sortOrder: 20,
+    priceUsd: '$1.99',
+    accentHex: '#4CC9F0',
+    iconKey: 'local_cafe',
+    translations: {
+      en: {
+        title: 'Paris',
+        tagline: 'Cafés, métro, and museum heists.',
+      },
+      tr: {
+        title: 'Paris',
+        tagline: 'Kafeler, metro ve müze soygunları.',
+      },
+    },
+  },
+  {
+    slug: 'tokyo',
+    category: 'city',
+    sortOrder: 30,
+    priceUsd: '$1.99',
+    accentHex: '#F15BB5',
+    iconKey: 'ramen_dining',
+    translations: {
+      en: {
+        title: 'Tokyo',
+        tagline: 'Karaoke, capsule hotels, and code.',
+      },
+      tr: {
+        title: 'Tokyo',
+        tagline: 'Karaoke, kapsül oteller ve kod.',
+      },
+    },
+  },
+  {
+    slug: 'stockholm',
+    category: 'city',
+    sortOrder: 40,
+    priceUsd: '$1.99',
+    accentHex: '#00B4D8',
+    iconKey: 'sailing',
+    translations: {
+      en: {
+        title: 'Stockholm',
+        tagline: 'Saunas, Vasa, and herring.',
+      },
+      tr: {
+        title: 'Stockholm',
+        tagline: 'Saunalar, Vasa ve ringa balığı.',
+      },
+    },
+  },
+  {
     slug: 'cyberpunk',
     category: 'theme',
     sortOrder: 100,

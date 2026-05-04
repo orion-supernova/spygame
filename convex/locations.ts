@@ -338,6 +338,50 @@ const ISTANBUL: SeedLocation[] = [
       },
     },
   },
+  {
+    name: 'Asian-Side Tea Garden',
+    bundleSlug: 'istanbul',
+    roles: ['Tea Server', 'Backgammon Player', 'Stray Cat', 'Newspaper Reader', 'Hookah Operator', 'Retiree', 'Reluctant Date', 'Crossword Solver', 'Sketch Artist', 'Off-Duty Ferry Captain', 'Loud-Argument Pair'],
+    translations: {
+      tr: {
+        name: 'Çay Bahçesi',
+        roles: ['Çaycı', 'Tavla Oyuncusu', 'Sokak Kedisi', 'Gazete Okuyucu', 'Nargileci', 'Emekli', 'İsteksiz Buluşma Eşi', 'Bulmaca Çözen', 'Karakalemci', 'İzinli Vapur Kaptanı', 'Yüksek Sesle Tartışan İkili'],
+      },
+    },
+  },
+  {
+    name: 'Beyoğlu Meyhane',
+    bundleSlug: 'istanbul',
+    roles: ['Waiter', 'Rakı Pourer', 'Mezze Chef', 'Live Saz Player', 'Singing Stranger', 'Birthday Group', 'Honeymooners', 'First-Time Tourist', 'Off-Duty Journalist', 'Late-Night Regular', 'Cat Under the Table'],
+    translations: {
+      tr: {
+        name: 'Beyoğlu Meyhanesi',
+        roles: ['Garson', 'Rakı Servisçisi', 'Meze Şefi', 'Saz Sanatçısı', 'Şarkı Söyleyen Yabancı', 'Doğum Günü Grubu', 'Balayı Çifti', 'İlk Defa Gelen Turist', 'İzinli Gazeteci', 'Geç Saat Müdavimi', 'Masa Altındaki Kedi'],
+      },
+    },
+  },
+  {
+    name: 'Kadıköy Bar Street',
+    bundleSlug: 'istanbul',
+    roles: ['Bartender', 'Indie Band Drummer', 'Promoter', 'Bouncer', 'Tipsy Local', 'Erasmus Student', 'Stray Dog', 'Street Food Vendor', 'Photographer', 'Off-Duty Police', 'Lost Tourist'],
+    translations: {
+      tr: {
+        name: 'Kadıköy Barlar Sokağı',
+        roles: ['Barmen', 'Indie Grup Davulcusu', 'Organizatör', 'Fedai', 'Çakırkeyif Yerli', 'Erasmus Öğrencisi', 'Sokak Köpeği', 'Sokak Yemekçisi', 'Fotoğrafçı', 'Sivil Polis', 'Kaybolmuş Turist'],
+      },
+    },
+  },
+  {
+    name: "Princes' Islands Phaeton",
+    bundleSlug: 'istanbul',
+    roles: ['Tour Guide', 'Tourist Family', 'Photographer', 'Honeymooners', 'Bicycle Renter', 'Stray Cat', 'Mansion Caretaker', 'Off-Duty Boat Captain', 'Iced Coffee Vendor', 'Pickpocket', 'Lost Day-Tripper'],
+    translations: {
+      tr: {
+        name: 'Adalar Faytonu',
+        roles: ['Tur Rehberi', 'Turist Aile', 'Fotoğrafçı', 'Balayı Çifti', 'Bisiklet Kiracısı', 'Sokak Kedisi', 'Köşk Bakıcısı', 'İzinli Tekne Kaptanı', 'Soğuk Kahve Satıcısı', 'Yankesici', 'Kaybolmuş Günübirlikçi'],
+      },
+    },
+  },
 ];
 
 // Bundle: Cyberpunk (theme pack)
@@ -408,9 +452,395 @@ const CYBERPUNK: SeedLocation[] = [
       },
     },
   },
+  {
+    name: 'Drone Racing Pit',
+    bundleSlug: 'cyberpunk',
+    roles: ['Pilot', 'Spotter', 'Pit Crew', 'Sponsor Rep', 'Bookie', 'Drone Repair Tech', 'Heckler', 'Camera Drone Operator', 'Tipsy Spectator', 'Underage Smuggler', 'Race Marshal'],
+    translations: {
+      tr: {
+        name: 'Drone Yarış Pisti',
+        roles: ['Pilot', 'Gözcü', 'Pit Ekibi', 'Sponsor Temsilcisi', 'Bahis Aracısı', 'Drone Tamircisi', 'Laf Atan', 'Kamera Drone Operatörü', 'Çakırkeyif Seyirci', 'Reşit Olmayan Kaçakçı', 'Yarış Görevlisi'],
+      },
+    },
+  },
+  {
+    name: 'Vat-Grown Meat Diner',
+    bundleSlug: 'cyberpunk',
+    roles: ['Synth-Cook', 'Waiter', 'Health Inspector', 'Off-Duty Replicant', 'Late-Night Trucker', 'Influencer Reviewer', 'Bouncer', 'Coffee Cart Operator', 'Janitor With A Secret', 'Suspicious Health Nut', 'Owner'],
+    translations: {
+      tr: {
+        name: 'Suni Et Lokantası',
+        roles: ['Sentetik Aşçı', 'Garson', 'Sağlık Müfettişi', 'İzinli Replikant', 'Gece Tırcısı', 'Influencer Eleştirmen', 'Fedai', 'Kahveci', 'Sırrı Olan Temizlikçi', 'Şüpheli Sağlık Manyağı', 'Patron'],
+      },
+    },
+  },
+  {
+    name: 'Underground Casino',
+    bundleSlug: 'cyberpunk',
+    roles: ['Croupier', 'High Roller', 'Bouncer', 'Cocktail Server', 'Lookout', 'Off-Duty Cop', 'Card Counter', 'Loan Shark', 'Tourist', 'Money Launderer', 'Cleaner'],
+    translations: {
+      tr: {
+        name: 'Yeraltı Kumarhanesi',
+        roles: ['Krupiye', 'Yüksek Bahisçi', 'Fedai', 'Kokteyl Garsonu', 'Gözcü', 'İzinli Polis', 'Kart Sayıcı', 'Tefeci', 'Turist', 'Kara Para Aklayıcı', 'Temizlikçi'],
+      },
+    },
+  },
+  {
+    name: 'AR Cathedral',
+    bundleSlug: 'cyberpunk',
+    roles: ['Holo-Priest', 'Pilgrim', 'Tourist', 'AR Engineer', 'Choir Hologram', 'Glitching Confessor', 'Server Tech', 'Janitor', 'Bouncer', 'Sleeping Devotee', 'Streamer'],
+    translations: {
+      tr: {
+        name: 'AR Katedrali',
+        roles: ['Holo-Rahip', 'Hacı', 'Turist', 'AR Mühendisi', 'Koro Hologramı', 'Glitch Atan İtirafçı', 'Sunucu Teknisyeni', 'Temizlikçi', 'Fedai', 'Uyuyan Mümin', 'Yayıncı'],
+      },
+    },
+  },
 ];
 
-const SEED: SeedLocation[] = [...FREE, ...ISTANBUL, ...CYBERPUNK];
+// Bundle: Paris (city pack)
+const PARIS: SeedLocation[] = [
+  {
+    name: 'Eiffel Tower',
+    bundleSlug: 'paris',
+    roles: ['Tour Guide', 'Souvenir Vendor', 'Selfie Tourist', "Restaurant Maître d'", 'Pickpocket', 'Honeymooners', 'Lost American', 'Mime in Striped Shirt', 'Sketch Artist', 'Off-Duty Gendarme', 'Acrobat'],
+    translations: {
+      tr: {
+        name: 'Eyfel Kulesi',
+        roles: ['Tur Rehberi', 'Hediyelik Eşyacı', 'Selfie Çeken Turist', 'Restoran Maître\'i', 'Yankesici', 'Balayı Çifti', 'Kaybolmuş Amerikalı', 'Çizgili Tişörtlü Pandomimci', 'Karakalemci', 'İzinli Jandarma', 'Akrobat'],
+      },
+    },
+  },
+  {
+    name: 'Louvre Museum',
+    bundleSlug: 'paris',
+    roles: ['Curator', 'Security Guard', 'Art Student', 'Tourist', 'Audio Guide Renter', 'Selfie Tourist', 'Restorationist', 'Janitor', 'Pickpocket', 'Lost Schoolchild', 'Off-Duty Forger'],
+    translations: {
+      tr: {
+        name: 'Louvre Müzesi',
+        roles: ['Küratör', 'Güvenlik Görevlisi', 'Sanat Öğrencisi', 'Turist', 'Sesli Rehber Kiracısı', 'Selfie Çeken Turist', 'Restoratör', 'Temizlikçi', 'Yankesici', 'Kaybolmuş Okul Çocuğu', 'İzinli Sahteci'],
+      },
+    },
+  },
+  {
+    name: 'Métro Station',
+    bundleSlug: 'paris',
+    roles: ['Conductor', 'Busker', 'Commuter', 'Tourist with Map', 'Pickpocket', 'Off-Duty Worker', 'Student', 'Transit Officer', 'Sleeping Passenger', 'Stray Cat', 'Magazine Vendor'],
+    translations: {
+      tr: {
+        name: 'Metro İstasyonu',
+        roles: ['Vatman', 'Sokak Müzisyeni', 'Yolcu', 'Haritalı Turist', 'Yankesici', 'Mesai Sonrası Yolcu', 'Öğrenci', 'Metro Görevlisi', 'Uyuyan Yolcu', 'Sokak Kedisi', 'Dergi Satıcısı'],
+      },
+    },
+  },
+  {
+    name: 'Café Terrasse',
+    bundleSlug: 'paris',
+    roles: ['Waiter', 'Espresso Drinker', 'Philosopher', 'Smoking Writer', 'Tourist', 'Newspaper Reader', 'Pickpocket', 'Off-Duty Chef', 'Beggar', 'Honeymooners', 'Stray Cat'],
+    translations: {
+      tr: {
+        name: 'Kafe Terası',
+        roles: ['Garson', 'Espresso İçicisi', 'Filozof', 'Sigara İçen Yazar', 'Turist', 'Gazete Okuyucu', 'Yankesici', 'İzinli Şef', 'Dilenci', 'Balayı Çifti', 'Sokak Kedisi'],
+      },
+    },
+  },
+  {
+    name: 'Catacombs',
+    bundleSlug: 'paris',
+    roles: ['Tour Guide', 'Wide-Eyed Tourist', 'Skeptical Skeptic', 'Photographer', 'Janitor', 'Lost Tour Group', 'Off-Duty Archaeologist', 'Catacomb Mapper', 'Goth Honeymooners', 'Trespasser', 'Audio Guide Renter'],
+    translations: {
+      tr: {
+        name: 'Katakomplar',
+        roles: ['Tur Rehberi', 'Şaşkın Turist', 'Şüpheci', 'Fotoğrafçı', 'Temizlikçi', 'Kaybolmuş Tur Grubu', 'İzinli Arkeolog', 'Katakomp Haritacısı', 'Goth Balayı Çifti', 'İzinsiz Giren', 'Sesli Rehber Kiracısı'],
+      },
+    },
+  },
+  {
+    name: 'Père Lachaise',
+    bundleSlug: 'paris',
+    roles: ['Tour Guide', 'Jim Morrison Pilgrim', 'Florist', 'Caretaker', 'Mourner', 'Sketch Artist', 'Lost Tourist', 'Photographer', 'Stray Cat', 'Off-Duty Gendarme', 'Conspiracy Theorist'],
+    translations: {
+      tr: {
+        name: 'Père Lachaise Mezarlığı',
+        roles: ['Tur Rehberi', 'Jim Morrison Hacısı', 'Çiçekçi', 'Bakıcı', 'Yas Tutan', 'Karakalemci', 'Kaybolmuş Turist', 'Fotoğrafçı', 'Sokak Kedisi', 'İzinli Jandarma', 'Komplo Teorisyeni'],
+      },
+    },
+  },
+  {
+    name: 'Notre-Dame',
+    bundleSlug: 'paris',
+    roles: ['Tour Guide', 'Pilgrim', 'Restoration Worker', 'Photographer', 'Choir Member', 'Tourist', 'Pickpocket', 'Sketch Artist', 'Off-Duty Gendarme', 'Lost American', 'Cathedral Cat'],
+    translations: {
+      tr: {
+        name: 'Notre Dame',
+        roles: ['Tur Rehberi', 'Hacı', 'Restorasyon İşçisi', 'Fotoğrafçı', 'Koro Üyesi', 'Turist', 'Yankesici', 'Karakalemci', 'İzinli Jandarma', 'Kaybolmuş Amerikalı', 'Katedral Kedisi'],
+      },
+    },
+  },
+  {
+    name: 'Boulangerie',
+    bundleSlug: 'paris',
+    roles: ['Baker', 'Apprentice', 'Cashier', 'Local Regular', 'Tourist', 'Pickpocket', 'School Kid', 'Health Inspector', 'Late-for-Work Office Worker', 'Boulangerie Cat', 'Croissant Critic'],
+    translations: {
+      tr: {
+        name: 'Fırın',
+        roles: ['Fırıncı', 'Çırak', 'Kasiyer', 'Sürekli Müşteri', 'Turist', 'Yankesici', 'Okul Çocuğu', 'Sağlık Müfettişi', 'İşe Geç Kalan Memur', 'Fırın Kedisi', 'Kruvasan Eleştirmeni'],
+      },
+    },
+  },
+  {
+    name: 'Champs-Élysées',
+    bundleSlug: 'paris',
+    roles: ['Luxury Boutique Greeter', 'Tourist', 'Pickpocket', 'Honeymooners', 'Street Performer', 'Off-Duty Gendarme', 'Photographer', 'Lost American', 'Souvenir Vendor', 'Café Waiter', 'Influencer'],
+    translations: {
+      tr: {
+        name: 'Champs-Élysées',
+        roles: ['Lüks Butik Karşılayıcısı', 'Turist', 'Yankesici', 'Balayı Çifti', 'Sokak Sanatçısı', 'İzinli Jandarma', 'Fotoğrafçı', 'Kaybolmuş Amerikalı', 'Hediyelik Eşyacı', 'Kafe Garsonu', 'Influencer'],
+      },
+    },
+  },
+  {
+    name: "Musée d'Orsay",
+    bundleSlug: 'paris',
+    roles: ['Curator', 'Security Guard', 'Art Student', 'Tourist', 'Sketch Artist', 'Audio Guide Renter', 'Restorationist', 'Pickpocket', 'Lost Schoolchild', 'Janitor', 'Honeymooners'],
+    translations: {
+      tr: {
+        name: 'Orsay Müzesi',
+        roles: ['Küratör', 'Güvenlik Görevlisi', 'Sanat Öğrencisi', 'Turist', 'Karakalemci', 'Sesli Rehber Kiracısı', 'Restoratör', 'Yankesici', 'Kaybolmuş Okul Çocuğu', 'Temizlikçi', 'Balayı Çifti'],
+      },
+    },
+  },
+];
+
+// Bundle: Tokyo (city pack)
+const TOKYO: SeedLocation[] = [
+  {
+    name: 'Shibuya Crossing',
+    bundleSlug: 'tokyo',
+    roles: ['Salaryman', 'Cosplayer', 'Tourist', 'Pickpocket', 'Lost American', 'Live Streamer', 'Hachiko Selfie-Taker', 'Off-Duty Cop', 'Costumed Mascot', 'Promoter', 'Photographer'],
+    translations: {
+      tr: {
+        name: 'Shibuya Kavşağı',
+        roles: ['Salaryman', 'Kostümlü Oyuncu', 'Turist', 'Yankesici', 'Kaybolmuş Amerikalı', 'Canlı Yayıncı', 'Hachiko\'da Selfie Çeken', 'İzinli Polis', 'Kostümlü Maskot', 'Organizatör', 'Fotoğrafçı'],
+      },
+    },
+  },
+  {
+    name: 'Capsule Hotel',
+    bundleSlug: 'tokyo',
+    roles: ['Front Desk Clerk', 'Drunk Salaryman', 'Backpacker', 'Janitor', 'Snoring Guest', 'Late-Night Arriver', 'Off-Duty Pilot', 'Manager', 'Sauna Attendant', 'Tourist with Suitcase', 'Late Checkout Negotiator'],
+    translations: {
+      tr: {
+        name: 'Kapsül Otel',
+        roles: ['Resepsiyon Görevlisi', 'Sarhoş Salaryman', 'Sırt Çantalı Gezgin', 'Temizlikçi', 'Horlayan Misafir', 'Geç Saatte Gelen', 'İzinli Pilot', 'Müdür', 'Sauna Görevlisi', 'Bavullu Turist', 'Geç Çıkış İçin Pazarlık Eden'],
+      },
+    },
+  },
+  {
+    name: 'Karaoke Box',
+    bundleSlug: 'tokyo',
+    roles: ['Microphone Hog', 'Off-Key Singer', 'Birthday Star', 'Snack Server', 'Drunk Salaryman', 'Bachelorette Group', 'Tour Guide', 'Late Arriver', 'Tone-Deaf Tourist', 'Tambourine Hero', 'Manager'],
+    translations: {
+      tr: {
+        name: 'Karaoke Odası',
+        roles: ['Mikrofon Sahibi', 'Akortsuz Şarkıcı', 'Doğum Günü Yıldızı', 'Aperatif Garsonu', 'Sarhoş Salaryman', 'Bekarlığa Veda Grubu', 'Tur Rehberi', 'Geç Gelen', 'Tonsuz Turist', 'Tef Kahramanı', 'Müdür'],
+      },
+    },
+  },
+  {
+    name: 'Tsukiji Fish Market',
+    bundleSlug: 'tokyo',
+    roles: ['Tuna Auctioneer', 'Sushi Chef', 'Wholesale Buyer', 'Tourist', 'Forklift Driver', 'Photographer', 'Knife Sharpener', 'Fish Market Cat', 'Off-Duty Coast Guard', 'Lost American', 'Apprentice'],
+    translations: {
+      tr: {
+        name: 'Tsukiji Balık Pazarı',
+        roles: ['Ton Balığı Mezatçısı', 'Suşi Şefi', 'Toptancı', 'Turist', 'Forklift Şoförü', 'Fotoğrafçı', 'Bıçak Bileyici', 'Pazar Kedisi', 'İzinli Sahil Güvenlik', 'Kaybolmuş Amerikalı', 'Çırak'],
+      },
+    },
+  },
+  {
+    name: 'Shinjuku Bar Alley',
+    bundleSlug: 'tokyo',
+    roles: ['Bartender', 'Salaryman Sleeping Standing Up', 'Sake Sommelier', 'Tourist', 'Bouncer', 'Lost Foreigner', 'Off-Duty Cop', 'Karaoke Singer Spillover', 'Late-Night Cook', 'Stray Cat', 'Tout'],
+    translations: {
+      tr: {
+        name: 'Shinjuku Bar Sokağı',
+        roles: ['Barmen', 'Ayakta Uyuyan Salaryman', 'Sake Sommelier', 'Turist', 'Fedai', 'Kaybolmuş Yabancı', 'İzinli Polis', 'Karaoke\'den Taşan Şarkıcı', 'Gece Aşçısı', 'Sokak Kedisi', 'Kapı Çağırıcısı'],
+      },
+    },
+  },
+  {
+    name: 'Akihabara Maid Café',
+    bundleSlug: 'tokyo',
+    roles: ['Maid Server', 'Regular Otaku', 'Tourist', 'Photographer', 'Manager', 'Confused Salaryman', 'Stage Performer', 'Cosplayer', 'First-Time Visitor', 'Off-Duty Mangaka', 'Birthday Group'],
+    translations: {
+      tr: {
+        name: 'Akihabara Maid Kafe',
+        roles: ['Maid Garsonu', 'Müdavim Otaku', 'Turist', 'Fotoğrafçı', 'Müdür', 'Şaşkın Salaryman', 'Sahne Sanatçısı', 'Kostümlü Oyuncu', 'İlk Defa Gelen', 'İzinli Mangaka', 'Doğum Günü Grubu'],
+      },
+    },
+  },
+  {
+    name: 'Robot Restaurant',
+    bundleSlug: 'tokyo',
+    roles: ['Robot Operator', 'Server', 'MC', 'Tourist', 'Photographer', 'Off-Duty Mecha Designer', 'Stunt Performer', 'Confused Local', 'Birthday Group', 'Lost American', 'Manager'],
+    translations: {
+      tr: {
+        name: 'Robot Restoranı',
+        roles: ['Robot Operatörü', 'Garson', 'Sunucu', 'Turist', 'Fotoğrafçı', 'İzinli Meka Tasarımcısı', 'Dublör', 'Şaşkın Yerli', 'Doğum Günü Grubu', 'Kaybolmuş Amerikalı', 'Müdür'],
+      },
+    },
+  },
+  {
+    name: 'Ramen Stall',
+    bundleSlug: 'tokyo',
+    roles: ['Itamae', 'Late-Night Salaryman', 'Slurping Tourist', 'Apprentice', 'Regular', 'Off-Duty Cop', 'Drunk Local', 'Health Inspector', 'Photographer', 'Stray Cat', 'Lost Foreigner'],
+    translations: {
+      tr: {
+        name: 'Ramen Tezgahı',
+        roles: ['Itamae', 'Gece Salaryman\'i', 'Höpürdeten Turist', 'Çırak', 'Müdavim', 'İzinli Polis', 'Sarhoş Yerli', 'Sağlık Müfettişi', 'Fotoğrafçı', 'Sokak Kedisi', 'Kaybolmuş Yabancı'],
+      },
+    },
+  },
+  {
+    name: 'Onsen',
+    bundleSlug: 'tokyo',
+    roles: ['Bath Attendant', 'Manager', 'Local Regular', 'Shy First-Timer', 'Honeymooners', 'Tourist', 'Towel Vendor', 'Off-Duty Sumo', 'Old-Friend Gossiper', 'Sleeping Bather', 'Sauna-Loving Salaryman'],
+    translations: {
+      tr: {
+        name: 'Kaplıca',
+        roles: ['Hamam Görevlisi', 'Müdür', 'Yerli Müdavim', 'Utangaç İlk Gelen', 'Balayı Çifti', 'Turist', 'Havlu Satıcısı', 'İzinli Sumo', 'Dedikodu Yapan Eski Dost', 'Uyuyan Yıkanan', 'Sauna Sever Salaryman'],
+      },
+    },
+  },
+  {
+    name: 'Vending-Machine Alley',
+    bundleSlug: 'tokyo',
+    roles: ['Restocker', 'Lost Tourist', 'Late-Night Office Worker', 'Photography Hobbyist', 'Drunk Salaryman', 'Stray Cat', 'Off-Duty Cop', 'Mystery Shopper', 'Coin Hoarder', 'Kid with Pocket Money', 'Vandal'],
+    translations: {
+      tr: {
+        name: 'Otomat Sokağı',
+        roles: ['Stok Yenileyici', 'Kaybolmuş Turist', 'Gece Memuru', 'Fotoğraf Meraklısı', 'Sarhoş Salaryman', 'Sokak Kedisi', 'İzinli Polis', 'Gizli Müşteri', 'Bozuk Para Biriktirici', 'Harçlıklı Çocuk', 'Vandal'],
+      },
+    },
+  },
+];
+
+// Bundle: Stockholm (city pack)
+const STOCKHOLM: SeedLocation[] = [
+  {
+    name: 'Vasa Museum',
+    bundleSlug: 'stockholm',
+    roles: ['Tour Guide', 'Marine Archaeologist', 'School Class Teacher', 'Bewildered American', 'Photographer', 'Souvenir Vendor', 'Audio Guide Renter', 'Off-Duty Sailor', 'Sketch Artist', 'Sleeping Toddler in Stroller', 'Restoration Specialist'],
+    translations: {
+      tr: {
+        name: 'Vasa Müzesi',
+        roles: ['Tur Rehberi', 'Sualtı Arkeoloğu', 'Sınıf Öğretmeni', 'Şaşkın Amerikalı', 'Fotoğrafçı', 'Hediyelik Eşyacı', 'Sesli Rehber Kiracısı', 'İzinli Denizci', 'Karakalemci', 'Bebek Arabasında Uyuyan Çocuk', 'Restorasyon Uzmanı'],
+      },
+    },
+  },
+  {
+    name: 'ABBA Museum',
+    bundleSlug: 'stockholm',
+    roles: ['Tour Guide', 'Singing Tour Guide', 'Tribute Singer', 'Bewildered American', 'Honeymooners', 'Souvenir Vendor', 'Reluctant Husband', 'Disco-Floor Solo Dancer', 'Photographer', 'Karaoke Booth Operator', 'Birthday Group'],
+    translations: {
+      tr: {
+        name: 'ABBA Müzesi',
+        roles: ['Tur Rehberi', 'Şarkı Söyleyen Tur Rehberi', 'Tribute Şarkıcı', 'Şaşkın Amerikalı', 'Balayı Çifti', 'Hediyelik Eşyacı', 'İsteksiz Koca', 'Disco Solo Dansçı', 'Fotoğrafçı', 'Karaoke Operatörü', 'Doğum Günü Grubu'],
+      },
+    },
+  },
+  {
+    name: 'Gamla Stan',
+    bundleSlug: 'stockholm',
+    roles: ['Tour Guide', 'Reindeer-Sweater Vendor', "Off-Duty King's Guard", 'Bewildered American', 'Pickpocket', 'Photographer', 'Honeymooners', 'Antique Shop Owner', 'Sketch Artist', 'Lost Cruise-Ship Tourist', 'Cobblestone-Stumbling Tourist'],
+    translations: {
+      tr: {
+        name: 'Gamla Stan',
+        roles: ['Tur Rehberi', 'Ren Geyiği Kazaklı Satıcı', 'İzinli Saray Muhafızı', 'Şaşkın Amerikalı', 'Yankesici', 'Fotoğrafçı', 'Balayı Çifti', 'Antikacı', 'Karakalemci', 'Kaybolmuş Yolcu Gemisi Turisti', 'Arnavut Kaldırımında Tökezleyen Turist'],
+      },
+    },
+  },
+  {
+    name: 'Stockholm Sauna',
+    bundleSlug: 'stockholm',
+    roles: ['Bath Attendant', 'Naked Sauna Regular', 'Shy First-Timer', 'Birch-Branch Whisker', 'Tourist', 'Honeymooners', 'Manager', 'Cold Plunge Show-Off', 'Off-Duty Hockey Player', 'Sauna Philosopher', 'Towel Folder'],
+    translations: {
+      tr: {
+        name: 'İskandinav Sauna',
+        roles: ['Hamam Görevlisi', 'Çıplak Sauna Müdavimi', 'Utangaç İlk Gelen', 'Huş Dalı Vurucusu', 'Turist', 'Balayı Çifti', 'Müdür', 'Soğuk Suya Atlayan Hava Atan', 'İzinli Hokey Oyuncusu', 'Sauna Filozofu', 'Havlu Katlayan'],
+      },
+    },
+  },
+  {
+    name: 'Archipelago Ferry',
+    bundleSlug: 'stockholm',
+    roles: ['Captain', 'Deckhand', 'Coffee Cart Operator', 'Commuter', 'Tourist', 'Bewildered American', 'Photographer', 'Honeymooners', 'Picnic Family', 'Off-Duty Coast Guard', 'Seasick Toddler'],
+    translations: {
+      tr: {
+        name: 'Takımada Vapuru',
+        roles: ['Kaptan', 'Tayfa', 'Kahveci', 'Yolcu', 'Turist', 'Şaşkın Amerikalı', 'Fotoğrafçı', 'Balayı Çifti', 'Piknik Yapan Aile', 'İzinli Sahil Güvenlik', 'Deniz Tutmuş Çocuk'],
+      },
+    },
+  },
+  {
+    name: 'Skansen Museum',
+    bundleSlug: 'stockholm',
+    roles: ['Tour Guide', 'Costumed Reenactor', 'Reindeer Handler', 'Glassblower', 'Bewildered American', 'Photographer', 'School Class Teacher', 'Folk Musician', 'Cinnamon Bun Vendor', 'Off-Duty Park Ranger', 'Lost Toddler'],
+    translations: {
+      tr: {
+        name: 'Skansen Müzesi',
+        roles: ['Tur Rehberi', 'Kostümlü Canlandırmacı', 'Ren Geyiği Bakıcısı', 'Cam Üfleyici', 'Şaşkın Amerikalı', 'Fotoğrafçı', 'Sınıf Öğretmeni', 'Halk Müzisyeni', 'Tarçınlı Çörekçi', 'İzinli Park Korucusu', 'Kaybolmuş Çocuk'],
+      },
+    },
+  },
+  {
+    name: 'Ice Bar',
+    bundleSlug: 'stockholm',
+    roles: ['Bartender', 'Bewildered American', 'Honeymooners', 'Photographer', 'Birthday Group', 'Coat Attendant', 'Ice Sculptor', 'Tourist', 'Off-Duty Hockey Player', 'Manager', 'Tipsy Brit'],
+    translations: {
+      tr: {
+        name: 'Buz Bar',
+        roles: ['Barmen', 'Şaşkın Amerikalı', 'Balayı Çifti', 'Fotoğrafçı', 'Doğum Günü Grubu', 'Palto Görevlisi', 'Buz Heykeltıraşı', 'Turist', 'İzinli Hokey Oyuncusu', 'Müdür', 'Çakırkeyif İngiliz'],
+      },
+    },
+  },
+  {
+    name: 'Royal Palace',
+    bundleSlug: 'stockholm',
+    roles: ["King's Guard", 'Tour Guide', 'Tourist', 'Bewildered American', 'Photographer', 'Souvenir Vendor', 'Off-Duty Diplomat', 'Pickpocket', 'Curator', 'Sketch Artist', 'Lost Cruise-Ship Tourist'],
+    translations: {
+      tr: {
+        name: 'Kraliyet Sarayı',
+        roles: ['Saray Muhafızı', 'Tur Rehberi', 'Turist', 'Şaşkın Amerikalı', 'Fotoğrafçı', 'Hediyelik Eşyacı', 'İzinli Diplomat', 'Yankesici', 'Küratör', 'Karakalemci', 'Kaybolmuş Yolcu Gemisi Turisti'],
+      },
+    },
+  },
+  {
+    name: 'Herring Buffet',
+    bundleSlug: 'stockholm',
+    roles: ['Buffet Server', 'Picky Bewildered American', 'Schnapps Pourer', 'Local Regular', 'Honeymooners', 'Tourist', 'Off-Duty Chef', 'Photographer', 'Picky Toddler', 'Reluctant Vegetarian', 'Manager'],
+    translations: {
+      tr: {
+        name: 'Ringa Büfesi',
+        roles: ['Büfe Garsonu', 'Burnu Havada Şaşkın Amerikalı', 'Snaps Servisçisi', 'Yerli Müdavim', 'Balayı Çifti', 'Turist', 'İzinli Şef', 'Fotoğrafçı', 'Mızmız Çocuk', 'İsteksiz Vejetaryen', 'Müdür'],
+      },
+    },
+  },
+  {
+    name: 'T-Bana Station',
+    bundleSlug: 'stockholm',
+    roles: ['Conductor', 'Busker', 'Commuter', 'Tourist with Map', 'Pickpocket', 'Off-Duty Worker', 'Student', 'Transit Officer', 'Sleeping Passenger', 'Sketch Artist', 'Reindeer-Sweater Tourist'],
+    translations: {
+      tr: {
+        name: 'T-Bana İstasyonu',
+        roles: ['Vatman', 'Sokak Müzisyeni', 'Yolcu', 'Haritalı Turist', 'Yankesici', 'Mesai Sonrası Yolcu', 'Öğrenci', 'Metro Görevlisi', 'Uyuyan Yolcu', 'Karakalemci', 'Ren Geyiği Kazaklı Turist'],
+      },
+    },
+  },
+];
+
+const SEED: SeedLocation[] = [...FREE, ...ISTANBUL, ...CYBERPUNK, ...PARIS, ...TOKYO, ...STOCKHOLM];
 
 /**
  * Idempotent: returns { inserted: 0 } if locations already exist. Public

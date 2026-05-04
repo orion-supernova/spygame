@@ -15,6 +15,9 @@ const Map<String, IconData> _iconForKey = <String, IconData>{
   'travel_explore': Icons.travel_explore_rounded,
   'rocket_launch': Icons.rocket_launch_rounded,
   'public': Icons.public_rounded,
+  'local_cafe': Icons.local_cafe_rounded,
+  'ramen_dining': Icons.ramen_dining_rounded,
+  'sailing': Icons.sailing_rounded,
 };
 
 IconData _resolveIcon(String key) =>

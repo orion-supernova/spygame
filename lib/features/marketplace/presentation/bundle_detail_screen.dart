@@ -34,7 +34,7 @@ class BundleDetailScreen extends ConsumerWidget {
                 detail: detail,
                 owned: owned,
                 onToggleOwned: () async {
-                  Haptics.medium();
+                  await Haptics.medium();
                   await ref
                       .read(ownedBundlesProvider.notifier)
                       .setOwned(slug, !owned);
@@ -64,16 +64,30 @@ class _DetailView extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final bundle = detail.bundle;
+
+    final categoryLabel = bundle.category == BundleCategory.city
+        ? l10n.marketplaceCategoryCity
+        : l10n.marketplaceCategoryTheme;
+
+    // Roles per location is uniform (11) by game design; show that figure
+    // in the friendly meta line rather than computing the average across
+    // locations.
+    const rolesPerLocation = 11;
+
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+          padding: const EdgeInsets.fromLTRB(8, 4, 16, 0),
           child: Row(
             children: [
               IconButton(
                 onPressed: () => context.pop(),
-                icon: const Icon(Icons.close, color: AppColors.paper),
+                icon: const Icon(
+                  Icons.close_rounded,
+                  color: AppColors.paper,
+                ),
               ),
+              const Spacer(),
             ],
           ),
         ),
@@ -83,87 +97,40 @@ class _DetailView extends StatelessWidget {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(28, 8, 28, 16),
+                  padding: const EdgeInsets.fromLTRB(28, 18, 28, 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: bundle.accentColor.withValues(alpha: 0.16),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color:
-                                bundle.accentColor.withValues(alpha: 0.55),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: bundle.accentColor
-                                    .withValues(alpha: 0.18),
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: bundle.accentColor,
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                bundle.icon,
-                                size: 32,
-                                color: bundle.accentColor,
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    bundle.title,
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                      color: AppColors.paper,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    bundle.tagline,
-                                    style: theme.textTheme.bodyMedium
-                                        ?.copyWith(
-                                      color: AppColors.paperMuted,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    l10n.marketplaceLocationCount(
-                                      bundle.locationCount,
-                                    ),
-                                    style: AppTypography.mono(
-                                      size: 11,
-                                      weight: FontWeight.w600,
-                                      letterSpacing: 1.4,
-                                      color: AppColors.paperFaint,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                      _Eyebrow(text: categoryLabel),
+                      const SizedBox(height: 18),
+                      Text(
+                        bundle.title,
+                        style: theme.textTheme.displayMedium?.copyWith(
+                          fontSize: 56,
+                          height: 0.98,
+                          color: AppColors.paper,
+                          letterSpacing: -1.2,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 14),
                       Text(
-                        l10n.marketplaceBundleLocationsLabel,
+                        bundle.tagline,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: AppColors.paperMuted,
+                          fontStyle: FontStyle.italic,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        l10n.marketplaceLocationsAndRoles(
+                          bundle.locationCount,
+                          rolesPerLocation,
+                        ),
                         style: AppTypography.mono(
                           size: 11,
                           weight: FontWeight.w600,
-                          letterSpacing: 2.2,
+                          letterSpacing: 1.6,
                           color: AppColors.paperFaint,
                         ),
                       ),
@@ -172,14 +139,18 @@ class _DetailView extends StatelessWidget {
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.fromLTRB(28, 6, 28, 14),
+                sliver: SliverToBoxAdapter(
+                  child: _Eyebrow(text: l10n.marketplaceBundleContentsLabel),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
                 sliver: SliverList.separated(
                   itemCount: detail.locations.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (_, i) => _LocationTile(
-                    location: detail.locations[i],
-                    accent: bundle.accentColor,
-                  ),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) =>
+                      _LocationCard(location: detail.locations[i]),
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 28)),
@@ -187,103 +158,58 @@ class _DetailView extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-          child: Column(
-            children: [
-              if (owned)
-                OutlinedButton(
-                  onPressed: onToggleOwned,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.paperFaint,
-                    side: const BorderSide(color: AppColors.inkOutline),
-                    minimumSize: const Size.fromHeight(56),
-                  ),
-                  child: Text(l10n.marketplaceRemoveMock),
-                )
-              else
-                ElevatedButton(
-                  onPressed: onToggleOwned,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: bundle.accentColor,
-                    foregroundColor: AppColors.ink,
-                    minimumSize: const Size.fromHeight(56),
-                  ),
-                  child: Text(
-                    '${l10n.marketplaceBuy} · ${bundle.priceDisplay}',
-                  ),
+          padding: const EdgeInsets.fromLTRB(28, 4, 28, 18),
+          child: owned
+              ? _OwnedBlock(onRemove: onToggleOwned)
+              : _UnlockBlock(
+                  price: bundle.priceDisplay,
+                  onTap: onToggleOwned,
                 ),
-              const SizedBox(height: 6),
-              Text(
-                l10n.marketplaceBuyMockNotice,
-                textAlign: TextAlign.center,
-                style: AppTypography.mono(
-                  size: 10,
-                  weight: FontWeight.w500,
-                  letterSpacing: 1.2,
-                  color: AppColors.paperFaint,
-                ),
-              ),
-            ],
-          ),
         ),
       ],
     );
   }
 }
 
-class _LocationTile extends StatelessWidget {
-  const _LocationTile({required this.location, required this.accent});
+class _LocationCard extends StatelessWidget {
+  const _LocationCard({required this.location});
   final BundleLocation location;
-  final Color accent;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final extra = location.totalRoles - location.sampleRoles.length;
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
       decoration: BoxDecoration(
         color: AppColors.inkRaised,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.inkOutline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: accent,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  location.name,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.paper,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            location.name,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: AppColors.paper,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
+              height: 1.1,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 6,
             runSpacing: 6,
             children: [
-              for (final role in location.sampleRoles)
-                _RoleChip(text: role),
+              for (final role in location.sampleRoles) _RoleChip(text: role),
               if (extra > 0)
                 _RoleChip(
                   text: l10n.marketplaceBundleRolesMore(extra),
-                  faint: true,
+                  muted: true,
                 ),
             ],
           ),
@@ -294,27 +220,148 @@ class _LocationTile extends StatelessWidget {
 }
 
 class _RoleChip extends StatelessWidget {
-  const _RoleChip({required this.text, this.faint = false});
+  const _RoleChip({required this.text, this.muted = false});
   final String text;
-  final bool faint;
+  final bool muted;
+
   @override
   Widget build(BuildContext context) {
+    // `muted: true` is the "+ N more" affordance — same shape as a regular
+    // role chip, recolored with the lime accent so it pops as a hint that
+    // more roles are hidden. Previously it ghosted into the background.
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.inkSurface,
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: AppColors.inkOutline),
+        color: muted
+            ? AppColors.lime.withValues(alpha: 0.10)
+            : AppColors.ink.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: muted
+              ? AppColors.lime.withValues(alpha: 0.55)
+              : AppColors.inkOutline,
+        ),
       ),
       child: Text(
         text,
         style: AppTypography.mono(
           size: 10,
-          weight: FontWeight.w600,
-          letterSpacing: 0.6,
-          color: faint ? AppColors.paperFaint : AppColors.paperMuted,
+          weight: FontWeight.w700,
+          letterSpacing: muted ? 1.4 : 0.8,
+          color: muted ? AppColors.lime : AppColors.paperMuted,
         ),
       ),
+    );
+  }
+}
+
+class _UnlockBlock extends StatelessWidget {
+  const _UnlockBlock({required this.price, required this.onTap});
+  final String price;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: onTap,
+            child: Text('${l10n.marketplaceUnlock} · $price'),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.marketplaceBuyMockNotice,
+          textAlign: TextAlign.center,
+          style: AppTypography.mono(
+            size: 10,
+            weight: FontWeight.w500,
+            letterSpacing: 1.2,
+            color: AppColors.paperFaint,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _OwnedBlock extends StatelessWidget {
+  const _OwnedBlock({required this.onRemove});
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+          decoration: BoxDecoration(
+            color: AppColors.lime.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.lime.withValues(alpha: 0.6)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.check_rounded, color: AppColors.lime, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  l10n.marketplaceOwnedBanner,
+                  style: AppTypography.mono(
+                    size: 12,
+                    weight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                    color: AppColors.lime,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        TextButton(
+          onPressed: onRemove,
+          child: Text(
+            l10n.marketplaceRemoveMock,
+            style: AppTypography.mono(
+              size: 11,
+              weight: FontWeight.w500,
+              letterSpacing: 1.2,
+              color: AppColors.paperFaint,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Eyebrow extends StatelessWidget {
+  const _Eyebrow({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 28, height: 2, color: AppColors.lime),
+        const SizedBox(width: 10),
+        Text(
+          text,
+          style: AppTypography.mono(
+            size: 11,
+            weight: FontWeight.w600,
+            letterSpacing: 2.2,
+            color: AppColors.lime,
+          ),
+        ),
+      ],
     );
   }
 }
