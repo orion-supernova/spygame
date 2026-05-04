@@ -115,6 +115,25 @@ class ConvexRoomRepository implements RoomRepository {
   }
 
   @override
+  Future<void> setDisabledLocations({
+    required String code,
+    required List<String> disabledLocationIds,
+  }) async {
+    try {
+      await _client.mutation(
+        name: 'rooms:setDisabledLocations',
+        args: {
+          'code': code,
+          'clientToken': _identity.clientToken,
+          'disabledLocationIds': disabledLocationIds,
+        },
+      );
+    } catch (e) {
+      throw _mapError(e);
+    }
+  }
+
+  @override
   Future<void> heartbeat({required String code}) async {
     try {
       await _client.mutation(

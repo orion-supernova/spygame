@@ -67,16 +67,21 @@ async function pickNextLocation(
   ctx: MutationCtx,
   used: Id<'locations'>[],
   ownedBundleSlugs: Set<string>,
+  disabledLocationIds: Set<string>,
 ): Promise<Doc<'locations'>> {
   const all = await ctx.db.query('locations').collect();
-  // Filter to free locations + owned bundles. Server doesn't validate
-  // ownership claims (no accounts) — RevenueCat-backed validation is a
-  // future task. For now we trust the client's claim.
+  // Filter to free locations + owned bundles, then drop the host's
+  // per-game blacklist. Server doesn't validate ownership claims (no
+  // accounts) — RevenueCat-backed validation is a future task.
   const eligible = all.filter(
-    (l) => l.bundleSlug == null || ownedBundleSlugs.has(l.bundleSlug),
+    (l) =>
+      (l.bundleSlug == null || ownedBundleSlugs.has(l.bundleSlug)) &&
+      !disabledLocationIds.has(l._id.toString()),
   );
   if (eligible.length === 0) {
-    throw new ConvexError('No locations seeded — run locations:seed.');
+    throw new ConvexError(
+      'No locations available — host disabled all of them.',
+    );
   }
   const usedSet = new Set(used.map((id) => id.toString()));
   const remaining = eligible.filter((l) => !usedSet.has(l._id.toString()));
@@ -97,10 +102,14 @@ async function startNewRound(args: {
   if (!room) throw new ConvexError('Room vanished.');
 
   const ownedBundleSlugs = new Set(game.ownedBundleSlugs ?? []);
+  const disabledLocationIds = new Set(
+    (game.disabledLocationIds ?? []).map((id) => id.toString()),
+  );
   const location = await pickNextLocation(
     ctx,
     game.usedLocationIds,
     ownedBundleSlugs,
+    disabledLocationIds,
   );
   const roundId = await ctx.db.insert('rounds', {
     gameId,
@@ -193,6 +202,7 @@ export const startGame = mutation({
       totalRounds: room.config.roundCount,
       usedLocationIds: [],
       ownedBundleSlugs: args.ownedBundleSlugs ?? [],
+      disabledLocationIds: room.disabledLocationIds ?? [],
     });
     await ctx.db.patch(room._id, {
       status: 'inGame',
@@ -478,8 +488,13 @@ export const watchLocations = query({
 
     if (!room || !room.currentGameId) {
       const owned = new Set(args.ownedBundleSlugs ?? []);
+      const disabled = new Set(
+        (room?.disabledLocationIds ?? []).map((id) => id.toString()),
+      );
       const eligible = all.filter(
-        (l) => l.bundleSlug == null || owned.has(l.bundleSlug),
+        (l) =>
+          (l.bundleSlug == null || owned.has(l.bundleSlug)) &&
+          !disabled.has(l._id.toString()),
       );
       return {
         locations: eligible.map((l) => ({
@@ -514,8 +529,13 @@ export const watchLocations = query({
     }
 
     const gameOwned = new Set(game.ownedBundleSlugs ?? []);
+    const gameDisabled = new Set(
+      (game.disabledLocationIds ?? []).map((id) => id.toString()),
+    );
     const eligible = all.filter(
-      (l) => l.bundleSlug == null || gameOwned.has(l.bundleSlug),
+      (l) =>
+        (l.bundleSlug == null || gameOwned.has(l.bundleSlug)) &&
+        !gameDisabled.has(l._id.toString()),
     );
     return {
       locations: eligible.map((l) => ({

@@ -105,6 +105,7 @@ class Room {
     required this.status,
     required this.ownerToken,
     required this.config,
+    required this.disabledLocationIds,
     required this.players,
     required this.currentGame,
     required this.currentRound,
@@ -117,6 +118,10 @@ class Room {
   final RoomStatus status;
   final String ownerToken;
   final GameConfig config;
+  /// Location IDs the host has blacklisted for the next game from this
+  /// room. Persists across games. Snapshotted onto the game row at
+  /// startGame so mid-game edits don't change the running pool.
+  final Set<String> disabledLocationIds;
   final List<Player> players;
   final GameSnapshot? currentGame;
   final RoundSnapshot? currentRound;

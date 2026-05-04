@@ -6,6 +6,10 @@ abstract interface class RoomRepository {
   Future<void> leaveRoom({required String code});
   Future<void> setReady({required String code, required bool ready});
   Future<void> updateConfig({required String code, required GameConfig config});
+  Future<void> setDisabledLocations({
+    required String code,
+    required List<String> disabledLocationIds,
+  });
   Future<void> heartbeat({required String code});
   Future<void> startGame({
     required String code,

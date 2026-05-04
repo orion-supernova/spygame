@@ -43,6 +43,10 @@ function publicConfig(room: Doc<'rooms'>) {
   };
 }
 
+function publicDisabledLocationIds(room: Doc<'rooms'>): string[] {
+  return (room.disabledLocationIds ?? []).map((id) => id.toString());
+}
+
 export const createRoom = mutation({
   args: {
     displayName: v.string(),
@@ -252,6 +256,40 @@ export const updateConfig = mutation({
   },
 });
 
+/**
+ * Host-only. Replaces the room's `disabledLocationIds` set with the given
+ * list. Called by the locations picker bottom-sheet in the lobby. Lobby-
+ * only — once a game is running, the snapshot on `games.disabledLocationIds`
+ * is what matters and editing here would have no effect on the live pool.
+ *
+ * Server doesn't validate that the IDs are actually locations the host
+ * owns or that they exist; the picker UI is the source of truth and can
+ * only present rows the user can see. An ID for a non-existent or
+ * unowned location is harmless — it just never matches a row in the
+ * filter.
+ */
+export const setDisabledLocations = mutation({
+  args: {
+    code: v.string(),
+    clientToken: v.string(),
+    disabledLocationIds: v.array(v.id('locations')),
+  },
+  handler: async (ctx, args) => {
+    const code = normalizeCode(args.code);
+    const room = await findRoomByCode(ctx, code);
+    if (!room) throw new ConvexError('Room not found.');
+    if (room.ownerToken !== args.clientToken) {
+      throw new ConvexError('Only the host can change locations.');
+    }
+    if (room.status !== 'lobby') {
+      throw new ConvexError('Cannot change locations during a game.');
+    }
+    await ctx.db.patch(room._id, {
+      disabledLocationIds: args.disabledLocationIds,
+    });
+  },
+});
+
 export const heartbeat = mutation({
   args: {
     code: v.string(),
@@ -324,6 +362,7 @@ export const watchRoom = query({
       status: room.status,
       ownerToken: room.ownerToken,
       config: publicConfig(room),
+      disabledLocationIds: publicDisabledLocationIds(room),
       players: players
         .map((p) => ({
           _id: p._id,

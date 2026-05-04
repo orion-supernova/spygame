@@ -6,6 +6,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../marketplace/data/marketplace_providers.dart';
+import '../../data/locations_picker_repository.dart';
 import '../../domain/room.dart';
 
 class ConfigPanel extends ConsumerWidget {
@@ -14,11 +15,18 @@ class ConfigPanel extends ConsumerWidget {
     required this.config,
     required this.editable,
     required this.onChanged,
+    required this.onEditLocations,
+    required this.disabledLocationIds,
   });
 
   final GameConfig config;
   final bool editable;
   final ValueChanged<GameConfig> onChanged;
+  /// Host-only callback that opens the locations picker sheet. The
+  /// ConfigPanel doesn't construct the sheet itself because the sheet
+  /// needs access to the room repository, which is owned by the lobby.
+  final VoidCallback onEditLocations;
+  final Set<String> disabledLocationIds;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -135,7 +143,89 @@ class ConfigPanel extends ConsumerWidget {
               for (final t in ownedTitles) _PackChip(text: t, accent: true),
             ],
           ),
+          if (editable) ...[
+            const SizedBox(height: 14),
+            _EditLocationsRow(
+              disabledIds: disabledLocationIds,
+              onTap: onEditLocations,
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _EditLocationsRow extends ConsumerWidget {
+  const _EditLocationsRow({required this.disabledIds, required this.onTap});
+
+  final Set<String> disabledIds;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final pickerAsync = ref.watch(locationsForPickerProvider);
+    final (enabled, total) = pickerAsync.maybeWhen(
+      data: (rows) {
+        final enabledCount =
+            rows.where((r) => !disabledIds.contains(r.id)).length;
+        return (enabledCount, rows.length);
+      },
+      orElse: () => (0, 0),
+    );
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: () {
+          Haptics.selection();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(14),
+        splashColor: AppColors.lime.withValues(alpha: 0.06),
+        highlightColor: AppColors.lime.withValues(alpha: 0.04),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: AppColors.ink.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.inkOutline),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.configEditLocations,
+                    style: AppTypography.mono(
+                      size: 12,
+                      weight: FontWeight.w700,
+                      letterSpacing: 1.8,
+                      color: AppColors.lime,
+                    ),
+                  ),
+                ),
+                Text(
+                  total == 0 ? '—' : l10n.configLocationsCount(enabled, total),
+                  style: AppTypography.mono(
+                    size: 13,
+                    weight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                    color: AppColors.paper,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  size: 22,
+                  color: AppColors.paperFaint,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

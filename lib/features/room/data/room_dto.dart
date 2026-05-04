@@ -17,10 +17,16 @@ class RoomMapper {
       status: _statusFromString(json['status']?.toString()),
       ownerToken: json['ownerToken']?.toString() ?? '',
       config: _configFromJson(json['config']),
+      disabledLocationIds: _stringSetFromJson(json['disabledLocationIds']),
       players: _playersFromJson(json['players']),
       currentGame: _gameFromJson(json['currentGame']),
       currentRound: _roundFromJson(json['currentRound']),
     );
+  }
+
+  static Set<String> _stringSetFromJson(Object? raw) {
+    if (raw is! List) return const <String>{};
+    return raw.whereType<Object>().map((v) => v.toString()).toSet();
   }
 
   static RoomStatus _statusFromString(String? raw) {

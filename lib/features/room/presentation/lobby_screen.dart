@@ -21,6 +21,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../data/room_providers.dart';
 import '../domain/room.dart';
 import 'widgets/config_panel.dart';
+import 'widgets/locations_sheet.dart';
 import 'widgets/player_tile.dart';
 import 'widgets/ready_button.dart';
 import 'widgets/room_code_chip.dart';
@@ -133,6 +134,17 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     }
   }
 
+  Future<void> _openLocationsSheet(Set<String> currentDisabled) async {
+    await Haptics.light();
+    if (!mounted) return;
+    await LocationsSheet.show(
+      context,
+      code: widget.code,
+      currentDisabled: currentDisabled,
+      repository: ref.read(roomRepositoryProvider),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final asyncRoom = ref.watch(roomStreamProvider(widget.code));
@@ -177,6 +189,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   room: room,
                   myToken: myToken,
                   busy: _busy,
+                  onEditLocations: () =>
+                      _openLocationsSheet(room.disabledLocationIds),
                   onToggleReady: () =>
                       _toggleReady(room.playerFor(myToken)?.isReady ?? false),
                   onStart: _start,
@@ -203,6 +217,7 @@ class _LobbyBody extends StatelessWidget {
     required this.onShare,
     required this.onLeave,
     required this.onConfigChanged,
+    required this.onEditLocations,
   });
 
   final Room room;
@@ -213,6 +228,7 @@ class _LobbyBody extends StatelessWidget {
   final VoidCallback onShare;
   final VoidCallback onLeave;
   final ValueChanged<GameConfig> onConfigChanged;
+  final VoidCallback onEditLocations;
 
   @override
   Widget build(BuildContext context) {
@@ -333,6 +349,8 @@ class _LobbyBody extends StatelessWidget {
                     config: room.config,
                     editable: isOwner,
                     onChanged: onConfigChanged,
+                    onEditLocations: onEditLocations,
+                    disabledLocationIds: room.disabledLocationIds,
                   ),
                 ),
               ),

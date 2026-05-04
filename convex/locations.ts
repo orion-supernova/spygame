@@ -1,4 +1,8 @@
+import { v } from 'convex/values';
+
 import { mutation, query } from './_generated/server';
+
+const LOCALE_VALIDATOR = v.optional(v.union(v.literal('en'), v.literal('tr')));
 
 /**
  * Original generic-venue location set + paid bundle packs. Each location
@@ -966,5 +970,37 @@ export const list = query({
       name: l.name,
       bundleSlug: l.bundleSlug ?? null,
     }));
+  },
+});
+
+/**
+ * Locale-projected list for the lobby's locations picker. Returns every
+ * row that's eligible to show up in this room — free locations plus any
+ * row whose bundle is in the host's `ownedBundleSlugs` set. Each row
+ * carries its `bundleSlug` so the client can group by bundle title using
+ * data already cached in `bundlesProvider`.
+ */
+export const listForPicker = query({
+  args: {
+    locale: LOCALE_VALIDATOR,
+    ownedBundleSlugs: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const owned = new Set(args.ownedBundleSlugs ?? []);
+    const all = await ctx.db.query('locations').collect();
+    const eligible = all.filter(
+      (l) => l.bundleSlug == null || owned.has(l.bundleSlug),
+    );
+    return eligible.map((l) => {
+      const localized =
+        args.locale === 'tr' && l.translations?.tr
+          ? l.translations.tr.name
+          : l.name;
+      return {
+        _id: l._id,
+        name: localized,
+        bundleSlug: l.bundleSlug ?? null,
+      };
+    });
   },
 });

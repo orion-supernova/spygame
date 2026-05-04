@@ -91,8 +91,62 @@
   "configActivePacksLabel": "ACTIVE PACKS",
   "@configActivePacksLabel": { "description": "Eyebrow label above the chip row in ConfigPanel showing which bundles are feeding the game. All-caps mono." },
 
-  "configActivePackFree": "Free",
-  "@configActivePackFree": { "description": "Chip label for the always-included free location set in the ACTIVE PACKS row." },
+  "configActivePackFree": "Classic",
+  "@configActivePackFree": { "description": "Chip label for the always-included core location set in the ACTIVE PACKS row. Matches the 'Classic locations' wording in the locations picker — same set, same label, no transactional 'free' framing." },
+
+  "configEditLocations": "EDIT LOCATIONS",
+  "@configEditLocations": { "description": "Tappable mono-caps label on the host's locations editor row in ConfigPanel. Opens the locations picker bottom-sheet." },
+
+  "configLocationsCount": "{enabled} of {total}",
+  "@configLocationsCount": {
+    "description": "Right-aligned count next to EDIT LOCATIONS, e.g. '38 of 74'.",
+    "placeholders": {
+      "enabled": { "type": "int", "example": "38" },
+      "total": { "type": "int", "example": "74" }
+    }
+  },
+
+  "locationsSheetTitle": "Locations",
+  "@locationsSheetTitle": { "description": "Display title at the top of the locations picker bottom-sheet." },
+
+  "locationsSheetSubtitle": "Pick which locations can show up this game.",
+  "@locationsSheetSubtitle": { "description": "Friendly subtitle under the locations picker title." },
+
+  "locationsSheetTotalEnabled": "{enabled} OF {total} ENABLED",
+  "@locationsSheetTotalEnabled": {
+    "description": "Mono caps total shown at the top of the locations picker, summing across all sections.",
+    "placeholders": {
+      "enabled": { "type": "int", "example": "38" },
+      "total": { "type": "int", "example": "74" }
+    }
+  },
+
+  "locationsSheetExpand": "Expand",
+  "@locationsSheetExpand": { "description": "Tooltip on the per-section expand/collapse chevron when the section is collapsed." },
+
+  "locationsSheetCollapse": "Collapse",
+  "@locationsSheetCollapse": { "description": "Tooltip on the per-section expand/collapse chevron when the section is expanded." },
+
+  "locationsSheetSectionFree": "Classic locations",
+  "@locationsSheetSectionFree": { "description": "Section header for the always-included core location pool inside the locations picker. We avoid 'free' here — the picker isn't a price comparison, it's a location selector — and 'classic' positions the set as the foundational canon rather than the cheap option." },
+
+  "locationsSheetSectionCount": "{enabled}/{total}",
+  "@locationsSheetSectionCount": {
+    "description": "Compact count next to each section header, e.g. '8/10'.",
+    "placeholders": {
+      "enabled": { "type": "int", "example": "8" },
+      "total": { "type": "int", "example": "10" }
+    }
+  },
+
+  "locationsSheetToggleAll": "Toggle all",
+  "@locationsSheetToggleAll": { "description": "Tooltip on the per-section bulk toggle button in the locations picker." },
+
+  "locationsSheetDone": "DONE",
+  "@locationsSheetDone": { "description": "Primary CTA at the bottom of the locations picker. Saves the host's selection and closes the sheet." },
+
+  "locationsSheetBrowseMarketplace": "Want more locations? Browse packs →",
+  "@locationsSheetBrowseMarketplace": { "description": "Persistent in-context entry point at the bottom of the locations picker that takes the user to the marketplace. Friendly bodyMedium tone, ends with a forward arrow rendered as an icon next to it." },
 
   "welcomeFootnote": "3 to 12 players. Spies among you. Trust no one.",
   "@welcomeFootnote": { "description": "Small mono footnote under the welcome CTAs. Three short clauses, spy-noir tone. The third clause is a wink at the spy/social-deduction premise." },

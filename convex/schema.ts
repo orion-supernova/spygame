@@ -25,6 +25,11 @@ export default defineSchema({
       roundCount: v.number(),
     }),
     currentGameId: v.optional(v.id('games')),
+    // Host-curated blacklist of locations that should NOT show up in the
+    // next game from this room. Persists across games (host's preference
+    // carries over). Snapshotted onto `games.disabledLocationIds` at
+    // startGame so mid-game edits don't change the running pool.
+    disabledLocationIds: v.optional(v.array(v.id('locations'))),
     createdAt: v.number(),
   })
     .index('by_code', ['code']),
@@ -68,6 +73,10 @@ export default defineSchema({
     // backward-compat with games created before this field existed; the
     // server treats `undefined` as "free locations only".
     ownedBundleSlugs: v.optional(v.array(v.string())),
+    // Snapshot of `rooms.disabledLocationIds` at game-start. Treated the
+    // same way ownedBundleSlugs is — frozen at startGame, never edited
+    // mid-game. Optional for backward-compat (treat undefined as []).
+    disabledLocationIds: v.optional(v.array(v.id('locations'))),
   })
     .index('by_room', ['roomId']),
 
