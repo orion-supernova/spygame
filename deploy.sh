@@ -1,9 +1,10 @@
 #!/bin/bash
-# Spygame iOS deploy script.
+# Spygame deploy script (iOS + web).
 #
 # Default behavior: deploy Convex backend → flutter clean/get/codegen → bump pubspec
-# version → pod install → flutter build → xcodebuild archive + export → upload to
-# App Store Connect → commit + push the version bump.
+# version → pod install → flutter build iOS → xcodebuild archive + export → upload to
+# App Store Connect → flutter build web + firebase hosting deploy → commit + push the
+# version bump.
 #
 # Run-and-ship: ./deploy.sh
 # See ./deploy.sh -h for flags.
@@ -18,6 +19,7 @@ cd "$SCRIPT_DIR"
 SKIP_VERSION_BUMP=false
 RUN_CONVEX=true
 RUN_UPLOAD=true
+RUN_WEB=true
 RUN_GIT=true
 DRY_RUN=false
 
@@ -25,14 +27,16 @@ print_help() {
     cat <<EOF
 Usage: ./deploy.sh [flags]
 
-Default (no flags): full ship — Convex deploy + version bump + build + upload + git push.
+Default (no flags): full ship — Convex deploy + version bump + iOS build + ASC upload
++ web build + Firebase hosting deploy + git push.
 
 Flags:
   --skip-version-bump   Re-ship the same version (e.g. after fixing a build issue).
   --no-convex           Skip 'npx convex deploy'.
   --no-upload           Archive + export the IPA but do NOT upload to App Store Connect.
+  --no-web              Skip the Flutter web build + Firebase hosting deploy.
   --no-git              Don't commit/push the version bump.
-  --dry                 Same as --no-convex --no-upload --no-git --skip-version-bump.
+  --dry                 Same as --no-convex --no-upload --no-web --no-git --skip-version-bump.
                         Use this to test the build path end-to-end without side effects.
   -h, --help            Show this help.
 EOF
@@ -43,11 +47,13 @@ while [[ $# -gt 0 ]]; do
         --skip-version-bump) SKIP_VERSION_BUMP=true ;;
         --no-convex)         RUN_CONVEX=false ;;
         --no-upload)         RUN_UPLOAD=false ;;
+        --no-web)            RUN_WEB=false ;;
         --no-git)            RUN_GIT=false ;;
         --dry)
             DRY_RUN=true
             RUN_CONVEX=false
             RUN_UPLOAD=false
+            RUN_WEB=false
             RUN_GIT=false
             SKIP_VERSION_BUMP=true
             ;;
@@ -61,6 +67,7 @@ echo "🚀 Spygame deploy"
 echo "  • Convex deploy:    $([ "$RUN_CONVEX" = true ] && echo yes || echo no)"
 echo "  • Version bump:     $([ "$SKIP_VERSION_BUMP" = false ] && echo yes || echo no)"
 echo "  • Upload to ASC:    $([ "$RUN_UPLOAD" = true ] && echo yes || echo no)"
+echo "  • Web (Firebase):   $([ "$RUN_WEB" = true ] && echo yes || echo no)"
 echo "  • Git commit/push:  $([ "$RUN_GIT" = true ] && echo yes || echo no)"
 [ "$DRY_RUN" = true ] && echo "  • Mode: DRY (no side effects)"
 echo ""
@@ -205,6 +212,18 @@ validate_environment() {
         exit 1
     fi
 
+    if [ "$RUN_WEB" = true ]; then
+        if ! command -v firebase >/dev/null 2>&1; then
+            echo "❌ firebase CLI not found on PATH."
+            echo "   Install with: npm i -g firebase-tools  (then 'firebase login')"
+            exit 1
+        fi
+        if [ ! -f "firebase.json" ] || [ ! -f ".firebaserc" ]; then
+            echo "❌ Missing firebase.json or .firebaserc at project root."
+            exit 1
+        fi
+    fi
+
     echo "  ✅ Environment OK"
 }
 
@@ -322,6 +341,37 @@ fi
 IOS_END_TIME=$(date +%s)
 IOS_BUILD_TIME=$((IOS_END_TIME - IOS_START_TIME))
 
+# ----- Web build + Firebase deploy -----
+WEB_BUILD_TIME=0
+WEB_SUCCESS=false
+if [ "$RUN_WEB" = true ]; then
+    WEB_START_TIME=$(date +%s)
+    echo "🌐 Starting web build..."
+
+    run_with_spinner "Building Flutter for web" flutter build web
+
+    # Cache-bust query strings in index.html reference {{APP_VERSION}}; the
+    # major.minor.patch from pubspec replaces them so the deployed HTML pulls
+    # fresh JS/assets after each ship.
+    WEB_VERSION=$(echo "$NEW_VERSION" | cut -d+ -f1)
+    INDEX="build/web/index.html"
+    if [ ! -f "$INDEX" ]; then
+        echo "❌ Build output missing: $INDEX"
+        exit 1
+    fi
+    sed -i '' "s/{{APP_VERSION}}/$WEB_VERSION/g" "$INDEX"
+    echo "  ✅ Injected version $WEB_VERSION into $INDEX"
+
+    run_with_spinner "Deploying to Firebase hosting" \
+        firebase deploy --only hosting --non-interactive
+
+    WEB_END_TIME=$(date +%s)
+    WEB_BUILD_TIME=$((WEB_END_TIME - WEB_START_TIME))
+    WEB_SUCCESS=true
+else
+    echo "⏭️  Skipping web build + Firebase deploy (--no-web)"
+fi
+
 # ----- Git -----
 if [ "$RUN_GIT" = true ] && [ "$SKIP_VERSION_BUMP" = false ]; then
     echo "🔄 Git commit + push..."
@@ -352,7 +402,9 @@ echo "✨ Deploy complete"
 echo "  📱 Version:        $NEW_VERSION"
 [ "$RUN_UPLOAD" = true ] && echo "  🍎 Uploaded to:    App Store Connect (TestFlight will show the build in a few minutes)"
 [ "$RUN_UPLOAD" = false ] && echo "  📦 IPA available:  $IPA_PATH"
+[ "$WEB_SUCCESS" = true ] && echo "  🌐 Web deployed:   Firebase hosting"
 echo ""
 echo "⏱️  Timing:"
 echo "  🍎 iOS build:      ${IOS_BUILD_TIME}s"
+[ "$RUN_WEB" = true ] && echo "  🌐 Web build:      ${WEB_BUILD_TIME}s"
 echo "  📊 Total:          ${TOTAL_TIME}s"
