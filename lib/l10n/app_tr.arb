@@ -137,6 +137,10 @@
   "notifRoundEndedBodyManual": "{round}. turu kurucu sonlandırdı.",
   "notifRoundEndedBodyTimer": "{round}. tur sona erdi.",
 
+  "liveTimerTitle": "{current}. tur / {total}",
+  "liveTimerSubtitle": "Where am I? · {code}",
+  "liveTimerEnded": "Tur sona erdi",
+
   "htpStep1": "ADIM 01 · AMAÇ",
   "htpHeading1": "Gizli\nbir mekân.",
   "htpBody1": "Herkes aynı mekândadır. Biriniz hariç.",

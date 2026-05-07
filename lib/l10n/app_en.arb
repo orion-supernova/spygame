@@ -448,6 +448,25 @@
     "placeholders": { "round": { "type": "int", "example": "2" } }
   },
 
+  "liveTimerTitle": "Round {current} of {total}",
+  "@liveTimerTitle": {
+    "description": "Title shown on the OS live timer (iOS Live Activity, Android ongoing notification) while a round is in progress. The seconds remaining are rendered separately by the OS chronometer.",
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total": { "type": "int", "example": "5" }
+    }
+  },
+
+  "liveTimerSubtitle": "Where am I? · {code}",
+  "@liveTimerSubtitle": {
+    "description": "Subtitle shown on the OS live timer surface, identifying the app and room. Brand name kept identical across locales.",
+    "placeholders": { "code": { "type": "String", "example": "ABCD" } }
+  },
+
+  "liveTimerEnded": "Round ended",
+  "@liveTimerEnded": { "description": "Final state shown on the live timer for ~30s before it dismisses, after the round ends." },
+
+
   "htpStep1": "STEP 01 · OBJECTIVE",
   "@htpStep1": { "description": "Tutorial card 1 step label. Mono caps." },
   "htpHeading1": "A secret\nlocation.",

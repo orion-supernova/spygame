@@ -22,6 +22,15 @@ class RoundEndNotifier {
   static const _channelName = 'Round timer';
   static const _channelDesc = 'Notifies when a round ends.';
 
+  static const _liveChannelId = 'whereami.round_live';
+  static const _liveChannelName = 'Live round timer';
+  static const _liveChannelDesc =
+      'Persistent countdown shown while a round is in progress.';
+
+  /// Fixed id for the ongoing live-timer notification — there is at most one
+  /// active round per device, so a single id makes show/cancel trivial.
+  static const liveTimerNotificationId = 999_999;
+
   bool _initialized = false;
 
   Future<void> init() async {
@@ -132,6 +141,50 @@ class RoundEndNotifier {
         ),
       ),
     );
+  }
+
+  /// Posts an ongoing notification with a self-ticking chronometer counting
+  /// down to [endsAtLocalMs] (device-local epoch ms). The OS draws the timer
+  /// without us having to push per-second updates. Safe to call repeatedly
+  /// for the same round — Android coalesces by id.
+  Future<void> showOngoingChronometer({
+    required int endsAtLocalMs,
+    required String title,
+    required String body,
+  }) async {
+    if (kIsWeb) return;
+    if (!Platform.isAndroid) return;
+    final delayMs = endsAtLocalMs - DateTime.now().millisecondsSinceEpoch;
+    if (delayMs <= 0) return;
+    await _plugin.show(
+      liveTimerNotificationId,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _liveChannelId,
+          _liveChannelName,
+          channelDescription: _liveChannelDesc,
+          importance: Importance.low,
+          priority: Priority.low,
+          ongoing: true,
+          autoCancel: false,
+          when: endsAtLocalMs,
+          usesChronometer: true,
+          chronometerCountDown: true,
+          playSound: false,
+          enableVibration: false,
+          onlyAlertOnce: true,
+          category: AndroidNotificationCategory.stopwatch,
+          visibility: NotificationVisibility.public,
+        ),
+      ),
+    );
+  }
+
+  Future<void> cancelOngoingChronometer() {
+    if (kIsWeb || !Platform.isAndroid) return Future.value();
+    return _plugin.cancel(liveTimerNotificationId);
   }
 
   Future<void> cancel(int notificationId) => _plugin.cancel(notificationId);

@@ -40,4 +40,19 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
   end
+
+  # Keep the SpygameLiveActivity widget extension target wired up and its
+  # CFBundleShortVersionString / CFBundleVersion in sync with pubspec.yaml.
+  # The script is idempotent and runs whenever `pod install` runs (which
+  # Flutter triggers automatically when pubspec or platform files change).
+  setup_script = File.expand_path('scripts/setup_live_activity.rb', __dir__)
+  if File.exist?(setup_script)
+    require 'open3'
+    out, status = Open3.capture2e('ruby', setup_script)
+    if status.success?
+      puts out unless out.empty?
+    else
+      warn "[!] setup_live_activity.rb failed:\n#{out}"
+    end
+  end
 end

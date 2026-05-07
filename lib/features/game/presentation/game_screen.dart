@@ -7,6 +7,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../core/convex/server_time_provider.dart';
 import '../../../core/lifecycle/app_lifecycle_observer.dart';
+import '../../../core/notifications/live_timer_controller.dart';
 import '../../../core/notifications/round_end_notifier.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/storage/identity_storage.dart';
@@ -69,6 +70,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     WakelockPlus.disable();
     // ignore: discarded_futures
     RoundEndNotifier.instance.cancelAll();
+    // ignore: discarded_futures
+    LiveTimerController.instance.end();
     super.dispose();
   }
 
@@ -80,11 +83,22 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final endsLocalMs = round.endsAtMs - offset;
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
+    final game = ref.read(roomStreamProvider(widget.code)).valueOrNull?.currentGame;
+    final totalRounds = game?.totalRounds ?? 0;
     await RoundEndNotifier.instance.scheduleAt(
       notificationId: round.index,
       endsAtLocalMs: endsLocalMs,
       title: l10n.notifRoundEndTitle,
       body: l10n.notifRoundEndBody(round.index),
+    );
+    await LiveTimerController.instance.start(
+      roundId: round.id,
+      roomCode: widget.code,
+      roundIndex: round.index,
+      totalRounds: totalRounds,
+      endsAtLocalMs: endsLocalMs,
+      title: l10n.liveTimerTitle(round.index, totalRounds),
+      body: l10n.liveTimerSubtitle(widget.code),
     );
   }
 
@@ -137,7 +151,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         ref
             .read(serverTimeOffsetProvider.notifier)
             .observeServerNow(room.serverNowMs);
-        if (room.status == RoomStatus.ended && mounted) {
+        if (room.status == RoomStatus.ended && context.mounted) {
+          await LiveTimerController.instance.end();
+          if (!context.mounted) return;
           context.go(AppRoute.summaryFor(room.code));
           return;
         }
@@ -150,6 +166,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               (previousRound?.id == round.id &&
                   previousRound?.isActive == true);
           await RoundEndNotifier.instance.cancelAll();
+          await LiveTimerController.instance.end();
           _scheduledForRoundId = null;
           if (shouldNotifyEnded) {
             await _notifyRoundEnded(round);
