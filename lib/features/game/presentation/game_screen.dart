@@ -25,6 +25,7 @@ import 'location_grid.dart';
 import 'role_card.dart';
 import 'widgets/intermission_panel.dart';
 import 'widgets/scroll_hint.dart';
+import 'widgets/spy_reveal_dialog.dart';
 import 'widgets/starting_countdown.dart';
 import 'widgets/timer_header_delegate.dart';
 
@@ -39,6 +40,8 @@ class GameScreen extends ConsumerStatefulWidget {
 class _GameScreenState extends ConsumerState<GameScreen> {
   String? _scheduledForRoundId;
   String? _notifiedEndedRoundId;
+  int? _shownSpyRevealForRound;
+  bool _endNavInFlight = false;
   int _lastSecondHaptic = -1;
   Timer? _heartbeat;
 
@@ -120,6 +123,26 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     }
   }
 
+  Future<void> _maybeShowSpyReveal(Room room) async {
+    final game = room.currentGame;
+    final revealIdx = game?.lastSpyRevealRoundIndex;
+    final spyToken = game?.lastSpyClientToken;
+    if (revealIdx == null || spyToken == null) return;
+    if (revealIdx == _shownSpyRevealForRound) return;
+    _shownSpyRevealForRound = revealIdx;
+    final spy = room.playerFor(spyToken);
+    if (spy == null) return;
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => SpyRevealDialog(
+        roundIndex: revealIdx,
+        spyName: spy.displayName,
+      ),
+    );
+  }
+
   Future<void> _notifyRoundEnded(RoundSnapshot round) async {
     if (_notifiedEndedRoundId == round.id) return;
     _notifiedEndedRoundId = round.id;
@@ -159,12 +182,20 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         ref
             .read(serverTimeOffsetProvider.notifier)
             .observeServerNow(room.serverNowMs);
-        if (room.status == RoomStatus.ended && context.mounted) {
+        if (room.status == RoomStatus.ended) {
+          // Guard against racing emissions: only one end-game flow runs.
+          // Show the spy reveal modal first, then navigate to the summary
+          // once the user dismisses it.
+          if (_endNavInFlight) return;
+          _endNavInFlight = true;
+          await _maybeShowSpyReveal(room);
+          if (!context.mounted) return;
           await LiveTimerController.instance.end();
           if (!context.mounted) return;
           context.go(AppRoute.summaryFor(room.code));
           return;
         }
+        await _maybeShowSpyReveal(room);
         final round = room.currentRound;
         if (round != null && round.isActive) {
           await _scheduleEndNotification(round);

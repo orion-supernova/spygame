@@ -85,6 +85,8 @@ class GameSnapshot {
     required this.nextRoundStartsAtMs,
     required this.currentRoundIndex,
     required this.totalRounds,
+    this.lastSpyRevealRoundIndex,
+    this.lastSpyClientToken,
   });
 
   final String id;
@@ -93,6 +95,8 @@ class GameSnapshot {
   final int? nextRoundStartsAtMs;
   final int currentRoundIndex;
   final int totalRounds;
+  final int? lastSpyRevealRoundIndex;
+  final String? lastSpyClientToken;
 }
 
 @immutable

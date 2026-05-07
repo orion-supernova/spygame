@@ -75,6 +75,8 @@ class RoomMapper {
     if (raw is! Map) return null;
     final phase = _phaseFromString(raw['phase']?.toString());
     final nextStart = raw['nextRoundStartsAtMs'];
+    final lastSpyRound = raw['lastSpyRevealRoundIndex'];
+    final lastSpyToken = raw['lastSpyClientToken'];
     return GameSnapshot(
       id: raw['_id']?.toString() ?? '',
       status: raw['status']?.toString() ?? 'active',
@@ -82,6 +84,10 @@ class RoomMapper {
       nextRoundStartsAtMs: (nextStart == null) ? null : _asInt(nextStart, 0),
       currentRoundIndex: _asInt(raw['currentRoundIndex'], 0),
       totalRounds: _asInt(raw['totalRounds'], 0),
+      lastSpyRevealRoundIndex:
+          (lastSpyRound == null) ? null : _asInt(lastSpyRound, 0),
+      lastSpyClientToken:
+          (lastSpyToken == null) ? null : lastSpyToken.toString(),
     );
   }
 

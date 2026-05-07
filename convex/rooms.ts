@@ -483,6 +483,8 @@ export const watchRoom = query({
           currentRoundIndex: game.currentRoundIndex,
           totalRounds: game.totalRounds,
           usedLocationIds: game.usedLocationIds,
+          lastSpyRevealRoundIndex: game.lastSpyRevealRoundIndex ?? null,
+          lastSpyClientToken: game.lastSpyClientToken ?? null,
         };
         if (game.currentRoundId) {
           const round = await ctx.db.get(game.currentRoundId);

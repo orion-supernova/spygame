@@ -292,6 +292,24 @@ async function endRoundCore(
   const room = await ctx.db.get(game.roomId);
   if (!room) return;
 
+  // Identify the spy for this round so the client can render a reveal modal
+  // during intermission (and on the final round, before the game-summary
+  // navigation). The token is no longer secret once the round has ended.
+  const assignmentsForRound = await ctx.db
+    .query('roundAssignments')
+    .withIndex('by_round_and_token', (q) => q.eq('roundId', args.roundId))
+    .collect();
+  const spyAssignment = assignmentsForRound.find((a) => a.role === 'spy');
+  const spyPatch: {
+    lastSpyRevealRoundIndex?: number;
+    lastSpyClientToken?: string;
+  } = spyAssignment
+    ? {
+        lastSpyRevealRoundIndex: round.index,
+        lastSpyClientToken: spyAssignment.clientToken,
+      }
+    : {};
+
   // Snapshot push-notification targets BEFORE we mutate room state so the
   // dispatcher gets a stable view, even if a leaveRoom races in. Passing
   // the materialized list (rather than just roundId) also lets the action
@@ -332,6 +350,7 @@ async function endRoundCore(
       status: 'ended',
       phase: 'ended',
       currentRoundId: undefined,
+      ...spyPatch,
     });
     await ctx.db.patch(room._id, { status: 'ended' });
     // Cascade-delete the room and all its data after a 30-min grace
@@ -351,6 +370,7 @@ async function endRoundCore(
   await ctx.db.patch(game._id, {
     phase: 'between',
     nextRoundStartsAtMs: undefined,
+    ...spyPatch,
   });
   for (const p of allPlayersForPush) {
     if (p.isReady) {

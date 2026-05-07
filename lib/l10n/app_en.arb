@@ -340,6 +340,21 @@
     "placeholders": { "round": { "type": "int", "example": "2" } }
   },
 
+  "spyRevealRoundEyebrow": "ROUND {round}",
+  "@spyRevealRoundEyebrow": {
+    "description": "Mono caps eyebrow at the top of the spy-reveal modal that pops up when a round ends. Names which round just finished.",
+    "placeholders": { "round": { "type": "int", "example": "2" } }
+  },
+
+  "spyRevealLine": "Spy: {name}",
+  "@spyRevealLine": {
+    "description": "Main line of the spy-reveal modal. Shows which player was the spy in the round that just ended.",
+    "placeholders": { "name": { "type": "String", "example": "Alex" } }
+  },
+
+  "spyRevealContinue": "Continue",
+  "@spyRevealContinue": { "description": "Primary action button on the spy-reveal modal. Dismisses the modal." },
+
   "intermissionHeadline": "Take a beat. Talk it out.",
   "@intermissionHeadline": { "description": "Headline inside the intermission panel. Encourages players to debrief together before the next round." },
 

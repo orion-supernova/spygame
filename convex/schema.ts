@@ -94,6 +94,11 @@ export default defineSchema({
     // same way ownedBundleSlugs is — frozen at startGame, never edited
     // mid-game. Optional for backward-compat (treat undefined as []).
     disabledLocationIds: v.optional(v.array(v.id('locations'))),
+    // Most-recently-ended round's spy. Set when a round transitions to
+    // status='ended' so subscribers can render a "Spy: <name>" reveal modal
+    // on the client. The token is no longer secret once the round is over.
+    lastSpyRevealRoundIndex: v.optional(v.number()),
+    lastSpyClientToken: v.optional(v.string()),
   })
     .index('by_room', ['roomId']),
 
