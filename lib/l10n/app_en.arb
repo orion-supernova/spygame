@@ -91,11 +91,23 @@
   "configActivePacksLabel": "ACTIVE PACKS",
   "@configActivePacksLabel": { "description": "Eyebrow label above the chip row in ConfigPanel showing which bundles are feeding the game. All-caps mono." },
 
+  "configActivePacksByHost": "· by host",
+  "@configActivePacksByHost": { "description": "Suffix shown next to the ACTIVE PACKS eyebrow on non-host devices to indicate the chip strip reflects the host's selection. Bullet is decorative, mirroring configHostOnly." },
+
   "configActivePackFree": "Classic",
   "@configActivePackFree": { "description": "Chip label for the always-included core location set in the ACTIVE PACKS row. Matches the 'Classic locations' wording in the locations picker — same set, same label, no transactional 'free' framing." },
 
   "configEditLocations": "EDIT LOCATIONS",
   "@configEditLocations": { "description": "Tappable mono-caps label on the host's locations editor row in ConfigPanel. Opens the locations picker bottom-sheet." },
+
+  "configViewLocations": "VIEW LOCATIONS",
+  "@configViewLocations": { "description": "Tappable mono-caps label on the non-host locations row in ConfigPanel. Opens the read-only locations sheet." },
+
+  "locationsReadOnlySheetTitle": "Active Locations",
+  "@locationsReadOnlySheetTitle": { "description": "Title at the top of the read-only locations sheet shown to non-host players." },
+
+  "locationsReadOnlySheetSubtitle": "Updates live as the host edits.",
+  "@locationsReadOnlySheetSubtitle": { "description": "Explainer under the read-only locations sheet title noting that it reflects the host's selection live." },
 
   "configLocationsCount": "{enabled} of {total}",
   "@configLocationsCount": {

@@ -163,9 +163,15 @@ export const leaveRoom = mutation({
     }
 
     if (room.ownerToken === args.clientToken && room.status === 'lobby') {
-      // Transfer ownership to the player who joined earliest.
+      // Transfer ownership to the player who joined earliest. The new host's
+      // owned-bundle set is unknown server-side until their lobby listener
+      // pushes it, so clear the stale list — non-hosts briefly see only the
+      // free pack until that push lands.
       const next = [...remaining].sort((a, b) => a.joinedAt - b.joinedAt)[0];
-      await ctx.db.patch(room._id, { ownerToken: next.clientToken });
+      await ctx.db.patch(room._id, {
+        ownerToken: next.clientToken,
+        hostOwnedBundleSlugs: [],
+      });
     }
   },
 });
@@ -290,6 +296,36 @@ export const setDisabledLocations = mutation({
   },
 });
 
+/**
+ * Host-only. Publishes the host's locally-owned bundle slugs to the room so
+ * non-host players can render the same "active packs" chips in the lobby.
+ * Server doesn't validate the slugs — ownership lives client-side
+ * (SharedPreferences, RevenueCat later) and the picker UI decides what's
+ * shown. Unknown or stale slugs are harmless: they just won't match any
+ * `bundles` row when the chip is rendered.
+ */
+export const setHostOwnedBundleSlugs = mutation({
+  args: {
+    code: v.string(),
+    clientToken: v.string(),
+    slugs: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const code = normalizeCode(args.code);
+    const room = await findRoomByCode(ctx, code);
+    if (!room) throw new ConvexError('Room not found.');
+    if (room.ownerToken !== args.clientToken) {
+      throw new ConvexError('Only the host can change active packs.');
+    }
+    if (room.status !== 'lobby') {
+      throw new ConvexError('Cannot change active packs during a game.');
+    }
+    await ctx.db.patch(room._id, {
+      hostOwnedBundleSlugs: args.slugs,
+    });
+  },
+});
+
 export const heartbeat = mutation({
   args: {
     code: v.string(),
@@ -324,6 +360,32 @@ export const watchRoom = query({
     if (!room) return null;
 
     const players = await getPlayers(ctx, room._id);
+
+    // Derive which packs have ≥1 enabled location given the host's owned set
+    // and the room's disabled list. Computed here so every subscriber sees
+    // the same chip strip and Convex re-runs the query whenever either input
+    // changes — clients don't need to fetch picker locations themselves.
+    const ownedSet = new Set(room.hostOwnedBundleSlugs ?? []);
+    const disabledSet = new Set(
+      (room.disabledLocationIds ?? []).map((id) => id.toString()),
+    );
+    const allLocations = await ctx.db.query('locations').collect();
+    let freePackActive = false;
+    const activeSlugs = new Set<string>();
+    let enabledLocationCount = 0;
+    let totalLocationCount = 0;
+    for (const loc of allLocations) {
+      const slug = loc.bundleSlug;
+      if (slug != null && !ownedSet.has(slug)) continue;
+      // In the room's pool — count it toward the total before the disabled
+      // filter so non-host clients can show the "X / Y" progress badge.
+      totalLocationCount++;
+      if (disabledSet.has(loc._id.toString())) continue;
+      enabledLocationCount++;
+      if (slug == null) freePackActive = true;
+      else activeSlugs.add(slug);
+    }
+
     let currentRound: any = null;
     let currentGame: any = null;
     if (room.currentGameId) {
@@ -363,6 +425,11 @@ export const watchRoom = query({
       ownerToken: room.ownerToken,
       config: publicConfig(room),
       disabledLocationIds: publicDisabledLocationIds(room),
+      hostOwnedBundleSlugs: room.hostOwnedBundleSlugs ?? [],
+      activePackSlugs: [...activeSlugs],
+      freePackActive,
+      enabledLocationCount,
+      totalLocationCount,
       players: players
         .map((p) => ({
           _id: p._id,
@@ -376,5 +443,44 @@ export const watchRoom = query({
       currentGame,
       currentRound,
     };
+  },
+});
+
+const LOCALE_VALIDATOR = v.optional(v.union(v.literal('en'), v.literal('tr')));
+
+/**
+ * Locale-projected list of locations the host has *enabled* for this room.
+ * Read-only mirror of the picker for non-host players: lets everyone see
+ * exactly which locations are in play, live as the host toggles. Reuses
+ * the room's published `hostOwnedBundleSlugs` so non-hosts don't need to
+ * pass the host's owned set themselves. Returns [] if the room is gone.
+ */
+export const enabledLocationsForRoom = query({
+  args: { code: v.string(), locale: LOCALE_VALIDATOR },
+  handler: async (ctx, args) => {
+    const code = normalizeCode(args.code);
+    const room = await findRoomByCode(ctx, code);
+    if (!room) return [];
+    const ownedSet = new Set(room.hostOwnedBundleSlugs ?? []);
+    const disabledSet = new Set(
+      (room.disabledLocationIds ?? []).map((id) => id.toString()),
+    );
+    const all = await ctx.db.query('locations').collect();
+    const eligibleEnabled = all.filter(
+      (l) =>
+        (l.bundleSlug == null || ownedSet.has(l.bundleSlug)) &&
+        !disabledSet.has(l._id.toString()),
+    );
+    return eligibleEnabled.map((l) => {
+      const localized =
+        args.locale === 'tr' && l.translations?.tr
+          ? l.translations.tr.name
+          : l.name;
+      return {
+        _id: l._id,
+        name: localized,
+        bundleSlug: l.bundleSlug ?? null,
+      };
+    });
   },
 });

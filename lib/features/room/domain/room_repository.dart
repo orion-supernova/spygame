@@ -10,6 +10,10 @@ abstract interface class RoomRepository {
     required String code,
     required List<String> disabledLocationIds,
   });
+  Future<void> setHostOwnedBundleSlugs({
+    required String code,
+    required List<String> slugs,
+  });
   Future<void> heartbeat({required String code});
   Future<void> startGame({
     required String code,

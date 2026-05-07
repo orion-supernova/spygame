@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +22,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../data/room_providers.dart';
 import '../domain/room.dart';
 import 'widgets/config_panel.dart';
+import 'widgets/locations_read_only_sheet.dart';
 import 'widgets/locations_sheet.dart';
 import 'widgets/player_tile.dart';
 import 'widgets/ready_button.dart';
@@ -122,6 +124,18 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  void _syncHostOwnedBundles(Room room, String myToken) {
+    if (!room.isOwner(myToken)) return;
+    if (room.status != RoomStatus.lobby) return;
+    final localOwned = ref.read(ownedBundlesProvider);
+    if (setEquals(localOwned, room.hostOwnedBundleSlugs)) return;
+    // ignore: discarded_futures
+    ref.read(roomRepositoryProvider).setHostOwnedBundleSlugs(
+          code: widget.code,
+          slugs: localOwned.toList(),
+        );
+  }
+
   Future<void> _onConfigChanged(GameConfig next) async {
     try {
       await ref
@@ -145,6 +159,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     );
   }
 
+  Future<void> _openLocationsReadOnlySheet() async {
+    await Haptics.light();
+    if (!mounted) return;
+    await LocationsReadOnlySheet.show(context, code: widget.code);
+  }
+
   @override
   Widget build(BuildContext context) {
     final asyncRoom = ref.watch(roomStreamProvider(widget.code));
@@ -159,7 +179,17 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         if (room.status == RoomStatus.inGame && mounted) {
           context.go(AppRoute.gameFor(room.code));
         }
+        _syncHostOwnedBundles(room, myToken);
       });
+    });
+
+    // Push the host's local owned-bundle set whenever it changes (e.g. they
+    // bought a pack while the lobby is open). The room-stream listener
+    // covers the initial-sync and ownership-transfer cases.
+    ref.listen(ownedBundlesProvider, (prev, next) {
+      final room = ref.read(roomStreamProvider(widget.code)).valueOrNull;
+      if (room == null) return;
+      _syncHostOwnedBundles(room, myToken);
     });
 
     return Scaffold(
@@ -191,6 +221,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   busy: _busy,
                   onEditLocations: () =>
                       _openLocationsSheet(room.disabledLocationIds),
+                  onViewLocations: _openLocationsReadOnlySheet,
                   onToggleReady: () =>
                       _toggleReady(room.playerFor(myToken)?.isReady ?? false),
                   onStart: _start,
@@ -218,6 +249,7 @@ class _LobbyBody extends StatelessWidget {
     required this.onLeave,
     required this.onConfigChanged,
     required this.onEditLocations,
+    required this.onViewLocations,
   });
 
   final Room room;
@@ -229,6 +261,7 @@ class _LobbyBody extends StatelessWidget {
   final VoidCallback onLeave;
   final ValueChanged<GameConfig> onConfigChanged;
   final VoidCallback onEditLocations;
+  final VoidCallback onViewLocations;
 
   @override
   Widget build(BuildContext context) {
@@ -350,7 +383,11 @@ class _LobbyBody extends StatelessWidget {
                     editable: isOwner,
                     onChanged: onConfigChanged,
                     onEditLocations: onEditLocations,
-                    disabledLocationIds: room.disabledLocationIds,
+                    onViewLocations: onViewLocations,
+                    activePackSlugs: room.activePackSlugs,
+                    freePackActive: room.freePackActive,
+                    enabledLocationCount: room.enabledLocationCount,
+                    totalLocationCount: room.totalLocationCount,
                   ),
                 ),
               ),

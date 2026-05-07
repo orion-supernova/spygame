@@ -30,6 +30,14 @@ export default defineSchema({
     // carries over). Snapshotted onto `games.disabledLocationIds` at
     // startGame so mid-game edits don't change the running pool.
     disabledLocationIds: v.optional(v.array(v.id('locations'))),
+    // Bundle slugs the current host claims to own. Pushed by the host
+    // client when they enter the lobby (and on local owned-set changes)
+    // so non-host players can render the same "active packs" chips. The
+    // server does not validate ownership — host is the source of truth.
+    // Cleared on ownership transfer; the new host repopulates it from
+    // their device. The authoritative startGame snapshot still comes
+    // from the host's `startGame` args, not this field.
+    hostOwnedBundleSlugs: v.optional(v.array(v.string())),
     createdAt: v.number(),
   })
     .index('by_code', ['code']),

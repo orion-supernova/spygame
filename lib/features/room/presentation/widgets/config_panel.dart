@@ -6,7 +6,6 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../marketplace/data/marketplace_providers.dart';
-import '../../data/locations_picker_repository.dart';
 import '../../domain/room.dart';
 
 class ConfigPanel extends ConsumerWidget {
@@ -16,26 +15,35 @@ class ConfigPanel extends ConsumerWidget {
     required this.editable,
     required this.onChanged,
     required this.onEditLocations,
-    required this.disabledLocationIds,
+    required this.onViewLocations,
+    required this.activePackSlugs,
+    required this.freePackActive,
+    required this.enabledLocationCount,
+    required this.totalLocationCount,
   });
 
   final GameConfig config;
   final bool editable;
   final ValueChanged<GameConfig> onChanged;
-  /// Host-only callback that opens the locations picker sheet. The
-  /// ConfigPanel doesn't construct the sheet itself because the sheet
-  /// needs access to the room repository, which is owned by the lobby.
+  /// Host-only callback that opens the editable locations picker sheet.
   final VoidCallback onEditLocations;
-  final Set<String> disabledLocationIds;
+  /// Non-host callback that opens the read-only locations sheet.
+  final VoidCallback onViewLocations;
+  /// Server-derived slugs that have ≥1 enabled location for this room —
+  /// the only input the chip strip needs.
+  final Set<String> activePackSlugs;
+  final bool freePackActive;
+  /// Server-derived counts driving the live "X / Y locations" badge.
+  final int enabledLocationCount;
+  final int totalLocationCount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final ownedSlugs = ref.watch(ownedBundlesProvider);
     final bundlesAsync = ref.watch(bundlesProvider);
-    final ownedTitles = bundlesAsync.maybeWhen(
+    final activeTitles = bundlesAsync.maybeWhen(
       data: (bundles) => bundles
-          .where((b) => ownedSlugs.contains(b.slug))
+          .where((b) => activePackSlugs.contains(b.slug))
           .map((b) => b.title)
           .toList(),
       orElse: () => const <String>[],
@@ -125,56 +133,71 @@ class ConfigPanel extends ConsumerWidget {
             color: AppColors.inkOutline,
           ),
           const SizedBox(height: 14),
-          Text(
-            l10n.configActivePacksLabel,
-            style: AppTypography.mono(
-              size: 11,
-              weight: FontWeight.w600,
-              letterSpacing: 2,
-              color: AppColors.paperFaint,
-            ),
+          Row(
+            children: [
+              Text(
+                l10n.configActivePacksLabel,
+                style: AppTypography.mono(
+                  size: 11,
+                  weight: FontWeight.w600,
+                  letterSpacing: 2,
+                  color: AppColors.paperFaint,
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (!editable)
+                Text(
+                  l10n.configActivePacksByHost,
+                  style: AppTypography.mono(
+                    size: 11,
+                    weight: FontWeight.w500,
+                    letterSpacing: 1.2,
+                    color: AppColors.paperFaint,
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 10),
           Wrap(
             spacing: 6,
             runSpacing: 6,
             children: [
-              _PackChip(text: l10n.configActivePackFree),
-              for (final t in ownedTitles) _PackChip(text: t, accent: true),
+              if (freePackActive)
+                _PackChip(text: l10n.configActivePackFree),
+              for (final t in activeTitles) _PackChip(text: t, accent: true),
             ],
           ),
-          if (editable) ...[
-            const SizedBox(height: 14),
-            _EditLocationsRow(
-              disabledIds: disabledLocationIds,
-              onTap: onEditLocations,
-            ),
-          ],
+          const SizedBox(height: 14),
+          _LocationsRow(
+            editable: editable,
+            enabled: enabledLocationCount,
+            total: totalLocationCount,
+            onTap: editable ? onEditLocations : onViewLocations,
+          ),
         ],
       ),
     );
   }
 }
 
-class _EditLocationsRow extends ConsumerWidget {
-  const _EditLocationsRow({required this.disabledIds, required this.onTap});
+class _LocationsRow extends StatelessWidget {
+  const _LocationsRow({
+    required this.editable,
+    required this.enabled,
+    required this.total,
+    required this.onTap,
+  });
 
-  final Set<String> disabledIds;
+  final bool editable;
+  final int enabled;
+  final int total;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final pickerAsync = ref.watch(locationsForPickerProvider);
-    final (enabled, total) = pickerAsync.maybeWhen(
-      data: (rows) {
-        final enabledCount =
-            rows.where((r) => !disabledIds.contains(r.id)).length;
-        return (enabledCount, rows.length);
-      },
-      orElse: () => (0, 0),
-    );
-
+    final label = editable ? l10n.configEditLocations : l10n.configViewLocations;
+    final accent = editable ? AppColors.lime : AppColors.paperMuted;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(14),
@@ -198,12 +221,12 @@ class _EditLocationsRow extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Text(
-                    l10n.configEditLocations,
+                    label,
                     style: AppTypography.mono(
                       size: 12,
                       weight: FontWeight.w700,
                       letterSpacing: 1.8,
-                      color: AppColors.lime,
+                      color: accent,
                     ),
                   ),
                 ),

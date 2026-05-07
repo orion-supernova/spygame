@@ -106,6 +106,11 @@ class Room {
     required this.ownerToken,
     required this.config,
     required this.disabledLocationIds,
+    required this.hostOwnedBundleSlugs,
+    required this.activePackSlugs,
+    required this.freePackActive,
+    required this.enabledLocationCount,
+    required this.totalLocationCount,
     required this.players,
     required this.currentGame,
     required this.currentRound,
@@ -122,6 +127,25 @@ class Room {
   /// room. Persists across games. Snapshotted onto the game row at
   /// startGame so mid-game edits don't change the running pool.
   final Set<String> disabledLocationIds;
+  /// Bundle slugs the current host claims to own, published by the host
+  /// client so non-hosts can render the same "active packs" chips. Empty
+  /// until the host's lobby listener pushes; cleared on ownership transfer.
+  final Set<String> hostOwnedBundleSlugs;
+  /// Server-derived set of bundle slugs that have at least one enabled
+  /// location given `hostOwnedBundleSlugs` and `disabledLocationIds`. Read
+  /// directly by the lobby chip strip — clients don't need to recompute.
+  final Set<String> activePackSlugs;
+  /// True if at least one free location is enabled. Drives the implicit
+  /// "Free" chip in the lobby.
+  final bool freePackActive;
+  /// Server-derived count of locations currently enabled in the room's
+  /// pool (free + host-owned packs minus disabled). Updates live on every
+  /// host toggle so non-hosts see the change without opening anything.
+  final int enabledLocationCount;
+  /// Total locations in the pool (free + host-owned packs, ignoring the
+  /// disabled list). Pairs with `enabledLocationCount` for the "X / Y"
+  /// progress badge.
+  final int totalLocationCount;
   final List<Player> players;
   final GameSnapshot? currentGame;
   final RoundSnapshot? currentRound;

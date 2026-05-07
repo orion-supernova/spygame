@@ -134,6 +134,25 @@ class ConvexRoomRepository implements RoomRepository {
   }
 
   @override
+  Future<void> setHostOwnedBundleSlugs({
+    required String code,
+    required List<String> slugs,
+  }) async {
+    try {
+      await _client.mutation(
+        name: 'rooms:setHostOwnedBundleSlugs',
+        args: {
+          'code': code,
+          'clientToken': _identity.clientToken,
+          'slugs': slugs,
+        },
+      );
+    } catch (e) {
+      throw _mapError(e);
+    }
+  }
+
+  @override
   Future<void> heartbeat({required String code}) async {
     try {
       await _client.mutation(

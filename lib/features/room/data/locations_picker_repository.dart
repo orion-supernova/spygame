@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:convex_flutter/convex_flutter.dart';
@@ -48,6 +49,57 @@ class LocationsPickerRepository {
       );
     }).toList();
   }
+
+  /// Live read-only mirror of the host's currently-enabled locations for a
+  /// given room. Subscribes to the server query so the read-only sheet
+  /// re-renders the moment the host toggles anything.
+  Stream<List<PickerLocation>> watchEnabled({
+    required String code,
+    required String locale,
+  }) {
+    final controller = StreamController<List<PickerLocation>>.broadcast();
+    SubscriptionHandle? handle;
+
+    Future<void> start() async {
+      try {
+        handle = await _client.subscribe(
+          name: 'rooms:enabledLocationsForRoom',
+          args: {'code': code, 'locale': locale},
+          onUpdate: (raw) {
+            if (controller.isClosed) return;
+            controller.add(_decodePickerList(raw));
+          },
+          onError: (message, _) {
+            if (controller.isClosed) return;
+            controller.addError(message);
+          },
+        );
+      } catch (e) {
+        if (!controller.isClosed) controller.addError(e);
+      }
+    }
+
+    // ignore: discarded_futures
+    start();
+    controller.onCancel = () {
+      handle?.cancel();
+    };
+    return controller.stream;
+  }
+
+  List<PickerLocation> _decodePickerList(String raw) {
+    if (raw.isEmpty) return const [];
+    final decoded = jsonDecode(raw);
+    if (decoded is! List) return const [];
+    return decoded.whereType<Map<Object?, Object?>>().map((m) {
+      final slug = m['bundleSlug']?.toString();
+      return PickerLocation(
+        id: m['_id']?.toString() ?? '',
+        name: m['name']?.toString() ?? '',
+        bundleSlug: (slug == null || slug.isEmpty) ? null : slug,
+      );
+    }).toList();
+  }
 }
 
 final locationsPickerRepositoryProvider =
@@ -65,3 +117,14 @@ final locationsForPickerProvider =
   final owned = ref.watch(ownedBundlesProvider).toList();
   return repo.list(locale: locale, ownedBundleSlugs: owned);
 });
+
+/// Live stream of currently-enabled locations for a room. Backs the
+/// non-host read-only sheet so toggles by the host are reflected instantly.
+/// Keyed by room code; locale is read from `localeProvider`.
+final enabledLocationsForRoomProvider = StreamProvider.autoDispose
+    .family<List<PickerLocation>, String>((ref, code) {
+  final repo = ref.watch(locationsPickerRepositoryProvider);
+  final locale = ref.watch(localeProvider).languageCode;
+  return repo.watchEnabled(code: code, locale: locale);
+});
+
