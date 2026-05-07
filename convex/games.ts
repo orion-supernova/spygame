@@ -17,9 +17,8 @@ const MIN_PLAYERS_TO_START = 3;
 // Solo-test escape hatch. Set `TESTING_MODE=true` on the dev Convex
 // deployment to allow 1-player games (and a spy count equal to the player
 // count). Leave unset in prod. Convex exposes env vars via `process.env`
-// at runtime; the local `declare` keeps the types clean without pulling
-// in @types/node (the convex tsconfig sets `types: []`).
-declare const process: { env: Record<string, string | undefined> };
+// at runtime — types come from `@types/node`, listed in
+// `convex/tsconfig.json` so the node-runtime push action also typechecks.
 const TESTING_MODE = process.env.TESTING_MODE === 'true';
 
 type AnyCtx = QueryCtx | MutationCtx;
@@ -293,8 +292,42 @@ async function endRoundCore(
   const room = await ctx.db.get(game.roomId);
   if (!room) return;
 
+  // Snapshot push-notification targets BEFORE we mutate room state so the
+  // dispatcher gets a stable view, even if a leaveRoom races in. Passing
+  // the materialized list (rather than just roundId) also lets the action
+  // skip a re-walk of room → players. Tokens may still be invalid by the
+  // time the push lands; the action handles 410/UNREGISTERED cleanup.
+  const allPlayersForPush = await ctx.db
+    .query('players')
+    .withIndex('by_room', (q) => q.eq('roomId', game.roomId))
+    .collect();
+  const pushTargets = allPlayersForPush
+    .filter((p) => p.pushTokenApnsLiveActivity || p.pushTokenFcm)
+    .map((p) => ({
+      playerId: p._id,
+      apnsLiveActivityToken: p.pushTokenApnsLiveActivity,
+      fcmToken: p.pushTokenFcm,
+      locale: (p.locale ?? 'en') as 'en' | 'tr',
+    }));
+
   const nextIndex = round.index + 1;
-  if (nextIndex > game.totalRounds) {
+  const gameEnded = nextIndex > game.totalRounds;
+
+  if (pushTargets.length > 0) {
+    await ctx.scheduler.runAfter(
+      0,
+      internal.notifications.dispatchRoundEndedPush,
+      {
+        targets: pushTargets,
+        roundId: args.roundId,
+        roundIndex: round.index,
+        endedReason: args.reason,
+        gameEnded,
+      },
+    );
+  }
+
+  if (gameEnded) {
     await ctx.db.patch(game._id, {
       status: 'ended',
       phase: 'ended',
@@ -319,11 +352,7 @@ async function endRoundCore(
     phase: 'between',
     nextRoundStartsAtMs: undefined,
   });
-  const allPlayers = await ctx.db
-    .query('players')
-    .withIndex('by_room', (q) => q.eq('roomId', game.roomId))
-    .collect();
-  for (const p of allPlayers) {
+  for (const p of allPlayersForPush) {
     if (p.isReady) {
       await ctx.db.patch(p._id, { isReady: false });
     }

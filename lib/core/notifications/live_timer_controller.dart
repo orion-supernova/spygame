@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'push_token_service.dart';
 import 'round_end_notifier.dart';
 
 /// Cross-platform façade over the OS-native "live" round timer.
@@ -16,12 +17,34 @@ import 'round_end_notifier.dart';
 /// when the round becomes active and [end] once when it ends. No per-second
 /// pushes.
 class LiveTimerController {
-  LiveTimerController._();
+  LiveTimerController._() {
+    if (!kIsWeb && Platform.isIOS) {
+      _iosChannel.setMethodCallHandler(_handleNativeCall);
+    }
+  }
   static final LiveTimerController instance = LiveTimerController._();
 
   static const _iosChannel = MethodChannel('com.walhallaa.spygame/live_activity');
 
   String? _activeRoundId;
+
+  Future<dynamic> _handleNativeCall(MethodCall call) async {
+    if (call.method == 'onLiveActivityPushToken') {
+      final args = call.arguments;
+      if (args is Map) {
+        final roomCode = args['roomCode'] as String?;
+        final token = args['token'] as String?;
+        if (roomCode != null && token != null && token.isNotEmpty) {
+          await PushTokenService.instance.onIosLiveActivityToken(
+            roomCode: roomCode,
+            token: token,
+          );
+        }
+      }
+      return null;
+    }
+    return null;
+  }
 
   Future<void> start({
     required String roundId,

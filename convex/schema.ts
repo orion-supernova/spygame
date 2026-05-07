@@ -49,6 +49,15 @@ export default defineSchema({
     isReady: v.boolean(),
     joinedAt: v.number(),
     lastSeenAt: v.number(),
+    // Push-notification routing for the round-end "Round ended" transition.
+    // The APNs token is per-Live-Activity (rotates every round) and is
+    // cleared on 410 Gone / 400 BadDeviceToken. The FCM token is per-device
+    // and persists across rounds. `locale` is the recipient's UI language
+    // so the server can localize the push payload before sending.
+    pushTokenApnsLiveActivity: v.optional(v.string()),
+    pushTokenApnsUpdatedAt: v.optional(v.number()),
+    pushTokenFcm: v.optional(v.string()),
+    locale: v.optional(v.union(v.literal('en'), v.literal('tr'))),
   })
     .index('by_room', ['roomId'])
     .index('by_room_and_token', ['roomId', 'clientToken']),

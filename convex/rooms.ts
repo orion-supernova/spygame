@@ -4,6 +4,7 @@ import { Doc, Id } from './_generated/dataModel';
 import {
   MutationCtx,
   QueryCtx,
+  internalMutation,
   mutation,
   query,
 } from './_generated/server';
@@ -323,6 +324,89 @@ export const setHostOwnedBundleSlugs = mutation({
     await ctx.db.patch(room._id, {
       hostOwnedBundleSlugs: args.slugs,
     });
+  },
+});
+
+/**
+ * Idempotent. Stores per-player push tokens used by the round-end fan-out
+ * action (`internal.notifications.dispatchRoundEndedPush`).
+ *
+ *  - `pushTokenApnsLiveActivity` is a per-Live-Activity APNs token; it is
+ *    re-emitted by ActivityKit each time a new activity starts, so we
+ *    overwrite on every call. We don't unset it here; the dispatcher
+ *    clears it on 410 Gone / 400 BadDeviceToken and the next activity
+ *    will re-register.
+ *  - `pushTokenFcm` is a per-device FCM token; persists across rounds.
+ *  - `locale` is the device UI language; lets the server localize the
+ *    "Round ended" body before sending.
+ *
+ * `undefined` for any field means "leave alone" — callers that only
+ * have one of the three values (e.g. iOS sending only the LA token,
+ * Android sending only FCM) don't accidentally clobber the others.
+ *
+ * No-op if the player isn't in the room (e.g. they already left).
+ */
+export const registerPushTokens = mutation({
+  args: {
+    code: v.string(),
+    clientToken: v.string(),
+    pushTokenApnsLiveActivity: v.optional(v.string()),
+    pushTokenFcm: v.optional(v.string()),
+    locale: v.optional(v.union(v.literal('en'), v.literal('tr'))),
+  },
+  handler: async (ctx, args) => {
+    const code = normalizeCode(args.code);
+    const room = await findRoomByCode(ctx, code);
+    if (!room) return;
+    const player = await ctx.db
+      .query('players')
+      .withIndex('by_room_and_token', (q) =>
+        q.eq('roomId', room._id).eq('clientToken', args.clientToken),
+      )
+      .first();
+    if (!player) return;
+
+    const patch: Partial<Doc<'players'>> = {};
+    if (args.pushTokenApnsLiveActivity !== undefined) {
+      patch.pushTokenApnsLiveActivity = args.pushTokenApnsLiveActivity;
+      patch.pushTokenApnsUpdatedAt = Date.now();
+    }
+    if (args.pushTokenFcm !== undefined) {
+      patch.pushTokenFcm = args.pushTokenFcm;
+    }
+    if (args.locale !== undefined) {
+      patch.locale = args.locale;
+    }
+    if (Object.keys(patch).length === 0) return;
+    await ctx.db.patch(player._id, patch);
+  },
+});
+
+/**
+ * Internal helper used by the push dispatcher to clear a per-player token
+ * after APNs/FCM tells us it's invalid (410 Gone, 400 BadDeviceToken,
+ * UNREGISTERED, INVALID_ARGUMENT). Plain helper so the action can call
+ * `runMutation(internal.rooms.clearInvalidPushToken, ...)`.
+ */
+export const clearInvalidPushToken = internalMutation({
+  args: {
+    playerId: v.id('players'),
+    field: v.union(
+      v.literal('pushTokenApnsLiveActivity'),
+      v.literal('pushTokenFcm'),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const player = await ctx.db.get(args.playerId);
+    if (!player) return;
+    const patch: Partial<Doc<'players'>> = {};
+    if (args.field === 'pushTokenApnsLiveActivity') {
+      patch.pushTokenApnsLiveActivity = undefined;
+      patch.pushTokenApnsUpdatedAt = undefined;
+    } else {
+      patch.pushTokenFcm = undefined;
+    }
+    await ctx.db.patch(args.playerId, patch);
   },
 });
 

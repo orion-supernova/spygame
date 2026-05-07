@@ -16,6 +16,12 @@ dependencies:
 
   # Backend
   convex_flutter: ^3.0.1
+  # Firebase Cloud Messaging — used by the Convex notifications action to
+  # wake Android devices for the round-end "Round ended" transition while
+  # the app is fully backgrounded. firebase_core is a transitive
+  # requirement of firebase_messaging.
+  firebase_core: ^3.6.0
+  firebase_messaging: ^15.1.3
   # Pinned to match the version convex_flutter's pre-built Rust core was
   # compiled against (its caret constraint accepts 2.12.x, which mismatches
   # at runtime and throws a StateError on first use).

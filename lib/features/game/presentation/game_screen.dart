@@ -8,6 +8,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../core/convex/server_time_provider.dart';
 import '../../../core/lifecycle/app_lifecycle_observer.dart';
 import '../../../core/notifications/live_timer_controller.dart';
+import '../../../core/notifications/push_token_service.dart';
 import '../../../core/notifications/round_end_notifier.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/storage/identity_storage.dart';
@@ -61,6 +62,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       // ignore: discarded_futures
       ref.read(roomRepositoryProvider).heartbeat(code: widget.code);
     });
+    // Register push tokens for the round-end "Round ended" fan-out. On
+    // Android this acquires the FCM token and ships it; on iOS the per-
+    // activity APNs token will arrive separately when the Live Activity
+    // boots.
+    // ignore: discarded_futures
+    PushTokenService.instance.bindToRoom(widget.code);
   }
 
   @override
@@ -72,6 +79,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     RoundEndNotifier.instance.cancelAll();
     // ignore: discarded_futures
     LiveTimerController.instance.end();
+    PushTokenService.instance.unbind();
     super.dispose();
   }
 

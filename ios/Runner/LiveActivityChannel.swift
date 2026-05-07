@@ -6,12 +6,18 @@ import ActivityKit
 
 /// Bridges the Flutter `LiveTimerController` Dart class to ActivityKit.
 ///
-/// Two methods are exposed on the channel `com.walhallaa.spygame/live_activity`:
+/// Methods exposed on the channel `com.walhallaa.spygame/live_activity`:
 ///   - `start(roomCode:String, roundIndex:Int, totalRounds:Int,
 ///            endsAtMs:Int64, title:String, body:String)` — requests a
 ///     new Live Activity. If one is already active for a stale round, it
 ///     is ended first.
 ///   - `end()` — ends any active activities.
+///
+/// Reverse calls (Swift → Dart) on the same channel:
+///   - `onLiveActivityPushToken(roomCode:String, token:String)` — emitted
+///     each time ActivityKit produces a push token for the running
+///     activity. Sent on every emission of `pushTokenUpdates` (iOS may
+///     rotate tokens mid-activity); the Dart side forwards to Convex.
 ///
 /// Failures are surfaced as FlutterError; the Dart side fails silently and
 /// keeps the in-app countdown as the source of truth.
@@ -19,6 +25,7 @@ public final class LiveActivityChannel {
     public static let channelName = "com.walhallaa.spygame/live_activity"
 
     private let channel: FlutterMethodChannel
+    private var pushTokenStreamTask: Task<Void, Never>?
 
     public init(messenger: FlutterBinaryMessenger) {
         self.channel = FlutterMethodChannel(
@@ -71,22 +78,47 @@ public final class LiveActivityChannel {
             return
         }
 
-        // End any stale activities first so we don't pile up.
-        Task {
+        // Cancel any prior token stream — it belongs to a stale activity.
+        pushTokenStreamTask?.cancel()
+        pushTokenStreamTask = nil
+
+        Task { [weak self] in
+            // End any stale activities first so we don't pile up.
             for activity in Activity<RoundActivityAttributes>.activities {
                 await activity.end(nil, dismissalPolicy: .immediate)
             }
+            let attributes = RoundActivityAttributes(roomCode: roomCode)
+            let state = RoundActivityAttributes.ContentState(
+                endsAtMs: endsAtMs,
+                title: title,
+                subtitle: body,
+                endedLabel: ""
+            )
+            let staleDate = Date(timeIntervalSince1970: TimeInterval(endsAtMs) / 1000.0)
+                .addingTimeInterval(60)
+            let content = ActivityContent(state: state, staleDate: staleDate)
+
+            // Prefer `.token` so the server can push round-end updates to a
+            // backgrounded device. This requires the Push Notifications
+            // capability + a valid `aps-environment` entitlement; if either
+            // is missing (simulator without APNs setup, dev build without
+            // capability wired) the request throws. Fall back to the no-
+            // push variant so the activity still appears locally — the
+            // Convex subscription will update it on next foreground, same
+            // as before this feature existed.
             do {
-                let attributes = RoundActivityAttributes(roomCode: roomCode)
-                let state = RoundActivityAttributes.ContentState(
-                    endsAtMs: endsAtMs,
-                    title: title,
-                    subtitle: body,
-                    endedLabel: ""
+                let activity = try Activity.request(
+                    attributes: attributes,
+                    content: content,
+                    pushType: .token
                 )
-                let staleDate = Date(timeIntervalSince1970: TimeInterval(endsAtMs) / 1000.0)
-                    .addingTimeInterval(60)
-                let content = ActivityContent(state: state, staleDate: staleDate)
+                self?.observePushTokenUpdates(for: activity, roomCode: roomCode)
+                result(nil)
+                return
+            } catch {
+                NSLog("[LiveActivity] .token request failed (%@); retrying without push", "\(error)")
+            }
+            do {
                 _ = try Activity.request(
                     attributes: attributes,
                     content: content,
@@ -106,12 +138,42 @@ public final class LiveActivityChannel {
         #endif
     }
 
+    #if canImport(ActivityKit)
+    @available(iOS 16.2, *)
+    private func observePushTokenUpdates(
+        for activity: Activity<RoundActivityAttributes>,
+        roomCode: String
+    ) {
+        pushTokenStreamTask?.cancel()
+        // `pushTokenUpdates` is an async sequence — iOS may rotate the
+        // token mid-activity (rare but documented). Forward every emission
+        // to Dart so the server always has the freshest token.
+        pushTokenStreamTask = Task { [weak self] in
+            for await tokenData in activity.pushTokenUpdates {
+                if Task.isCancelled { return }
+                let hex = tokenData.map { String(format: "%02x", $0) }.joined()
+                await MainActor.run { [weak self] in
+                    self?.channel.invokeMethod(
+                        "onLiveActivityPushToken",
+                        arguments: [
+                            "roomCode": roomCode,
+                            "token": hex,
+                        ]
+                    )
+                }
+            }
+        }
+    }
+    #endif
+
     private func endAllActivities(result: @escaping FlutterResult) {
         #if canImport(ActivityKit)
         guard #available(iOS 16.2, *) else {
             result(nil)
             return
         }
+        pushTokenStreamTask?.cancel()
+        pushTokenStreamTask = nil
         Task {
             for activity in Activity<RoundActivityAttributes>.activities {
                 let endedState = RoundActivityAttributes.ContentState(

@@ -9,6 +9,11 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // Required for ActivityKit push tokens. Live Activities use APNs
+    // independently of regular notification permission, but the app must
+    // still register for remote notifications so APNs accepts the
+    // per-activity push tokens emitted by `pushTokenUpdates`.
+    application.registerForRemoteNotifications()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
