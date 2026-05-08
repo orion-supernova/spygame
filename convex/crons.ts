@@ -31,4 +31,11 @@ crons.interval(
   internal.maintenance.purgeOrphans,
 );
 
+// Daily prune of the bounded `liveActivityFailures` diagnostic log.
+crons.interval(
+  'purge old diagnostics',
+  { hours: 24 },
+  internal.maintenance.purgeOldDiagnostics,
+);
+
 export default crons;

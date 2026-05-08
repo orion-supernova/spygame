@@ -370,6 +370,13 @@ export const registerPushTokens = mutation({
     if (args.pushTokenApnsLiveActivity !== undefined) {
       patch.pushTokenApnsLiveActivity = args.pushTokenApnsLiveActivity;
       patch.pushTokenApnsUpdatedAt = Date.now();
+      // The new token may be from a different environment than the old
+      // one (e.g. user reinstalled from TestFlight onto an App Store
+      // build), so the cached gateway is no longer trustworthy. Force
+      // the dispatcher to re-discover.
+      if (player.pushTokenApnsGateway !== undefined) {
+        patch.pushTokenApnsGateway = undefined;
+      }
     }
     if (args.pushTokenFcm !== undefined) {
       patch.pushTokenFcm = args.pushTokenFcm;
@@ -379,6 +386,26 @@ export const registerPushTokens = mutation({
     }
     if (Object.keys(patch).length === 0) return;
     await ctx.db.patch(player._id, patch);
+  },
+});
+
+/**
+ * Persist the working APNs gateway ('prod' | 'dev') for a player after the
+ * dispatcher discovers it via the auto-fallback retry. Subsequent push
+ * sends will hit the right gateway on the first try.
+ */
+export const setApnsGateway = internalMutation({
+  args: {
+    playerId: v.id('players'),
+    gateway: v.union(v.literal('prod'), v.literal('dev')),
+  },
+  handler: async (ctx, args) => {
+    const player = await ctx.db.get(args.playerId);
+    if (!player) return;
+    if (player.pushTokenApnsGateway === args.gateway) return;
+    await ctx.db.patch(args.playerId, {
+      pushTokenApnsGateway: args.gateway,
+    });
   },
 });
 

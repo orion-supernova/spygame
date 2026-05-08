@@ -39,7 +39,6 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   String? _scheduledForRoundId;
-  String? _notifiedEndedRoundId;
   int? _shownSpyRevealForRound;
   bool _endNavInFlight = false;
   int _lastSecondHaptic = -1;
@@ -143,20 +142,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 
-  Future<void> _notifyRoundEnded(RoundSnapshot round) async {
-    if (_notifiedEndedRoundId == round.id) return;
-    _notifiedEndedRoundId = round.id;
-    if (!mounted) return;
-    final l10n = AppLocalizations.of(context);
-    await RoundEndNotifier.instance.showNow(
-      notificationId: 10_000 + round.index,
-      title: l10n.notifRoundEndedTitle,
-      body: round.endedReason == 'manual'
-          ? l10n.notifRoundEndedBodyManual(round.index)
-          : l10n.notifRoundEndedBodyTimer(round.index),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final asyncRoom = ref.watch(roomStreamProvider(widget.code));
@@ -176,7 +161,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     });
 
     ref.listen(roomStreamProvider(widget.code), (prev, next) {
-      final previousRound = prev?.valueOrNull?.currentRound;
       next.whenData((room) async {
         if (room == null) return;
         ref
@@ -200,16 +184,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         if (round != null && round.isActive) {
           await _scheduleEndNotification(round);
         } else if (round != null && !round.isActive) {
-          final shouldNotifyEnded =
-              _scheduledForRoundId == round.id ||
-              (previousRound?.id == round.id &&
-                  previousRound?.isActive == true);
+          // Round just ended. Drop the pre-scheduled "round end" local
+          // notification (if it's still pending — common for host-ended
+          // rounds) and dismiss the Live Activity / chronometer. The in-app
+          // UI flips visibly on its own, so we deliberately do NOT post an
+          // additional "Round ended" alert here.
           await RoundEndNotifier.instance.cancelAll();
           await LiveTimerController.instance.end();
           _scheduledForRoundId = null;
-          if (shouldNotifyEnded) {
-            await _notifyRoundEnded(round);
-          }
         }
       });
     });

@@ -56,6 +56,15 @@ export default defineSchema({
     // so the server can localize the push payload before sending.
     pushTokenApnsLiveActivity: v.optional(v.string()),
     pushTokenApnsUpdatedAt: v.optional(v.number()),
+    // Which APNs gateway (production vs development) the current
+    // `pushTokenApnsLiveActivity` was issued against. Discovered lazily by
+    // the dispatcher: try the configured default, and on `BadDeviceToken`
+    // retry the other side and persist whichever worked. Cleared whenever
+    // a new token is registered (the new token may be from a different
+    // env than the old one).
+    pushTokenApnsGateway: v.optional(
+      v.union(v.literal('prod'), v.literal('dev')),
+    ),
     pushTokenFcm: v.optional(v.string()),
     locale: v.optional(v.union(v.literal('en'), v.literal('tr'))),
   })
@@ -152,6 +161,18 @@ export default defineSchema({
       }),
     ),
   }).index('by_bundle', ['bundleSlug']),
+
+  // Bounded log of Live Activity push-token acquisition failures reported
+  // by iOS clients. Pruned by a periodic sweep (see `maintenance.ts`).
+  // Lets us measure how often `Activity.request(pushType: .token)` fails
+  // in the wild without having to ship a heavy telemetry pipeline.
+  liveActivityFailures: defineTable({
+    code: v.string(),
+    message: v.string(),
+    atMs: v.number(),
+    roomCode: v.optional(v.string()),
+    osVersion: v.optional(v.string()),
+  }).index('by_atMs', ['atMs']),
 
   // Static catalog of paid location packs. Server is the source of truth
   // for which slugs exist and which locations belong to each. Real

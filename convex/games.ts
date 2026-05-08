@@ -324,6 +324,7 @@ async function endRoundCore(
     .map((p) => ({
       playerId: p._id,
       apnsLiveActivityToken: p.pushTokenApnsLiveActivity,
+      apnsGateway: p.pushTokenApnsGateway,
       fcmToken: p.pushTokenFcm,
       locale: (p.locale ?? 'en') as 'en' | 'tr',
     }));

@@ -45,6 +45,12 @@ public final class LiveActivityChannel {
                 return
             }
             startActivity(args: args, result: result)
+        case "update":
+            guard let args = call.arguments as? [String: Any] else {
+                result(FlutterError(code: "bad_args", message: "Expected map", details: nil))
+                return
+            }
+            updateActivity(args: args, result: result)
         case "end":
             endAllActivities(result: result)
         default:
@@ -98,14 +104,13 @@ public final class LiveActivityChannel {
                 .addingTimeInterval(60)
             let content = ActivityContent(state: state, staleDate: staleDate)
 
-            // Prefer `.token` so the server can push round-end updates to a
-            // backgrounded device. This requires the Push Notifications
-            // capability + a valid `aps-environment` entitlement; if either
-            // is missing (simulator without APNs setup, dev build without
-            // capability wired) the request throws. Fall back to the no-
-            // push variant so the activity still appears locally — the
-            // Convex subscription will update it on next foreground, same
-            // as before this feature existed.
+            // Require `pushType: .token` — the server-driven round-end update
+            // path depends on it. We deliberately do NOT silently fall back
+            // to `pushType: nil` here: that path leaves the activity visible
+            // but un-updatable, and the failure was previously invisible to
+            // both the user and our telemetry. Surface the error to Dart
+            // (`no_push_token`) so it can be logged via Convex diagnostics
+            // and we can fix the entitlement / APNs misconfiguration.
             do {
                 let activity = try Activity.request(
                     attributes: attributes,
@@ -114,19 +119,9 @@ public final class LiveActivityChannel {
                 )
                 self?.observePushTokenUpdates(for: activity, roomCode: roomCode)
                 result(nil)
-                return
             } catch {
-                NSLog("[LiveActivity] .token request failed (%@); retrying without push", "\(error)")
-            }
-            do {
-                _ = try Activity.request(
-                    attributes: attributes,
-                    content: content,
-                    pushType: nil
-                )
-                result(nil)
-            } catch {
-                result(FlutterError(code: "request_failed",
+                NSLog("[LiveActivity] .token request failed: %@", "\(error)")
+                result(FlutterError(code: "no_push_token",
                                     message: error.localizedDescription,
                                     details: nil))
             }
@@ -165,6 +160,41 @@ public final class LiveActivityChannel {
         }
     }
     #endif
+
+    private func updateActivity(args: [String: Any], result: @escaping FlutterResult) {
+        #if canImport(ActivityKit)
+        guard #available(iOS 16.2, *) else {
+            result(nil)
+            return
+        }
+        guard let endsAtMs = (args["endsAtMs"] as? NSNumber)?.int64Value,
+              let title = args["title"] as? String,
+              let body = args["body"] as? String else {
+            result(FlutterError(code: "bad_args",
+                                message: "Missing required fields",
+                                details: args))
+            return
+        }
+        let endedLabel = (args["endedLabel"] as? String) ?? ""
+        Task {
+            for activity in Activity<RoundActivityAttributes>.activities {
+                let newState = RoundActivityAttributes.ContentState(
+                    endsAtMs: endsAtMs,
+                    title: title,
+                    subtitle: body,
+                    endedLabel: endedLabel
+                )
+                let staleDate = Date(timeIntervalSince1970: TimeInterval(endsAtMs) / 1000.0)
+                    .addingTimeInterval(60)
+                let content = ActivityContent(state: newState, staleDate: staleDate)
+                await activity.update(content)
+            }
+            result(nil)
+        }
+        #else
+        result(nil)
+        #endif
+    }
 
     private func endAllActivities(result: @escaping FlutterResult) {
         #if canImport(ActivityKit)

@@ -200,6 +200,28 @@ export const purgeOrphans = internalMutation({
 });
 
 /**
+ * Prune old `liveActivityFailures` rows. Bounded log written by the iOS
+ * Dart layer when ActivityKit fails to issue a push token; we keep a
+ * one-week window so we can spot spikes without unbounded growth.
+ */
+const LIVE_ACTIVITY_FAILURE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+export const purgeOldDiagnostics = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const cutoff = Date.now() - LIVE_ACTIVITY_FAILURE_TTL_MS;
+    const stale = await ctx.db
+      .query('liveActivityFailures')
+      .withIndex('by_atMs', (q) => q.lt('atMs', cutoff))
+      .collect();
+    for (const row of stale) {
+      await ctx.db.delete(row._id);
+    }
+    return { deleted: stale.length };
+  },
+});
+
+/**
  * Existing job: transfer ownership in a lobby if the host has gone silent
  * but other players are still around, so the room doesn't get stuck.
  */

@@ -1,9 +1,11 @@
+import 'dart:async' show unawaited;
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../convex/convex_bootstrap.dart';
 import 'push_token_service.dart';
 import 'round_end_notifier.dart';
 
@@ -77,11 +79,44 @@ class LiveTimerController {
           'body': body,
         });
       } on PlatformException catch (e) {
-        // iOS < 16.2 or user disabled Live Activities — fail silent, the
-        // in-app timer remains the source of truth.
+        // iOS < 16.2, user disabled Live Activities, or APNs token issuance
+        // failed (`no_push_token`). The in-app timer remains the source of
+        // truth in all cases. For `no_push_token` specifically we report to
+        // Convex so we can spot entitlement/APNs-config issues in production
+        // — a silent fallback (the previous behavior) shipped Live
+        // Activities the server could never update.
         debugPrint('Live Activity start failed: ${e.code} ${e.message}');
+        if (e.code == 'no_push_token') {
+          unawaited(_logLiveActivityFailure(
+            code: e.code,
+            message: e.message ?? '',
+            roomCode: roomCode,
+          ));
+        }
       } on MissingPluginException {
         // Channel not registered (older build). Ignore.
+      }
+    }
+  }
+
+  Future<void> _logLiveActivityFailure({
+    required String code,
+    required String message,
+    required String roomCode,
+  }) async {
+    if (!ConvexBootstrap.isInitialized) return;
+    try {
+      await ConvexBootstrap.client.mutation(
+        name: 'diagnostics:logLiveActivityFailure',
+        args: {
+          'code': code,
+          'message': message,
+          'roomCode': roomCode,
+        },
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[diagnostics] logLiveActivityFailure failed: $e');
       }
     }
   }

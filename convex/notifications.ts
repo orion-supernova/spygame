@@ -22,10 +22,12 @@ const FCM_TOKEN_TTL_BUFFER_MS = 5 * 60 * 1000;
 const PUSH_DISMISSAL_AFTER_S = 30;
 
 type Locale = 'en' | 'tr';
+type ApnsGateway = 'prod' | 'dev';
 
 interface PushTarget {
   playerId: Id<'players'>;
   apnsLiveActivityToken?: string;
+  apnsGateway?: ApnsGateway;
   fcmToken?: string;
   locale: Locale;
 }
@@ -121,10 +123,14 @@ interface ApnsResult {
   reason?: string;
 }
 
-function apnsHost(): string {
+function defaultApnsGateway(): ApnsGateway {
   // `APNS_USE_SANDBOX=true` for development builds running against Apple's
   // sandbox APNs gateway; default to production.
-  return process.env.APNS_USE_SANDBOX === 'true' ? APNS_HOST_DEV : APNS_HOST_PROD;
+  return process.env.APNS_USE_SANDBOX === 'true' ? 'dev' : 'prod';
+}
+
+function apnsHostFor(gateway: ApnsGateway): string {
+  return gateway === 'dev' ? APNS_HOST_DEV : APNS_HOST_PROD;
 }
 
 async function sendApnsLiveActivityEnd(args: {
@@ -133,9 +139,10 @@ async function sendApnsLiveActivityEnd(args: {
   jwt: string;
   contentState: Record<string, unknown>;
   collapseId: string;
+  gateway: ApnsGateway;
 }): Promise<ApnsResult> {
   return new Promise((resolve, reject) => {
-    const client = http2.connect(apnsHost());
+    const client = http2.connect(apnsHostFor(args.gateway));
     let settled = false;
     const finish = (r: ApnsResult | Error) => {
       if (settled) return;
@@ -301,6 +308,9 @@ export const dispatchRoundEndedPush = internalAction({
       v.object({
         playerId: v.id('players'),
         apnsLiveActivityToken: v.optional(v.string()),
+        apnsGateway: v.optional(
+          v.union(v.literal('prod'), v.literal('dev')),
+        ),
         fcmToken: v.optional(v.string()),
         locale: v.union(v.literal('en'), v.literal('tr')),
       }),
@@ -334,27 +344,55 @@ export const dispatchRoundEndedPush = internalAction({
     const work: Promise<unknown>[] = [];
 
     if (apnsJwt && apnsBundle) {
+      const fallbackDefault = defaultApnsGateway();
       for (const t of apnsTargets) {
         const localized = localizeFor(t.locale, {
           roundIndex: args.roundIndex,
           endedReason: args.endedReason,
           gameEnded: args.gameEnded,
         });
+        const contentState = {
+          endsAtMs: Date.now(),
+          title: localized.pushTitle,
+          subtitle: localized.pushBody,
+          endedLabel: localized.endedLabel,
+        };
+        // Per-token gateway: prefer the previously-discovered one; otherwise
+        // fall back to the env default. On `BadDeviceToken`, retry the
+        // other gateway once. APNs tokens are environment-bound: a token
+        // issued for the sandbox APNs server is rejected by prod and vice
+        // versa, so this auto-fallback unblocks TestFlight/dev builds whose
+        // tokens don't match the server's APNS_USE_SANDBOX setting.
+        const primary: ApnsGateway = t.apnsGateway ?? fallbackDefault;
+        const secondary: ApnsGateway = primary === 'prod' ? 'dev' : 'prod';
         work.push(
           (async () => {
             try {
-              const result = await sendApnsLiveActivityEnd({
+              let result = await sendApnsLiveActivityEnd({
                 deviceToken: t.apnsLiveActivityToken!,
                 bundleId: apnsBundle,
                 jwt: apnsJwt,
-                contentState: {
-                  endsAtMs: Date.now(),
-                  title: localized.pushTitle,
-                  subtitle: localized.pushBody,
-                  endedLabel: localized.endedLabel,
-                },
+                contentState,
                 collapseId: `round-end-${args.roundId}`,
+                gateway: primary,
               });
+              let workingGateway: ApnsGateway = primary;
+              const wasBadDeviceToken =
+                result.status === 400 && result.reason === 'BadDeviceToken';
+              if (wasBadDeviceToken) {
+                // Retry against the other gateway. If THIS one still says
+                // BadDeviceToken, the token is genuinely dead and we fall
+                // through to the cleanup branch below.
+                result = await sendApnsLiveActivityEnd({
+                  deviceToken: t.apnsLiveActivityToken!,
+                  bundleId: apnsBundle,
+                  jwt: apnsJwt,
+                  contentState,
+                  collapseId: `round-end-${args.roundId}`,
+                  gateway: secondary,
+                });
+                workingGateway = secondary;
+              }
               if (result.status === 401) {
                 // JWT rejected; force refresh on next call.
                 invalidateApnsJwt();
@@ -367,6 +405,15 @@ export const dispatchRoundEndedPush = internalAction({
                   internal.rooms.clearInvalidPushToken,
                   { playerId: t.playerId, field: 'pushTokenApnsLiveActivity' },
                 );
+              } else if (result.status >= 200 && result.status < 300) {
+                // Persist the gateway we actually delivered through so the
+                // next push hits the right one on the first try.
+                if (t.apnsGateway !== workingGateway) {
+                  await ctx.runMutation(
+                    internal.rooms.setApnsGateway,
+                    { playerId: t.playerId, gateway: workingGateway },
+                  );
+                }
               } else if (result.status >= 400) {
                 console.error('[push] APNs error', result.status, result.reason);
               }
