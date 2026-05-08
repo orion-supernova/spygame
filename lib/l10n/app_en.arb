@@ -418,11 +418,8 @@
     "placeholders": { "round": { "type": "int", "example": "2" } }
   },
 
-  "spyRevealLine": "Spy: {name}",
-  "@spyRevealLine": {
-    "description": "Main line of the spy-reveal modal. Shows which player was the spy in the round that just ended.",
-    "placeholders": { "name": { "type": "String", "example": "Alex" } }
-  },
+  "spyRevealNameEyebrow": "SPY",
+  "@spyRevealNameEyebrow": { "description": "Mono caps eyebrow shown directly above the spy's name on the spy-reveal modal so the user knows the dust will reveal the spy. Always visible; the name below it is hidden behind animated dust until tapped." },
 
   "spyRevealContinue": "Continue",
   "@spyRevealContinue": { "description": "Primary action button on the spy-reveal modal. Dismisses the modal." },

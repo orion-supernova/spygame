@@ -122,7 +122,7 @@
   "gameRoundEnded": "TUR BİTTİ",
   "intermissionRoundDone": "{round}. TUR BİTTİ",
   "spyRevealRoundEyebrow": "{round}. TUR",
-  "spyRevealLine": "Casus: {name}",
+  "spyRevealNameEyebrow": "CASUS",
   "spyRevealContinue": "Devam",
   "spyRevealTapHint": "Açmak için dokun",
   "intermissionHeadline": "Mola. Hep birlikte konuşun.",

@@ -19,6 +19,22 @@ class ConvexBootstrap {
       ConvexConfig(deploymentUrl: AppConvexConfig.deploymentUrl),
     );
     _initialized = true;
+    // The web impl of convex_flutter throws "WebSocket not connected" if a
+    // subscribe/mutation/query lands before the WS handshake finishes, and
+    // ConvexClient.initialize() doesn't await onopen. Cold-start screens
+    // (share-link /join/CODE, refreshing /lobby/CODE) subscribe within a
+    // frame and lose the race; the home flow doesn't because the user
+    // takes seconds to type a name first. Wait briefly for the socket so
+    // those screens can talk.
+    if (ConvexClient.instance.isConnected) return;
+    try {
+      await ConvexClient.instance.connectionState
+          .firstWhere((s) => s == WebSocketConnectionState.connected)
+          .timeout(const Duration(seconds: 5));
+    } catch (_) {
+      // Don't block launch on a slow handshake — operations will surface
+      // their own error if the user is genuinely offline.
+    }
   }
 
   static ConvexClient get client => ConvexClient.instance;
