@@ -163,6 +163,12 @@
   "welcomeFootnote": "3 to 12 players. Spies among you. Trust no one.",
   "@welcomeFootnote": { "description": "Small mono footnote under the welcome CTAs. Three short clauses, spy-noir tone. The third clause is a wink at the spy/social-deduction premise." },
 
+  "welcomeVersion": "Version: {version}",
+  "@welcomeVersion": {
+    "description": "Tiny version label in the welcome screen footer. Shows the semantic app version without the build number.",
+    "placeholders": { "version": { "type": "String", "example": "1.0.8" } }
+  },
+
   "welcomeConfigBannerTitle": "CONVEX_URL not set",
   "@welcomeConfigBannerTitle": { "description": "Dev banner shown only when the build is missing the backend URL. CONVEX_URL is a literal env-var name; do not translate it." },
 

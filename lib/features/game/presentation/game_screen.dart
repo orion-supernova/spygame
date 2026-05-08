@@ -237,8 +237,31 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
               data: (room) {
                 if (room == null) {
-                  return Center(
-                    child: Text(AppLocalizations.of(context).gameRoomEnded),
+                  final l10n = AppLocalizations.of(context);
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Spacer(),
+                        Text(
+                          l10n.gameRoomEnded,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .textTheme
+                              .displaySmall
+                              ?.copyWith(
+                                color: AppColors.paper,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const Spacer(),
+                        ElevatedButton(
+                          onPressed: () => context.go(AppRoute.home),
+                          child: Text(l10n.joinScreenCtaBackHome),
+                        ),
+                      ],
+                    ),
                   );
                 }
                 return _GameBody(

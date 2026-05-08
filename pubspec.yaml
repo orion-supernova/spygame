@@ -54,6 +54,7 @@ dependencies:
   collection: ^1.18.0
   meta: ^1.15.0
   timezone: ^0.9.4
+  package_info_plus: ^8.0.2
 
 dev_dependencies:
   flutter_test:

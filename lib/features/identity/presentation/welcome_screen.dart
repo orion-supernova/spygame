@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../core/config/convex_config.dart';
 import '../../../core/convex/convex_bootstrap.dart';
@@ -149,6 +150,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                             color: AppColors.paperFaint,
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        const _VersionLabel(),
                       ],
                     ),
                 ],
@@ -185,6 +188,34 @@ class _Eyebrow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _VersionLabel extends StatelessWidget {
+  const _VersionLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        final info = snapshot.data;
+        if (info == null) {
+          return const SizedBox.shrink();
+        }
+        return Text(
+          l10n.welcomeVersion(info.version),
+          textAlign: TextAlign.center,
+          style: AppTypography.mono(
+            size: 10,
+            weight: FontWeight.w500,
+            letterSpacing: 1.2,
+            color: AppColors.paperFaint,
+          ),
+        );
+      },
     );
   }
 }
