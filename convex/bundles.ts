@@ -5,10 +5,12 @@ import { mutation, query } from './_generated/server';
 
 /**
  * Static catalog of paid location packs. Server is the source of truth
- * for which slugs exist and which locations belong to each. Real
- * ownership is tracked client-side (SharedPreferences) and will move to
- * RevenueCat entitlements later — server does not validate ownership
- * claims because there are no accounts.
+ * for which slugs exist and which locations belong to each. Ownership is
+ * driven on-device by RevenueCat — the platform store receipt (Apple /
+ * Google) is the cryptographic proof of purchase, so the server does
+ * not need to validate ownership claims and there are no user records.
+ * `priceUsd` here is a display fallback only; the live UI prefers RC's
+ * locale-formatted `priceString` from the active offering.
  */
 type SeedBundle = {
   slug: string;
@@ -31,7 +33,7 @@ const SEED: SeedBundle[] = [
     slug: 'istanbul',
     category: 'city',
     sortOrder: 10,
-    priceUsd: '$1.99',
+    priceUsd: '$0.99',
     accentHex: '#E4572E',
     iconKey: 'mosque',
     translations: {
@@ -49,7 +51,7 @@ const SEED: SeedBundle[] = [
     slug: 'paris',
     category: 'city',
     sortOrder: 20,
-    priceUsd: '$1.99',
+    priceUsd: '$0.99',
     accentHex: '#4CC9F0',
     iconKey: 'local_cafe',
     translations: {
@@ -67,7 +69,7 @@ const SEED: SeedBundle[] = [
     slug: 'tokyo',
     category: 'city',
     sortOrder: 30,
-    priceUsd: '$1.99',
+    priceUsd: '$0.99',
     accentHex: '#F15BB5',
     iconKey: 'ramen_dining',
     translations: {
@@ -85,7 +87,7 @@ const SEED: SeedBundle[] = [
     slug: 'stockholm',
     category: 'city',
     sortOrder: 40,
-    priceUsd: '$1.99',
+    priceUsd: '$0.99',
     accentHex: '#00B4D8',
     iconKey: 'sailing',
     translations: {
@@ -103,7 +105,7 @@ const SEED: SeedBundle[] = [
     slug: 'cyberpunk',
     category: 'theme',
     sortOrder: 100,
-    priceUsd: '$1.99',
+    priceUsd: '$0.99',
     accentHex: '#9B5DE5',
     iconKey: 'electric_bolt',
     translations: {

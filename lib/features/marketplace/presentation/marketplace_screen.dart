@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
+import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../data/marketplace_providers.dart';
 import '../domain/bundle.dart';
@@ -61,6 +63,7 @@ class MarketplaceScreen extends ConsumerWidget {
                               ),
                             ),
                             const Spacer(),
+                            const _RestoreOrWebHint(),
                           ],
                         ),
                       ),
@@ -253,6 +256,83 @@ class _Eyebrow extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Header-row affordance: a "Restore purchases" text button on iOS/Android,
+/// or a quiet "Buy on iOS or Android" hint on web (where purchases_flutter
+/// is unsupported).
+class _RestoreOrWebHint extends ConsumerStatefulWidget {
+  const _RestoreOrWebHint();
+
+  @override
+  ConsumerState<_RestoreOrWebHint> createState() => _RestoreOrWebHintState();
+}
+
+class _RestoreOrWebHintState extends ConsumerState<_RestoreOrWebHint> {
+  bool _busy = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (kIsWeb) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Text(
+          l10n.marketplaceWebPurchaseHint,
+          style: AppTypography.mono(
+            size: 10,
+            weight: FontWeight.w500,
+            letterSpacing: 1.2,
+            color: AppColors.paperFaint,
+          ),
+        ),
+      );
+    }
+    return TextButton(
+      onPressed: _busy ? null : _onTap,
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.lime,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      ),
+      child: Text(
+        _busy ? l10n.marketplaceRestoring : l10n.marketplaceRestore,
+        style: AppTypography.mono(
+          size: 11,
+          weight: FontWeight.w700,
+          letterSpacing: 1.4,
+          color: _busy ? AppColors.paperFaint : AppColors.lime,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onTap() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _busy = true);
+    await Haptics.light();
+    try {
+      final restored =
+          await ref.read(ownedBundlesProvider.notifier).restore();
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            restored.isEmpty
+                ? l10n.marketplaceRestoreEmpty
+                : l10n.marketplaceRestoreSuccess(restored.length),
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.marketplacePurchaseFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 }
 

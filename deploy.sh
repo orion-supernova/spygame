@@ -326,8 +326,13 @@ if [ "$RUN_IOS" = true ]; then
 
     # Refreshes Generated.xcconfig with the current pubspec version — this is what
     # fixes "Xcode archived the old version after I bumped pubspec".
+    # RevenueCat SDK keys come from .env.local (already loaded above); only the
+    # iOS key is consumed at runtime on iOS, but pass both so a missing
+    # variable surfaces here instead of crashing later.
     run_with_spinner "Building Flutter for iOS (release)" \
-        flutter build ios --release --no-codesign
+        flutter build ios --release --no-codesign \
+            --dart-define=REVENUECAT_IOS_KEY="${REVENUECAT_IOS_KEY:-}" \
+            --dart-define=REVENUECAT_ANDROID_KEY="${REVENUECAT_ANDROID_KEY:-}"
 
     run_with_spinner "Creating Xcode archive" \
         xcodebuild -workspace ios/Runner.xcworkspace \

@@ -53,13 +53,31 @@
   "@marketplaceCategoryTheme": { "description": "Eyebrow on the bundle detail screen for theme-category bundles." },
 
   "marketplaceUnlock": "UNLOCK",
-  "@marketplaceUnlock": { "description": "Big rounded lime CTA on bundle detail screen for not-yet-owned bundles. Pairs with the price, e.g. 'UNLOCK · $1.99'. All-caps. Mirrors GET STARTED energy." },
+  "@marketplaceUnlock": { "description": "Big rounded lime CTA on bundle detail screen for not-yet-owned bundles. Pairs with the price, e.g. 'UNLOCK · $0.99'. All-caps. Mirrors GET STARTED energy." },
 
-  "marketplaceBuyMockNotice": "Mock purchase — real billing coming later.",
-  "@marketplaceBuyMockNotice": { "description": "Small print under the Unlock button in this pre-RevenueCat phase." },
+  "marketplaceUnlocking": "UNLOCKING…",
+  "@marketplaceUnlocking": { "description": "Replaces UNLOCK while a purchase is in flight. All-caps with ellipsis." },
 
-  "marketplaceRemoveMock": "Remove (mock)",
-  "@marketplaceRemoveMock": { "description": "Quiet text button shown on already-owned bundles to toggle the mock ownership flag back off." },
+  "marketplaceRestore": "Restore purchases",
+  "@marketplaceRestore": { "description": "Text button in the marketplace header that replays the user's platform receipts so previously-bought bundles return after reinstall or new device." },
+
+  "marketplaceRestoring": "Restoring…",
+  "@marketplaceRestoring": { "description": "Replaces the Restore label while the restore call is in flight." },
+
+  "marketplaceRestoreSuccess": "{count, plural, one{Restored 1 pack.} other{Restored {count} packs.}}",
+  "@marketplaceRestoreSuccess": {
+    "description": "Snackbar message shown after a successful restore that returned at least one bundle.",
+    "placeholders": { "count": { "type": "int", "example": "2" } }
+  },
+
+  "marketplaceRestoreEmpty": "No previous purchases found.",
+  "@marketplaceRestoreEmpty": { "description": "Snackbar message after a restore that returned zero bundles. Friendly, not an error." },
+
+  "marketplacePurchaseFailed": "Purchase failed. Please try again.",
+  "@marketplacePurchaseFailed": { "description": "Snackbar message on any non-cancellation purchase error. Generic on purpose — store-specific reasons live in OS dialogs." },
+
+  "marketplaceWebPurchaseHint": "Purchases available on iOS and Android.",
+  "@marketplaceWebPurchaseHint": { "description": "Inline hint shown on web (where in-app purchases are not supported), in place of the Buy and Restore controls." },
 
   "marketplaceOwnedBanner": "You own this pack.",
   "@marketplaceOwnedBanner": { "description": "Confirmation line shown on bundle detail when the user owns the pack — replaces the buy CTA." },

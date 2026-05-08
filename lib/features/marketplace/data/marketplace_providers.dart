@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../../core/convex/convex_client_provider.dart';
 import '../../../core/providers/locale_provider.dart';
 import '../domain/bundle.dart';
 import 'bundles_repository.dart';
-import 'owned_bundles_storage.dart';
+import 'iap_service.dart';
 
 final bundlesRepositoryProvider = Provider<BundlesRepository>((ref) {
   final client = ref.watch(convexClientProvider);
@@ -27,20 +31,76 @@ final bundleDetailProvider = FutureProvider.autoDispose
   return repo.detail(slug: slug, locale: locale);
 });
 
-/// Locally-owned bundle slugs. Mock for now (SharedPreferences); will
-/// move to RevenueCat entitlements later.
-class OwnedBundlesNotifier extends StateNotifier<Set<String>> {
-  OwnedBundlesNotifier() : super(OwnedBundlesStorage.instance.slugs);
+/// Boundary to RevenueCat. Singleton; the same instance backs both this
+/// provider and [OwnedBundlesNotifier] below.
+final iapServiceProvider = Provider<IapService>((_) => IapService.instance);
 
-  Future<void> setOwned(String slug, bool owned) async {
-    await OwnedBundlesStorage.instance.setOwned(slug, owned);
-    state = OwnedBundlesStorage.instance.slugs;
+/// The current RC offering (5 packages, one per bundle slug). `null` on
+/// web or when RC is not configured — the UI falls back to the Convex
+/// `priceUsd` display string in that case.
+final defaultOfferingProvider = FutureProvider.autoDispose<Offering?>((ref) {
+  return ref.watch(iapServiceProvider).loadDefaultOffering();
+});
+
+/// Set of bundle slugs the current store account owns.
+///
+/// Backed by RevenueCat: the store receipt itself (signed by Apple /
+/// Google) is the proof of ownership — no server-side cache, no user
+/// records. The notifier seeds from `getCustomerInfo()` on construction
+/// and then mirrors every `addCustomerInfoUpdateListener` callback so
+/// purchases, restores, and refunds all flow through the same Riverpod
+/// stream that existing readers (`lobby_screen`, `locations_picker`,
+/// `game_providers`) already watch synchronously.
+class OwnedBundlesNotifier extends StateNotifier<Set<String>> {
+  OwnedBundlesNotifier(this._iap) : super(const <String>{}) {
+    _seed();
+    _sub = _iap.entitlementUpdates.listen((slugs) {
+      if (mounted) state = slugs;
+    });
+  }
+
+  final IapService _iap;
+  StreamSubscription<Set<String>>? _sub;
+
+  Future<void> _seed() async {
+    final initial = await _iap.currentEntitlementSlugs();
+    if (mounted) state = initial;
+  }
+
+  /// Triggers the platform purchase flow. On success returns true and the
+  /// updated entitlements arrive via the stream listener (so [state]
+  /// updates automatically — no need to set it here).
+  Future<bool> purchasePackage(Package package) async {
+    try {
+      final updated = await _iap.purchasePackage(package);
+      if (mounted) state = updated;
+      return true;
+    } on PlatformException catch (e) {
+      // RC throws PlatformException; the user-cancel code is non-fatal.
+      final code = PurchasesErrorHelper.getErrorCode(e);
+      if (code == PurchasesErrorCode.purchaseCancelledError) return false;
+      rethrow;
+    }
+  }
+
+  /// Replays receipts. Returns the set of slugs after restore so the UI
+  /// can tell the user how many bundles came back.
+  Future<Set<String>> restore() async {
+    final updated = await _iap.restore();
+    if (mounted) state = updated;
+    return updated;
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 }
 
 final ownedBundlesProvider =
     StateNotifierProvider<OwnedBundlesNotifier, Set<String>>(
-  (ref) => OwnedBundlesNotifier(),
+  (ref) => OwnedBundlesNotifier(ref.watch(iapServiceProvider)),
 );
 
 /// Coming-soon placeholders rendered alongside real bundles to make the

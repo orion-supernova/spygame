@@ -50,6 +50,11 @@ dependencies:
   # UI
   google_fonts: ^6.2.1
 
+  # In-app purchases (RevenueCat). Single SDK for iOS App Store + Google
+  # Play, plus receipt validation, restore, and refund propagation. Maps
+  # the existing clientToken to RC's appUserID — no auth required.
+  purchases_flutter: ^10.0.2
+
   # Utilities
   collection: ^1.18.0
   meta: ^1.15.0

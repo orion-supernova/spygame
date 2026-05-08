@@ -4,6 +4,11 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- Required by Google Play Billing (used via RevenueCat) for in-app
+         purchases. The Play Billing Library declares this in its own
+         manifest too, but listing it here makes the app's billing
+         intent explicit. -->
+    <uses-permission android:name="com.android.vending.BILLING"/>
 
     <application
         android:label="Where am I?"

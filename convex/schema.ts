@@ -31,9 +31,11 @@ export default defineSchema({
     // startGame so mid-game edits don't change the running pool.
     disabledLocationIds: v.optional(v.array(v.id('locations'))),
     // Bundle slugs the current host claims to own. Pushed by the host
-    // client when they enter the lobby (and on local owned-set changes)
-    // so non-host players can render the same "active packs" chips. The
-    // server does not validate ownership — host is the source of truth.
+    // client (sourced from RevenueCat-validated entitlements on the
+    // device — i.e. signed Apple / Google store receipts) when they
+    // enter the lobby and on entitlement changes, so non-host players
+    // can render the same "active packs" chips. The server does not
+    // re-validate ownership; the platform receipt is the trust anchor.
     // Cleared on ownership transfer; the new host repopulates it from
     // their device. The authoritative startGame snapshot still comes
     // from the host's `startGame` args, not this field.
@@ -175,15 +177,15 @@ export default defineSchema({
   }).index('by_atMs', ['atMs']),
 
   // Static catalog of paid location packs. Server is the source of truth
-  // for which slugs exist and which locations belong to each. Real
-  // ownership is tracked client-side (SharedPreferences) and will move to
-  // RevenueCat entitlements later — server does not validate ownership
-  // claims because there are no accounts.
+  // for which slugs exist and which locations belong to each. Ownership
+  // is driven on-device by RevenueCat — Apple/Google store receipts are
+  // the cryptographic proof of purchase, so the server does not need to
+  // validate ownership claims and there are no user records.
   bundles: defineTable({
     slug: v.string(),
     category: v.union(v.literal('city'), v.literal('theme')),
     sortOrder: v.number(),
-    priceUsd: v.string(), // display only, e.g. "$1.99"
+    priceUsd: v.string(), // display fallback only, e.g. "$0.99"
     accentHex: v.string(), // tile/accent color, e.g. "#FFB02E"
     iconKey: v.string(), // client maps this to a Material icon
     translations: v.object({

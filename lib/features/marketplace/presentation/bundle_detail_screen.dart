@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
@@ -33,12 +35,7 @@ class BundleDetailScreen extends ConsumerWidget {
               data: (detail) => _DetailView(
                 detail: detail,
                 owned: owned,
-                onToggleOwned: () async {
-                  await Haptics.medium();
-                  await ref
-                      .read(ownedBundlesProvider.notifier)
-                      .setOwned(slug, !owned);
-                },
+                slug: slug,
               ),
             ),
           ),
@@ -52,12 +49,12 @@ class _DetailView extends StatelessWidget {
   const _DetailView({
     required this.detail,
     required this.owned,
-    required this.onToggleOwned,
+    required this.slug,
   });
 
   final BundleDetail detail;
   final bool owned;
-  final VoidCallback onToggleOwned;
+  final String slug;
 
   @override
   Widget build(BuildContext context) {
@@ -160,11 +157,8 @@ class _DetailView extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(28, 4, 28, 18),
           child: owned
-              ? _OwnedBlock(onRemove: onToggleOwned)
-              : _UnlockBlock(
-                  price: bundle.priceDisplay,
-                  onTap: onToggleOwned,
-                ),
+              ? const _OwnedBlock()
+              : _UnlockBlock(slug: slug, fallbackPrice: bundle.priceDisplay),
         ),
       ],
     );
@@ -255,88 +249,132 @@ class _RoleChip extends StatelessWidget {
   }
 }
 
-class _UnlockBlock extends StatelessWidget {
-  const _UnlockBlock({required this.price, required this.onTap});
-  final String price;
-  final VoidCallback onTap;
+/// Buy CTA. Resolves the matching RevenueCat [Package] from the active
+/// offering by slug; the price label uses RC's locale-formatted
+/// [StoreProduct.priceString] when available and falls back to the
+/// Convex `priceUsd` if the offering hasn't loaded yet (or never will,
+/// e.g. on web).
+class _UnlockBlock extends ConsumerStatefulWidget {
+  const _UnlockBlock({required this.slug, required this.fallbackPrice});
+  final String slug;
+  final String fallbackPrice;
+
+  @override
+  ConsumerState<_UnlockBlock> createState() => _UnlockBlockState();
+}
+
+class _UnlockBlockState extends ConsumerState<_UnlockBlock> {
+  bool _busy = false;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final offeringAsync = ref.watch(defaultOfferingProvider);
+    final package = offeringAsync.maybeWhen(
+      data: (offering) => _findPackage(offering, widget.slug),
+      orElse: () => null,
+    );
+
+    final price = package?.storeProduct.priceString ?? widget.fallbackPrice;
+    final canBuy = !kIsWeb && !_busy && package != null;
+
+    final label = _busy
+        ? l10n.marketplaceUnlocking
+        : '${l10n.marketplaceUnlock} · $price';
+
     return Column(
       children: [
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: onTap,
-            child: Text('${l10n.marketplaceUnlock} · $price'),
+            onPressed: canBuy ? () => _onTap(package) : null,
+            child: Text(label),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          l10n.marketplaceBuyMockNotice,
-          textAlign: TextAlign.center,
-          style: AppTypography.mono(
-            size: 10,
-            weight: FontWeight.w500,
-            letterSpacing: 1.2,
-            color: AppColors.paperFaint,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _OwnedBlock extends StatelessWidget {
-  const _OwnedBlock({required this.onRemove});
-  final VoidCallback onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-          decoration: BoxDecoration(
-            color: AppColors.lime.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.lime.withValues(alpha: 0.6)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.check_rounded, color: AppColors.lime, size: 22),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  l10n.marketplaceOwnedBanner,
-                  style: AppTypography.mono(
-                    size: 12,
-                    weight: FontWeight.w700,
-                    letterSpacing: 0.4,
-                    color: AppColors.lime,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 6),
-        TextButton(
-          onPressed: onRemove,
-          child: Text(
-            l10n.marketplaceRemoveMock,
+        if (kIsWeb) ...[
+          const SizedBox(height: 8),
+          Text(
+            l10n.marketplaceWebPurchaseHint,
+            textAlign: TextAlign.center,
             style: AppTypography.mono(
-              size: 11,
+              size: 10,
               weight: FontWeight.w500,
               letterSpacing: 1.2,
               color: AppColors.paperFaint,
             ),
           ),
-        ),
+        ],
       ],
+    );
+  }
+
+  Package? _findPackage(Offering? offering, String slug) {
+    if (offering == null) return null;
+    for (final p in offering.availablePackages) {
+      if (p.identifier == slug) return p;
+      // Fallback: match by store product ID suffix in case the RC package
+      // identifiers were left as default values rather than slugs.
+      if (p.storeProduct.identifier.endsWith('.$slug') ||
+          p.storeProduct.identifier.endsWith('_$slug')) {
+        return p;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _onTap(Package package) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _busy = true);
+    await Haptics.medium();
+    try {
+      await ref
+          .read(ownedBundlesProvider.notifier)
+          .purchasePackage(package);
+      // Success state is rendered via ownedBundlesProvider (the parent
+      // detail screen rebuilds with _OwnedBlock).
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.marketplacePurchaseFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+}
+
+class _OwnedBlock extends StatelessWidget {
+  const _OwnedBlock();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      decoration: BoxDecoration(
+        color: AppColors.lime.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.lime.withValues(alpha: 0.6)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.check_rounded, color: AppColors.lime, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              l10n.marketplaceOwnedBanner,
+              style: AppTypography.mono(
+                size: 12,
+                weight: FontWeight.w700,
+                letterSpacing: 0.4,
+                color: AppColors.lime,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

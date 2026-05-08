@@ -10,10 +10,10 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'app.dart';
 import 'core/convex/convex_bootstrap.dart';
+import 'core/iap/revenuecat_bootstrap.dart';
 import 'core/notifications/push_messaging.dart';
 import 'core/notifications/round_end_notifier.dart';
 import 'core/storage/identity_storage.dart';
-import 'features/marketplace/data/owned_bundles_storage.dart';
 
 Future<void> main() async {
   // Use clean `/join/CODE` URLs on web so shared links route into the app
@@ -38,7 +38,10 @@ Future<void> main() async {
   );
 
   await IdentityStorage.instance.init();
-  await OwnedBundlesStorage.instance.init();
+  // RC needs the clientToken to use as appUserID, so bootstrap runs
+  // strictly after IdentityStorage. Failures are non-fatal — the
+  // marketplace falls back to a locked, browse-only mode.
+  await RevenueCatBootstrap.initialize();
   await RoundEndNotifier.instance.init();
   await ConvexBootstrap.initialize();
   await _initFirebaseMessaging();
