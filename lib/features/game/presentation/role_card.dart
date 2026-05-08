@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -32,11 +33,13 @@ class _RoleCardState extends State<RoleCard> with TickerProviderStateMixin {
         _revealed = true;
         Haptics.medium();
         _flip.forward();
+        _recognizer?.lockIn();
         setState(() {});
       }
     })
     ..addListener(_tickHaptic);
 
+  _PressHoldRecognizer? _recognizer;
   bool _revealed = false;
   int _hapticStep = 0;
 
@@ -74,10 +77,19 @@ class _RoleCardState extends State<RoleCard> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final role = widget.role;
-    return GestureDetector(
-      onTapDown: (_) => _press.forward(),
-      onTapUp: (_) => _release(),
-      onTapCancel: _release,
+    return RawGestureDetector(
+      behavior: HitTestBehavior.opaque,
+      gestures: <Type, GestureRecognizerFactory>{
+        _PressHoldRecognizer:
+            GestureRecognizerFactoryWithHandlers<_PressHoldRecognizer>(
+          () => _PressHoldRecognizer(),
+          (recognizer) {
+            _recognizer = recognizer;
+            recognizer.onStart = () => _press.forward();
+            recognizer.onEnd = _release;
+          },
+        ),
+      },
       child: AnimatedBuilder(
         animation: _flip,
         builder: (_, __) {
@@ -298,4 +310,69 @@ class _Front extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Joins the gesture arena on pointer-down but doesn't claim it. The press
+/// animation runs as visual feedback; if the user drags far enough during
+/// the animation the parent scrollable wins the arena and our gesture is
+/// rejected (press reverses, scroll happens). Once the press animation hits
+/// the lock-in point, [lockIn] claims the arena so subsequent finger
+/// movement can't cancel the reveal.
+class _PressHoldRecognizer extends OneSequenceGestureRecognizer {
+  VoidCallback? onStart;
+  VoidCallback? onEnd;
+  int? _activePointer;
+  bool _locked = false;
+  bool _ended = false;
+
+  @override
+  void addAllowedPointer(PointerDownEvent event) {
+    if (_activePointer != null) return;
+    _activePointer = event.pointer;
+    _locked = false;
+    _ended = false;
+    startTrackingPointer(event.pointer);
+    onStart?.call();
+  }
+
+  void lockIn() {
+    if (_activePointer == null || _locked || _ended) return;
+    _locked = true;
+    resolve(GestureDisposition.accepted);
+  }
+
+  @override
+  void handleEvent(PointerEvent event) {
+    if (event.pointer != _activePointer) return;
+    if (event is PointerUpEvent || event is PointerCancelEvent) {
+      _finish();
+    }
+  }
+
+  void _finish() {
+    if (_ended || _activePointer == null) return;
+    _ended = true;
+    final pointer = _activePointer!;
+    _activePointer = null;
+    stopTrackingPointer(pointer);
+    if (!_locked) resolve(GestureDisposition.rejected);
+    onEnd?.call();
+  }
+
+  @override
+  void rejectGesture(int pointer) {
+    if (pointer == _activePointer && !_locked && !_ended) {
+      _ended = true;
+      _activePointer = null;
+      stopTrackingPointer(pointer);
+      onEnd?.call();
+    }
+    super.rejectGesture(pointer);
+  }
+
+  @override
+  void didStopTrackingLastPointer(int pointer) {}
+
+  @override
+  String get debugDescription => 'press hold';
 }
