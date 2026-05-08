@@ -61,6 +61,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0FC66446B2748744CB3D8DF2 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		105807A968DC02F0C06512DF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1164213FD05B526F26EF928A /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		11EA3F1993C9715EFD0E056E /* SpygameLiveActivityBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpygameLiveActivityBundle.swift; sourceTree = "<group>"; };
@@ -73,6 +74,7 @@
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		49093B087A25F06DEFDA6CD8 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		51030E0C8BAB3377B3F0A298 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		54B41B482FAD40030087624A /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		550244D1AD2D38D1C02B09CF /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
@@ -233,6 +235,8 @@
 				550244D1AD2D38D1C02B09CF /* RoundActivityAttributes.swift */,
 				1164213FD05B526F26EF928A /* RoundActivityAttributes.swift */,
 				51030E0C8BAB3377B3F0A298 /* RoundActivityAttributes.swift */,
+				49093B087A25F06DEFDA6CD8 /* RoundActivityAttributes.swift */,
+				0FC66446B2748744CB3D8DF2 /* RoundActivityAttributes.swift */,
 			);
 			path = SpygameLiveActivity;
 			sourceTree = "<group>";
@@ -557,7 +561,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = "";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 37TC2VKVJ6;
 				INFOPLIST_FILE = SpygameLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Spygame Live Activity";
@@ -568,7 +572,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.walhallaa.spygame.v02202404.LiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -710,7 +714,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = "";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 37TC2VKVJ6;
 				INFOPLIST_FILE = SpygameLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Spygame Live Activity";
@@ -721,7 +725,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.walhallaa.spygame.v02202404.LiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -737,7 +741,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = "";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 37TC2VKVJ6;
 				INFOPLIST_FILE = SpygameLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Spygame Live Activity";
@@ -748,7 +752,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.walhallaa.spygame.v02202404.LiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

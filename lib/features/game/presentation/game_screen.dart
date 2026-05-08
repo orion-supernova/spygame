@@ -134,7 +134,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (!mounted) return;
     await showDialog<void>(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (_) => SpyRevealDialog(
         roundIndex: revealIdx,
         spyName: spy.displayName,

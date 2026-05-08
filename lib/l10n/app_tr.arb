@@ -124,6 +124,7 @@
   "spyRevealRoundEyebrow": "{round}. TUR",
   "spyRevealLine": "Casus: {name}",
   "spyRevealContinue": "Devam",
+  "spyRevealTapHint": "Açmak için dokun",
   "intermissionHeadline": "Mola. Hep birlikte konuşun.",
   "intermissionPrompt": "{total} turluk oyunun {next}. turuna hazır olunca dokun.",
   "intermissionReadyLabel": "HAZIR",

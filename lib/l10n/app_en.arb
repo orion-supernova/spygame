@@ -427,6 +427,9 @@
   "spyRevealContinue": "Continue",
   "@spyRevealContinue": { "description": "Primary action button on the spy-reveal modal. Dismisses the modal." },
 
+  "spyRevealTapHint": "Tap to reveal",
+  "@spyRevealTapHint": { "description": "Hint shown beneath the blurred spy line on the spy-reveal modal, prompting the device-holder to tap the dialog body to uncover the spy's name." },
+
   "intermissionHeadline": "Take a beat. Talk it out.",
   "@intermissionHeadline": { "description": "Headline inside the intermission panel. Encourages players to debrief together before the next round." },
 
