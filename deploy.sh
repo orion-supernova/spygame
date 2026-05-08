@@ -18,21 +18,28 @@ cd "$SCRIPT_DIR"
 # ----- flags -----
 SKIP_VERSION_BUMP=false
 RUN_CONVEX=true
+RUN_IOS=true
 RUN_UPLOAD=true
 RUN_WEB=true
 RUN_GIT=true
 DRY_RUN=false
+TARGET_FLAG_PROVIDED=false
 
 print_help() {
     cat <<EOF
 Usage: ./deploy.sh [flags]
 
-Default (no flags): full ship — Convex deploy + version bump + iOS build + ASC upload
+Default (no flags, TTY): prompts you to pick iOS / Web / All. With no TTY (CI),
+defaults to a full ship — Convex deploy + version bump + iOS build + ASC upload
 + web build + Firebase hosting deploy + git push.
+
+Any of --no-ios / --no-web / --no-upload / --dry counts as a target choice and
+skips the prompt.
 
 Flags:
   --skip-version-bump   Re-ship the same version (e.g. after fixing a build issue).
   --no-convex           Skip 'npx convex deploy'.
+  --no-ios              Skip the iOS build + ASC upload entirely.
   --no-upload           Archive + export the IPA but do NOT upload to App Store Connect.
   --no-web              Skip the Flutter web build + Firebase hosting deploy.
   --no-git              Don't commit/push the version bump.
@@ -46,8 +53,9 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --skip-version-bump) SKIP_VERSION_BUMP=true ;;
         --no-convex)         RUN_CONVEX=false ;;
-        --no-upload)         RUN_UPLOAD=false ;;
-        --no-web)            RUN_WEB=false ;;
+        --no-ios)            RUN_IOS=false; RUN_UPLOAD=false; TARGET_FLAG_PROVIDED=true ;;
+        --no-upload)         RUN_UPLOAD=false; TARGET_FLAG_PROVIDED=true ;;
+        --no-web)            RUN_WEB=false; TARGET_FLAG_PROVIDED=true ;;
         --no-git)            RUN_GIT=false ;;
         --dry)
             DRY_RUN=true
@@ -56,6 +64,7 @@ while [[ $# -gt 0 ]]; do
             RUN_WEB=false
             RUN_GIT=false
             SKIP_VERSION_BUMP=true
+            TARGET_FLAG_PROVIDED=true
             ;;
         -h|--help) print_help; exit 0 ;;
         *) echo "❌ Unknown flag: $1"; print_help; exit 1 ;;
@@ -63,9 +72,29 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
+# ----- target selection prompt -----
+# When invoked interactively with no target flag, ask which surface(s) to ship.
+# CI/non-TTY runs fall through to today's defaults (full ship).
+if [ "$TARGET_FLAG_PROVIDED" = false ] && [ -t 0 ]; then
+    echo "What do you want to deploy?"
+    echo "  1) iOS only"
+    echo "  2) Web only"
+    echo "  3) All (iOS + Web)  [default]"
+    printf "Choose [1/2/3]: "
+    read -r TARGET_CHOICE </dev/tty
+    case "$TARGET_CHOICE" in
+        1) RUN_IOS=true;  RUN_WEB=false ;;
+        2) RUN_IOS=false; RUN_UPLOAD=false; RUN_WEB=true ;;
+        ""|3) ;;  # all: keep defaults
+        *) echo "❌ Invalid choice: $TARGET_CHOICE"; exit 1 ;;
+    esac
+    echo ""
+fi
+
 echo "🚀 Spygame deploy"
 echo "  • Convex deploy:    $([ "$RUN_CONVEX" = true ] && echo yes || echo no)"
 echo "  • Version bump:     $([ "$SKIP_VERSION_BUMP" = false ] && echo yes || echo no)"
+echo "  • iOS build:        $([ "$RUN_IOS" = true ] && echo yes || echo no)"
 echo "  • Upload to ASC:    $([ "$RUN_UPLOAD" = true ] && echo yes || echo no)"
 echo "  • Web (Firebase):   $([ "$RUN_WEB" = true ] && echo yes || echo no)"
 echo "  • Git commit/push:  $([ "$RUN_GIT" = true ] && echo yes || echo no)"
@@ -207,7 +236,7 @@ validate_environment() {
         fi
     fi
 
-    if [ ! -f "ios/ExportOptions.plist" ]; then
+    if [ "$RUN_IOS" = true ] && [ ! -f "ios/ExportOptions.plist" ]; then
         echo "❌ Missing ios/ExportOptions.plist (needed for xcodebuild -exportArchive)."
         exit 1
     fi
@@ -267,79 +296,85 @@ else
 fi
 
 # ----- iOS build -----
-IOS_START_TIME=$(date +%s)
-echo "🍎 Starting iOS build..."
+IOS_BUILD_TIME=0
+IPA_PATH=""
+IOS_SUCCESS=false
+if [ "$RUN_IOS" = true ]; then
+    IOS_START_TIME=$(date +%s)
+    echo "🍎 Starting iOS build..."
 
-echo "  • CocoaPods install"
-(
-    cd ios
-    pod install >/tmp/spygame_pod_install.log 2>&1
-    POD_STATUS=$?
-    if [ $POD_STATUS -ne 0 ]; then
-        echo "  ⚠️  pod install failed, retrying after 'pod repo update'..."
-        pod repo update >/tmp/spygame_pod_repo_update.log 2>&1
-        pod install >/tmp/spygame_pod_install_retry.log 2>&1
+    echo "  • CocoaPods install"
+    (
+        cd ios
+        pod install >/tmp/spygame_pod_install.log 2>&1
         POD_STATUS=$?
-    fi
-    if [ $POD_STATUS -ne 0 ]; then
-        echo "❌ CocoaPods install failed. Logs:"
-        echo "   /tmp/spygame_pod_install.log"
-        echo "   /tmp/spygame_pod_repo_update.log"
-        echo "   /tmp/spygame_pod_install_retry.log"
+        if [ $POD_STATUS -ne 0 ]; then
+            echo "  ⚠️  pod install failed, retrying after 'pod repo update'..."
+            pod repo update >/tmp/spygame_pod_repo_update.log 2>&1
+            pod install >/tmp/spygame_pod_install_retry.log 2>&1
+            POD_STATUS=$?
+        fi
+        if [ $POD_STATUS -ne 0 ]; then
+            echo "❌ CocoaPods install failed. Logs:"
+            echo "   /tmp/spygame_pod_install.log"
+            echo "   /tmp/spygame_pod_repo_update.log"
+            echo "   /tmp/spygame_pod_install_retry.log"
+            exit 1
+        fi
+    )
+    echo "  ✅ Pods installed"
+
+    # Refreshes Generated.xcconfig with the current pubspec version — this is what
+    # fixes "Xcode archived the old version after I bumped pubspec".
+    run_with_spinner "Building Flutter for iOS (release)" \
+        flutter build ios --release --no-codesign
+
+    run_with_spinner "Creating Xcode archive" \
+        xcodebuild -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            archive \
+            -destination 'generic/platform=iOS' \
+            -allowProvisioningUpdates
+
+    run_with_spinner "Exporting IPA" \
+        env PATH="/usr/bin:$PATH" xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportPath build/ios \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -allowProvisioningUpdates
+
+    # The IPA is named after CFBundleName, not PRODUCT_NAME, so we glob for it
+    # rather than hardcoding "Runner.ipa".
+    IPA_PATH="$(find build/ios -maxdepth 1 -type f -name '*.ipa' | head -n 1)"
+    if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
+        echo "❌ No .ipa found in build/ios/ after export"
+        ls -la build/ios/ || true
         exit 1
     fi
-)
-echo "  ✅ Pods installed"
+    echo "  ✅ IPA at $IPA_PATH"
 
-# Refreshes Generated.xcconfig with the current pubspec version — this is what
-# fixes "Xcode archived the old version after I bumped pubspec".
-run_with_spinner "Building Flutter for iOS (release)" \
-    flutter build ios --release --no-codesign
+    # ----- Upload -----
+    if [ "$RUN_UPLOAD" = true ]; then
+        run_with_spinner "Uploading to App Store Connect" \
+            xcrun altool --upload-app \
+                --type ios \
+                --file "$IPA_PATH" \
+                --apiKey "$APP_STORE_CONNECT_KEY_ID" \
+                --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+                --apiKeyPath "$P8_FILE_PATH"
+        IOS_SUCCESS=true
+    else
+        echo "⏭️  Skipping App Store Connect upload (--no-upload)"
+        IOS_SUCCESS=true
+    fi
 
-run_with_spinner "Creating Xcode archive" \
-    xcodebuild -workspace ios/Runner.xcworkspace \
-        -scheme Runner \
-        -configuration Release \
-        -archivePath build/Runner.xcarchive \
-        archive \
-        -destination 'generic/platform=iOS' \
-        -allowProvisioningUpdates
-
-run_with_spinner "Exporting IPA" \
-    env PATH="/usr/bin:$PATH" xcodebuild -exportArchive \
-        -archivePath build/Runner.xcarchive \
-        -exportPath build/ios \
-        -exportOptionsPlist ios/ExportOptions.plist \
-        -allowProvisioningUpdates
-
-# The IPA is named after CFBundleName, not PRODUCT_NAME, so we glob for it
-# rather than hardcoding "Runner.ipa".
-IPA_PATH="$(find build/ios -maxdepth 1 -type f -name '*.ipa' | head -n 1)"
-if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
-    echo "❌ No .ipa found in build/ios/ after export"
-    ls -la build/ios/ || true
-    exit 1
-fi
-echo "  ✅ IPA at $IPA_PATH"
-
-# ----- Upload -----
-IOS_SUCCESS=false
-if [ "$RUN_UPLOAD" = true ]; then
-    run_with_spinner "Uploading to App Store Connect" \
-        xcrun altool --upload-app \
-            --type ios \
-            --file "$IPA_PATH" \
-            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
-            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
-            --apiKeyPath "$P8_FILE_PATH"
-    IOS_SUCCESS=true
+    IOS_END_TIME=$(date +%s)
+    IOS_BUILD_TIME=$((IOS_END_TIME - IOS_START_TIME))
 else
-    echo "⏭️  Skipping App Store Connect upload (--no-upload)"
-    IOS_SUCCESS=true
+    echo "⏭️  Skipping iOS build (--no-ios)"
 fi
-
-IOS_END_TIME=$(date +%s)
-IOS_BUILD_TIME=$((IOS_END_TIME - IOS_START_TIME))
 
 # ----- Web build + Firebase deploy -----
 WEB_BUILD_TIME=0
@@ -400,11 +435,13 @@ TOTAL_TIME=$((SCRIPT_END_TIME - SCRIPT_START_TIME))
 echo ""
 echo "✨ Deploy complete"
 echo "  📱 Version:        $NEW_VERSION"
-[ "$RUN_UPLOAD" = true ] && echo "  🍎 Uploaded to:    App Store Connect (TestFlight will show the build in a few minutes)"
-[ "$RUN_UPLOAD" = false ] && echo "  📦 IPA available:  $IPA_PATH"
+if [ "$RUN_IOS" = true ]; then
+    [ "$RUN_UPLOAD" = true ] && echo "  🍎 Uploaded to:    App Store Connect (TestFlight will show the build in a few minutes)"
+    [ "$RUN_UPLOAD" = false ] && echo "  📦 IPA available:  $IPA_PATH"
+fi
 [ "$WEB_SUCCESS" = true ] && echo "  🌐 Web deployed:   Firebase hosting"
 echo ""
 echo "⏱️  Timing:"
-echo "  🍎 iOS build:      ${IOS_BUILD_TIME}s"
+[ "$RUN_IOS" = true ] && echo "  🍎 iOS build:      ${IOS_BUILD_TIME}s"
 [ "$RUN_WEB" = true ] && echo "  🌐 Web build:      ${WEB_BUILD_TIME}s"
 echo "  📊 Total:          ${TOTAL_TIME}s"
