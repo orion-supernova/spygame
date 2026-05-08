@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.walhallaa.spygame.v02202404",
+      "sha256_cert_fingerprints": [
+        "A4:94:08:9F:58:99:40:39:F7:15:EE:C2:58:51:82:96:F2:EE:36:45:0A:AA:42:55:BC:F1:3A:A8:A3:1F:91:D8",
+        "REPLACE_WITH_RELEASE_SHA256_BEFORE_SHIPPING"
+      ]
+    }
+  }
+]

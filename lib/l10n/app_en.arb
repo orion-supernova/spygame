@@ -205,6 +205,69 @@
   "homeHintNeedCodename": "Add a codename above to join.",
   "@homeHintNeedCodename": { "description": "Hint shown above the join button when there's no codename. Soft, not an error." },
 
+  "joinScreenEyebrow": "YOU'RE INVITED",
+  "@joinScreenEyebrow": { "description": "Mono-caps eyebrow at the top of the link-join screen, framing the screen as an invitation to a friend's room." },
+
+  "joinScreenTitle": "Join the room",
+  "@joinScreenTitle": { "description": "Display title on the link-join screen, just below the room preview card." },
+
+  "joinScreenSubtitle": "Confirm your codename, then jump in.",
+  "@joinScreenSubtitle": { "description": "One-line subtitle under the title on the link-join screen." },
+
+  "joinScreenHostLine": "{host}'s room",
+  "@joinScreenHostLine": {
+    "description": "Friendly line on the link-join preview card naming the room's host.",
+    "placeholders": { "host": { "type": "String", "example": "Alex" } }
+  },
+
+  "joinScreenAnonymousHost": "Someone's room",
+  "@joinScreenAnonymousHost": { "description": "Fallback line on the link-join preview card when the host's name isn't available yet." },
+
+  "joinScreenPlayerCount": "{count, plural, one{1 player waiting} other{{count} players waiting}}",
+  "@joinScreenPlayerCount": {
+    "description": "Plural line under the host name showing how many players are already in the lobby.",
+    "placeholders": { "count": { "type": "int", "example": "3" } }
+  },
+
+  "joinScreenStatusLobby": "Lobby open",
+  "@joinScreenStatusLobby": { "description": "Pill status on the join preview when the room is in the lobby phase, ready to accept joins." },
+
+  "joinScreenStatusInGame": "Game in progress",
+  "@joinScreenStatusInGame": { "description": "Pill status on the join preview when the room has already started a game and can no longer be joined." },
+
+  "joinScreenStatusEnded": "Game ended",
+  "@joinScreenStatusEnded": { "description": "Pill status on the join preview when the room's game has finished and can no longer be joined." },
+
+  "joinScreenLoading": "Loading room…",
+  "@joinScreenLoading": { "description": "Placeholder text shown while the join screen waits for the first room snapshot." },
+
+  "joinScreenCtaJoin": "JOIN AS {name}",
+  "@joinScreenCtaJoin": {
+    "description": "Primary CTA on the link-join screen. All-caps. Replaces the home screen's CREATE/JOIN ROOM button.",
+    "placeholders": { "name": { "type": "String", "example": "ALEX" } }
+  },
+
+  "joinScreenCtaJoinNoName": "JOIN ROOM",
+  "@joinScreenCtaJoinNoName": { "description": "Fallback CTA label on the link-join screen when the user hasn't typed a name yet (button is disabled)." },
+
+  "joinScreenCtaBusy": "JOINING…",
+  "@joinScreenCtaBusy": { "description": "Replaces the join CTA while the request is in flight. Includes ellipsis." },
+
+  "joinScreenCtaBackHome": "BACK TO HOME",
+  "@joinScreenCtaBackHome": { "description": "Secondary text button on the link-join screen that returns to the home screen. All-caps." },
+
+  "joinScreenErrorNotFound": "Room {code} not found.",
+  "@joinScreenErrorNotFound": {
+    "description": "Error text shown on the link-join screen when no room matches the code in the URL.",
+    "placeholders": { "code": { "type": "String", "example": "ABCD" } }
+  },
+
+  "joinScreenErrorInGame": "This game is already in progress.",
+  "@joinScreenErrorInGame": { "description": "Helper text shown on the link-join screen when the room is mid-game and the user can't join." },
+
+  "joinScreenErrorEnded": "This game has ended.",
+  "@joinScreenErrorEnded": { "description": "Helper text shown on the link-join screen when the room's game has finished." },
+
   "lobbyEyebrow": "LOBBY",
   "@lobbyEyebrow": { "description": "Header label on the lobby screen. Mono caps." },
 
@@ -229,10 +292,13 @@
     "placeholders": { "current": { "type": "int", "example": "4" } }
   },
 
-  "lobbyShareMessage": "Join my \"Where am I?\" room. Code: {code}",
+  "lobbyShareMessage": "Join my \"Where am I?\" room.\nCode: {code}\n{url}",
   "@lobbyShareMessage": {
-    "description": "Body of the share-sheet message when host shares the room. \"Where am I?\" is the brand name (keep identical).",
-    "placeholders": { "code": { "type": "String", "example": "ABCD" } }
+    "description": "Body of the share-sheet message when host shares the room. \"Where am I?\" is the brand name (keep identical). The url opens the join screen via Universal Link / App Link.",
+    "placeholders": {
+      "code": { "type": "String", "example": "ABCD" },
+      "url": { "type": "String", "example": "https://whereami-ea329.web.app/join/ABCD" }
+    }
   },
 
   "lobbyShareSubject": "Where am I? — Room {code}",

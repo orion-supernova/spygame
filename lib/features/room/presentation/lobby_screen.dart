@@ -109,9 +109,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         ? box.localToGlobal(Offset.zero) & box.size
         : null;
     final l10n = AppLocalizations.of(context);
+    final url = 'https://whereami-ea329.web.app/join/${widget.code}';
     await Haptics.light();
     await Share.share(
-      l10n.lobbyShareMessage(widget.code),
+      l10n.lobbyShareMessage(widget.code, url),
       subject: l10n.lobbyShareSubject(widget.code),
       sharePositionOrigin: origin,
     );

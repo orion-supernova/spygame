@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["37TC2VKVJ6.com.walhallaa.spygame.v02202404"],
+        "components": [
+          { "/": "/join/*" },
+          { "/": "/lobby/*" }
+        ]
+      }
+    ]
+  }
+}

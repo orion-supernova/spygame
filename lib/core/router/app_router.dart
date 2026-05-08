@@ -9,6 +9,7 @@ import '../../features/identity/presentation/welcome_screen.dart';
 import '../../features/marketplace/presentation/bundle_detail_screen.dart';
 import '../../features/marketplace/presentation/marketplace_screen.dart';
 import '../../features/room/presentation/home_screen.dart';
+import '../../features/room/presentation/join_room_screen.dart';
 import '../../features/room/presentation/lobby_screen.dart';
 
 class AppRoute {
@@ -18,10 +19,12 @@ class AppRoute {
   static const howToPlay = '/how-to-play';
   static const marketplace = '/marketplace';
   static const bundleDetail = '/marketplace/:slug';
+  static const join = '/join/:code';
   static const lobby = '/lobby/:code';
   static const game = '/game/:code';
   static const summary = '/summary/:code';
 
+  static String joinFor(String code) => '/join/${code.toUpperCase()}';
   static String lobbyFor(String code) => '/lobby/$code';
   static String gameFor(String code) => '/game/$code';
   static String summaryFor(String code) => '/summary/$code';
@@ -33,6 +36,7 @@ class AppRoute {
 int _depthFor(String path) {
   if (path == AppRoute.welcome) return 0;
   if (path == AppRoute.home) return 1;
+  if (path.startsWith('/join/')) return 1;
   if (path.startsWith('/lobby/')) return 2;
   if (path.startsWith('/game/')) return 3;
   if (path.startsWith('/summary/')) return 4;
@@ -141,6 +145,16 @@ final routerProvider = Provider<GoRouter>((ref) {
           key: state.pageKey,
           child: BundleDetailScreen(
             slug: state.pathParameters['slug'] ?? '',
+          ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoute.join,
+        pageBuilder: (_, state) => _slidePage(
+          key: state.pageKey,
+          reverse: _consumeReverse(state.uri.path),
+          child: JoinRoomScreen(
+            code: (state.pathParameters['code'] ?? '').toUpperCase(),
           ),
         ),
       ),
