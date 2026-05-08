@@ -31,7 +31,7 @@ Google Play product IDs accept lowercase letters, digits, underscores, and **dot
 
 ### Localized copy (use this for both stores)
 
-For each bundle, both stores ask for a **display name** and **description** per supported language. The display names and descriptions below match the in-app catalog (`convex/bundles.ts`).
+For each bundle, both stores ask for a **display name** and **description** per supported language. The display names and descriptions below match the in-app catalog (`convex/bundles.ts`). Provide a localization for every language the app currently ships in — if you add another locale later, also add a matching `translations.<locale>` row in `convex/bundles.ts` and create the corresponding store-side localization.
 
 **Istanbul**
 - EN name: `Istanbul Pack`
