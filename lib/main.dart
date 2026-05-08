@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'app.dart';
 import 'core/convex/convex_bootstrap.dart';
@@ -15,6 +16,9 @@ import 'core/storage/identity_storage.dart';
 import 'features/marketplace/data/owned_bundles_storage.dart';
 
 Future<void> main() async {
+  // Use clean `/join/CODE` URLs on web so shared links route into the app
+  // instead of bouncing to Welcome. No-op on iOS/Android.
+  usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // Draw behind the system status and navigation bars so the app's ink
