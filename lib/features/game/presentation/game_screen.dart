@@ -357,8 +357,10 @@ class _GameBody extends ConsumerWidget {
               child: CircularProgressIndicator(color: AppColors.lime),
             ),
           ),
-          error: (e, _) =>
-              Text(e.toString(), style: Theme.of(context).textTheme.bodyMedium),
+          error: (_, _) => Text(
+            l10n.errorUnknown,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
           data: (board) => LocationGrid(board: board),
         ),
       ],

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:convex_flutter/convex_flutter.dart';
 
+import '../../../core/convex/convex_bootstrap.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../core/storage/identity_storage.dart';
 import '../domain/room.dart';
@@ -15,22 +16,27 @@ class ConvexRoomRepository implements RoomRepository {
   final ConvexClient _client;
   final IdentityStorage _identity;
 
+  static const _interactiveMutationTimeout = Duration(seconds: 5);
+
   @override
   Future<String> createRoom({required String displayName}) async {
     try {
+      await ConvexBootstrap.ensureReady();
       final raw = await _client.mutation(
         name: 'rooms:createRoom',
         args: {
           'displayName': displayName,
           'clientToken': _identity.clientToken,
         },
-      );
+      ).timeout(_interactiveMutationTimeout);
       final result = _decode(raw);
       final code = (result is Map ? result['code'] : null)?.toString();
       if (code == null || code.isEmpty) {
         throw const UnknownException('Server did not return a room code.');
       }
       return code.toUpperCase();
+    } on TimeoutException {
+      throw const NetworkException();
     } on AppException {
       rethrow;
     } catch (e) {
@@ -44,6 +50,7 @@ class ConvexRoomRepository implements RoomRepository {
     required String displayName,
   }) async {
     try {
+      await ConvexBootstrap.ensureReady();
       final raw = await _client.mutation(
         name: 'rooms:joinRoom',
         args: {
@@ -51,11 +58,13 @@ class ConvexRoomRepository implements RoomRepository {
           'displayName': displayName,
           'clientToken': _identity.clientToken,
         },
-      );
+      ).timeout(_interactiveMutationTimeout);
       final result = _decode(raw);
       final returned =
           (result is Map ? result['code'] : null)?.toString() ?? code;
       return returned.toUpperCase();
+    } on TimeoutException {
+      throw const NetworkException();
     } catch (e) {
       throw _mapError(e);
     }
@@ -64,6 +73,7 @@ class ConvexRoomRepository implements RoomRepository {
   @override
   Future<void> leaveRoom({required String code}) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'rooms:leaveRoom',
         args: {
@@ -80,6 +90,7 @@ class ConvexRoomRepository implements RoomRepository {
     required bool ready,
   }) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'rooms:setReady',
         args: {
@@ -99,6 +110,7 @@ class ConvexRoomRepository implements RoomRepository {
     required GameConfig config,
   }) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'rooms:updateConfig',
         args: {
@@ -120,6 +132,7 @@ class ConvexRoomRepository implements RoomRepository {
     required List<String> disabledLocationIds,
   }) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'rooms:setDisabledLocations',
         args: {
@@ -139,6 +152,7 @@ class ConvexRoomRepository implements RoomRepository {
     required List<String> slugs,
   }) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'rooms:setHostOwnedBundleSlugs',
         args: {
@@ -155,6 +169,7 @@ class ConvexRoomRepository implements RoomRepository {
   @override
   Future<void> heartbeat({required String code}) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'rooms:heartbeat',
         args: {
@@ -171,6 +186,7 @@ class ConvexRoomRepository implements RoomRepository {
     required List<String> ownedBundleSlugs,
   }) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'games:startGame',
         args: {
@@ -187,6 +203,7 @@ class ConvexRoomRepository implements RoomRepository {
   @override
   Future<void> endRoundManual({required String code}) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'games:endRoundManual',
         args: {
@@ -206,6 +223,7 @@ class ConvexRoomRepository implements RoomRepository {
 
     Future<void> start() async {
       try {
+        await ConvexBootstrap.ensureReady();
         handle = await _client.subscribe(
           name: 'rooms:watchRoom',
           args: {'code': code},
@@ -268,14 +286,14 @@ class ConvexRoomRepository implements RoomRepository {
       );
     }
     if (msg.toLowerCase().contains('socket') ||
-        msg.toLowerCase().contains('network')) {
+        msg.toLowerCase().contains('network') ||
+        msg.toLowerCase().contains('timeout') ||
+        msg.toLowerCase().contains('connection')) {
       return const NetworkException();
     }
-    return UnknownException(_cleanMessage(msg));
-  }
-
-  String _cleanMessage(String raw) {
-    final match = RegExp(r'(?:ConvexError|Error):\s*([^\n]+)').firstMatch(raw);
-    return match?.group(1)?.trim() ?? raw.split('\n').first;
+    // Never surface raw server/exception text to users — those strings can
+    // leak implementation details (e.g. "WebSocket not connected"). The
+    // presentation layer maps this to the localized fallback.
+    return const UnknownException();
   }
 }

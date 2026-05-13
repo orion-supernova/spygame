@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:convex_flutter/convex_flutter.dart';
 
+import '../../../core/convex/convex_bootstrap.dart';
 import '../../../core/storage/identity_storage.dart';
 import '../domain/game_repository.dart';
 import '../domain/role.dart';
@@ -18,6 +19,7 @@ class ConvexGameRepository implements GameRepository {
     SubscriptionHandle? handle;
     Future<void> start() async {
       try {
+        await ConvexBootstrap.ensureReady();
         handle = await _client.subscribe(
           name: 'games:getMyRole',
           args: {
@@ -81,6 +83,7 @@ class ConvexGameRepository implements GameRepository {
     SubscriptionHandle? handle;
     Future<void> start() async {
       try {
+        await ConvexBootstrap.ensureReady();
         handle = await _client.subscribe(
           name: 'games:watchLocations',
           args: {
@@ -146,6 +149,7 @@ class ConvexGameRepository implements GameRepository {
     required int expectedEndsAtMs,
   }) async {
     try {
+      await ConvexBootstrap.ensureReady();
       await _client.mutation(
         name: 'games:endRoundIfDue',
         args: {

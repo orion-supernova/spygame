@@ -206,7 +206,7 @@ Casusu bul. Ya da casus ol.
 ### Promotional Text
 
 ```
-Herkes ortak bir gizli mekânı bilir. Birinizin haberi yok. Onu bul — ya da ele verme. İsteğe bağlı mekân paketleri: İstanbul, Paris, Tokyo, Stockholm, Cyberpunk.
+Herkes ortak bir gizli mekânı bilir. Birinizin bu mekândan haberi yok. Onu bul, ya da yakalanma. İsteğe bağlı mekân paketleri: İstanbul, Paris, Tokyo, Stockholm, Cyberpunk.
 ```
 
 ### Description

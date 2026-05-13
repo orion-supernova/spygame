@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:firebase_core/firebase_core.dart';
@@ -20,11 +21,14 @@ Future<void> main() async {
   // instead of bouncing to Welcome. No-op on iOS/Android.
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  // Draw behind the system status and navigation bars so the app's ink
-  // background extends through the top notch and bottom home-indicator area
-  // instead of leaving an opaque black strip.
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  // Fire-and-forget — these don't gate the first frame. Draws behind the
+  // system status/nav bars so the app's ink background extends through the
+  // notch + home-indicator area instead of leaving an opaque black strip.
+  unawaited(
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
+  );
+  unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -37,14 +41,22 @@ Future<void> main() async {
     ),
   );
 
+  // Widgets and providers read IdentityStorage fields synchronously on the
+  // first build (HomeScreen codename field, locale provider, RevenueCat
+  // appUserID), so this one stays awaited.
   await IdentityStorage.instance.init();
-  // RC needs the clientToken to use as appUserID, so bootstrap runs
-  // strictly after IdentityStorage. Failures are non-fatal — the
-  // marketplace falls back to a locked, browse-only mode.
-  await RevenueCatBootstrap.initialize();
-  await RoundEndNotifier.instance.init();
-  await ConvexBootstrap.initialize();
-  await _initFirebaseMessaging();
+
+  // Create the Convex singleton so providers reading ConvexClient.instance
+  // (room/game repositories, etc.) don't throw on first build. Fast — just
+  // dylib load + WS listener registration; the slow handshake wait happens
+  // in the background via ensureReady() which data-layer operations await.
+  await ConvexBootstrap.ensureInitialized();
+
+  // Everything else bootstraps in parallel with the first frame.
+  unawaited(RevenueCatBootstrap.initialize());
+  unawaited(RoundEndNotifier.instance.init());
+  unawaited(ConvexBootstrap.ensureReady());
+  unawaited(_initFirebaseMessaging());
 
   runApp(const ProviderScope(child: WhereAmIApp()));
 }
