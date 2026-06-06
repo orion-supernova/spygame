@@ -3,9 +3,15 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    // Reads `google-services.json` and merges Firebase resources at build
-    // time. Required by `firebase_messaging`.
-    id("com.google.gms.google-services")
+}
+
+// Reads `app/google-services.json` and merges Firebase resources at build
+// time (used by `firebase_messaging`). Applied only when the config file
+// exists so the build works without it — the Dart side already treats
+// Firebase init as optional (see `_initFirebaseMessaging` in lib/main.dart):
+// without the file the APK simply ships with FCM push disabled.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 android {
