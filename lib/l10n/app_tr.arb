@@ -62,7 +62,6 @@
   "homeCtaJoin": "ODAYA KATIL",
   "homeCtaBusy": "BEKLE…",
   "homeDividerOrJoin": "YA DA KATIL",
-  "homeJoinCodeHint": "— — — —",
   "homeErrorNeedName": "Önce bir takma ad yaz.",
   "homeErrorNeedCode": "Kodlar 4 karakter olmalı.",
   "homeHintNeedCodename": "Katılmak için yukarıya takma ad yaz.",

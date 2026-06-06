@@ -65,59 +65,53 @@ class BundleCard extends StatelessWidget {
     final titleColor = isPlaceholder ? AppColors.paperMuted : AppColors.paper;
     final radius = BorderRadius.circular(22);
 
-    return Material(
-      color: Colors.transparent,
-      borderRadius: radius,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        splashColor: AppColors.lime.withValues(alpha: 0.06),
-        highlightColor: AppColors.lime.withValues(alpha: 0.04),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: AppColors.inkRaised,
-            borderRadius: radius,
-            border: Border.all(color: borderColor, width: borderWidth),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _Eyebrow(text: eyebrowText, color: eyebrowColor),
-                const SizedBox(height: 16),
-                Text(
-                  bundle.title,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: titleColor,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.4,
-                    height: 1.05,
-                  ),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.inkRaised,
+          borderRadius: radius,
+          border: Border.all(color: borderColor, width: borderWidth),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _Eyebrow(text: eyebrowText, color: eyebrowColor),
+              const SizedBox(height: 16),
+              Text(
+                bundle.title,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: titleColor,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.4,
+                  height: 1.05,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  bundle.tagline,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isPlaceholder
-                        ? AppColors.paperFaint
-                        : AppColors.paperMuted,
-                    fontStyle: FontStyle.italic,
-                    height: 1.4,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                bundle.tagline,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: isPlaceholder
+                      ? AppColors.paperFaint
+                      : AppColors.paperMuted,
+                  fontStyle: FontStyle.italic,
+                  height: 1.4,
                 ),
-                if (!isPlaceholder) ...[
-                  const SizedBox(height: 18),
-                  _Footer(
-                    locationCount: bundle.locationCount,
-                    priceDisplay: priceOverride ?? bundle.priceDisplay,
-                    owned: owned,
-                  ),
-                ],
+              ),
+              if (!isPlaceholder) ...[
+                const SizedBox(height: 18),
+                _Footer(
+                  locationCount: bundle.locationCount,
+                  priceDisplay: priceOverride ?? bundle.priceDisplay,
+                  owned: owned,
+                ),
               ],
-            ),
+            ],
           ),
         ),
       ),
@@ -178,11 +172,7 @@ class _Footer extends StatelessWidget {
           ),
         ),
         if (owned)
-          const Icon(
-            Icons.check_rounded,
-            size: 18,
-            color: AppColors.lime,
-          )
+          const Icon(Icons.check_rounded, size: 18, color: AppColors.lime)
         else
           Text(
             priceDisplay,

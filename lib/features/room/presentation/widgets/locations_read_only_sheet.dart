@@ -58,8 +58,9 @@ class _LocationsReadOnlySheetState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final enabledAsync =
-        ref.watch(enabledLocationsForRoomProvider(widget.code));
+    final enabledAsync = ref.watch(
+      enabledLocationsForRoomProvider(widget.code),
+    );
     final bundlesAsync = ref.watch(bundlesProvider);
     final bundleTitles = bundlesAsync.maybeWhen(
       data: (bundles) {
@@ -176,15 +177,12 @@ class _ReadOnlyBody extends StatelessWidget {
       grouped.putIfAbsent(r.bundleSlug, () => []).add(r);
     }
     final bundleKeys = grouped.keys.where((k) => k != null).toList()
-      ..sort((a, b) =>
-          (bundleTitles[a] ?? a!).compareTo(bundleTitles[b] ?? b!));
+      ..sort(
+        (a, b) => (bundleTitles[a] ?? a!).compareTo(bundleTitles[b] ?? b!),
+      );
     final sections = <_SectionData>[
       if (grouped[null] != null)
-        _SectionData(
-          key: _kFreeKey,
-          title: freeLabel,
-          rows: grouped[null]!,
-        ),
+        _SectionData(key: _kFreeKey, title: freeLabel, rows: grouped[null]!),
       for (final slug in bundleKeys)
         _SectionData(
           key: slug!,
@@ -243,52 +241,46 @@ class _Section extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Material(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () => onToggleExpanded(sectionKey),
-              splashColor: AppColors.lime.withValues(alpha: 0.05),
-              highlightColor: AppColors.lime.withValues(alpha: 0.03),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(2, 8, 2, 8),
-                child: Row(
-                  children: [
-                    Container(width: 22, height: 2, color: AppColors.lime),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        title.toUpperCase(),
-                        style: AppTypography.mono(
-                          size: 11,
-                          weight: FontWeight.w600,
-                          letterSpacing: 2.2,
-                          color: AppColors.lime,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '${rows.length}',
+          GestureDetector(
+            onTap: () => onToggleExpanded(sectionKey),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(2, 8, 2, 8),
+              child: Row(
+                children: [
+                  Container(width: 22, height: 2, color: AppColors.lime),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      title.toUpperCase(),
                       style: AppTypography.mono(
                         size: 11,
                         weight: FontWeight.w600,
-                        letterSpacing: 1.2,
-                        color: AppColors.paperFaint,
+                        letterSpacing: 2.2,
+                        color: AppColors.lime,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    AnimatedRotation(
-                      turns: isExpanded ? 0.25 : 0,
-                      duration: const Duration(milliseconds: 180),
-                      child: const Icon(
-                        Icons.chevron_right_rounded,
-                        size: 22,
-                        color: AppColors.paperMuted,
-                      ),
+                  ),
+                  Text(
+                    '${rows.length}',
+                    style: AppTypography.mono(
+                      size: 11,
+                      weight: FontWeight.w600,
+                      letterSpacing: 1.2,
+                      color: AppColors.paperFaint,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 6),
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.25 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: const Icon(
+                      Icons.chevron_right_rounded,
+                      size: 22,
+                      color: AppColors.paperMuted,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -313,17 +305,13 @@ class _Section extends StatelessWidget {
                           Container(
                             height: 1,
                             margin: const EdgeInsets.symmetric(horizontal: 14),
-                            color:
-                                AppColors.inkOutline.withValues(alpha: 0.5),
+                            color: AppColors.inkOutline.withValues(alpha: 0.5),
                           ),
                         Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                           child: Text(
                             rows[i].name,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
+                            style: Theme.of(context).textTheme.bodyLarge
                                 ?.copyWith(color: AppColors.paper),
                           ),
                         ),

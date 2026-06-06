@@ -217,9 +217,6 @@
   "homeDividerOrJoin": "OR JOIN",
   "@homeDividerOrJoin": { "description": "Divider label between create and join sections. Mono caps." },
 
-  "homeJoinCodeHint": "— — — —",
-  "@homeJoinCodeHint": { "description": "Placeholder for the 4-character room-code input. Em-dashes separated by spaces. Identical across locales." },
-
   "homeErrorNeedName": "Type a name first.",
   "@homeErrorNeedName": { "description": "Error shown if user taps create/join without a codename." },
 

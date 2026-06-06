@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,6 +13,7 @@ import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../identity/presentation/widgets/language_button.dart';
 import '../data/room_providers.dart';
+import 'widgets/room_code_input.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -215,27 +215,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ],
                             ),
                             const SizedBox(height: 22),
-                            TextField(
+                            RoomCodeInput(
                               controller: _codeCtrl,
-                              textCapitalization: TextCapitalization.characters,
-                              maxLength: 4,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                  RegExp(r'[A-Za-z0-9]'),
-                                ),
-                                _UpperCaseFormatter(),
-                              ],
-                              textAlign: TextAlign.center,
-                              style: AppTypography.mono(
-                                size: 38,
-                                weight: FontWeight.w700,
-                                letterSpacing: 14,
-                                color: AppColors.paper,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: l10n.homeJoinCodeHint,
-                                counterText: '',
-                              ),
                               onChanged: (_) => setState(() {}),
                             ),
                             const SizedBox(height: 16),
@@ -294,13 +275,3 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 }
 
 enum _BusyAction { create, join }
-
-class _UpperCaseFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    return newValue.copyWith(text: newValue.text.toUpperCase());
-  }
-}

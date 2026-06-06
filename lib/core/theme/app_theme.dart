@@ -23,6 +23,10 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: scheme,
+      splashFactory: NoSplash.splashFactory,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
       scaffoldBackgroundColor: AppColors.ink,
       canvasColor: AppColors.ink,
       textTheme: AppTypography.build(),
@@ -47,8 +51,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.inkRaised,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
         hintStyle: const TextStyle(color: AppColors.paperFaint),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -65,6 +71,8 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: Colors.transparent,
           backgroundColor: AppColors.lime,
           foregroundColor: AppColors.ink,
           disabledBackgroundColor: AppColors.inkOutline,
@@ -83,20 +91,21 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: Colors.transparent,
           foregroundColor: AppColors.paper,
           minimumSize: const Size.fromHeight(56),
           side: const BorderSide(color: AppColors.inkOutline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 17,
-          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: Colors.transparent,
           foregroundColor: AppColors.lime,
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),

@@ -25,14 +25,18 @@ class ConfigPanel extends ConsumerWidget {
   final GameConfig config;
   final bool editable;
   final ValueChanged<GameConfig> onChanged;
+
   /// Host-only callback that opens the editable locations picker sheet.
   final VoidCallback onEditLocations;
+
   /// Non-host callback that opens the read-only locations sheet.
   final VoidCallback onViewLocations;
+
   /// Server-derived slugs that have ≥1 enabled location for this room —
   /// the only input the chip strip needs.
   final Set<String> activePackSlugs;
   final bool freePackActive;
+
   /// Server-derived counts driving the live "X / Y locations" badge.
   final int enabledLocationCount;
   final int totalLocationCount;
@@ -87,14 +91,12 @@ class ConfigPanel extends ConsumerWidget {
             label: l10n.configLabelSpies,
             value: '${config.spyCount}',
             onMinus: editable && config.spyCount > 1
-                ? () => onChanged(
-                      config.copyWith(spyCount: config.spyCount - 1),
-                    )
+                ? () =>
+                      onChanged(config.copyWith(spyCount: config.spyCount - 1))
                 : null,
             onPlus: editable && config.spyCount < 3
-                ? () => onChanged(
-                      config.copyWith(spyCount: config.spyCount + 1),
-                    )
+                ? () =>
+                      onChanged(config.copyWith(spyCount: config.spyCount + 1))
                 : null,
           ),
           const SizedBox(height: 10),
@@ -103,13 +105,13 @@ class ConfigPanel extends ConsumerWidget {
             value: '${config.roundMinutes}',
             onMinus: editable && config.roundMinutes > 1
                 ? () => onChanged(
-                      config.copyWith(roundMinutes: config.roundMinutes - 1),
-                    )
+                    config.copyWith(roundMinutes: config.roundMinutes - 1),
+                  )
                 : null,
             onPlus: editable && config.roundMinutes < 15
                 ? () => onChanged(
-                      config.copyWith(roundMinutes: config.roundMinutes + 1),
-                    )
+                    config.copyWith(roundMinutes: config.roundMinutes + 1),
+                  )
                 : null,
           ),
           const SizedBox(height: 10),
@@ -118,20 +120,17 @@ class ConfigPanel extends ConsumerWidget {
             value: '${config.roundCount}',
             onMinus: editable && config.roundCount > 1
                 ? () => onChanged(
-                      config.copyWith(roundCount: config.roundCount - 1),
-                    )
+                    config.copyWith(roundCount: config.roundCount - 1),
+                  )
                 : null,
             onPlus: editable && config.roundCount < 10
                 ? () => onChanged(
-                      config.copyWith(roundCount: config.roundCount + 1),
-                    )
+                    config.copyWith(roundCount: config.roundCount + 1),
+                  )
                 : null,
           ),
           const SizedBox(height: 18),
-          Container(
-            height: 1,
-            color: AppColors.inkOutline,
-          ),
+          Container(height: 1, color: AppColors.inkOutline),
           const SizedBox(height: 14),
           Row(
             children: [
@@ -162,8 +161,7 @@ class ConfigPanel extends ConsumerWidget {
             spacing: 6,
             runSpacing: 6,
             children: [
-              if (freePackActive)
-                _PackChip(text: l10n.configActivePackFree),
+              if (freePackActive) _PackChip(text: l10n.configActivePackFree),
               for (final t in activeTitles) _PackChip(text: t, accent: true),
             ],
           ),
@@ -196,57 +194,53 @@ class _LocationsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final label = editable ? l10n.configEditLocations : l10n.configViewLocations;
+    final label = editable
+        ? l10n.configEditLocations
+        : l10n.configViewLocations;
     final accent = editable ? AppColors.lime : AppColors.paperMuted;
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: () {
-          Haptics.selection();
-          onTap();
-        },
-        borderRadius: BorderRadius.circular(14),
-        splashColor: AppColors.lime.withValues(alpha: 0.06),
-        highlightColor: AppColors.lime.withValues(alpha: 0.04),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: AppColors.ink.withValues(alpha: 0.55),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.inkOutline),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    label,
-                    style: AppTypography.mono(
-                      size: 12,
-                      weight: FontWeight.w700,
-                      letterSpacing: 1.8,
-                      color: accent,
-                    ),
-                  ),
-                ),
-                Text(
-                  total == 0 ? '—' : l10n.configLocationsCount(enabled, total),
+    return GestureDetector(
+      onTap: () {
+        Haptics.selection();
+        onTap();
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.ink.withValues(alpha: 0.55),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.inkOutline),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
                   style: AppTypography.mono(
-                    size: 13,
-                    weight: FontWeight.w600,
-                    letterSpacing: 0.4,
-                    color: AppColors.paper,
+                    size: 12,
+                    weight: FontWeight.w700,
+                    letterSpacing: 1.8,
+                    color: accent,
                   ),
                 ),
-                const SizedBox(width: 6),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  size: 22,
-                  color: AppColors.paperFaint,
+              ),
+              Text(
+                total == 0 ? '—' : l10n.configLocationsCount(enabled, total),
+                style: AppTypography.mono(
+                  size: 13,
+                  weight: FontWeight.w600,
+                  letterSpacing: 0.4,
+                  color: AppColors.paper,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 22,
+                color: AppColors.paperFaint,
+              ),
+            ],
           ),
         ),
       ),
@@ -302,8 +296,7 @@ class _Row extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: theme.textTheme.bodyLarge
-                ?.copyWith(color: AppColors.paper),
+            style: theme.textTheme.bodyLarge?.copyWith(color: AppColors.paper),
           ),
         ),
         _StepperButton(icon: Icons.remove, onTap: onMinus),
@@ -334,14 +327,14 @@ class _StepperButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
-    return InkResponse(
+    return GestureDetector(
       onTap: enabled
           ? () {
               Haptics.selection();
               onTap!.call();
             }
           : null,
-      radius: 26,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         width: 36,
         height: 36,

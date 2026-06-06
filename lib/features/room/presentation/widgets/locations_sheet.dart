@@ -175,8 +175,9 @@ class _LocationsSheetState extends ConsumerState<LocationsSheet> {
                 picker.maybeWhen(
                   data: (rows) {
                     final total = rows.length;
-                    final enabled =
-                        rows.where((r) => !_disabled.contains(r.id)).length;
+                    final enabled = rows
+                        .where((r) => !_disabled.contains(r.id))
+                        .length;
                     return _TotalBadge(enabled: enabled, total: total);
                   },
                   orElse: () => const SizedBox.shrink(),
@@ -279,15 +280,12 @@ class _Body extends StatelessWidget {
       grouped.putIfAbsent(r.bundleSlug, () => []).add(r);
     }
     final bundleKeys = grouped.keys.where((k) => k != null).toList()
-      ..sort((a, b) =>
-          (bundleTitles[a] ?? a!).compareTo(bundleTitles[b] ?? b!));
+      ..sort(
+        (a, b) => (bundleTitles[a] ?? a!).compareTo(bundleTitles[b] ?? b!),
+      );
     final orderedSections = <_SectionData>[
       if (grouped[null] != null)
-        _SectionData(
-          key: _kFreeKey,
-          title: freeLabel,
-          rows: grouped[null]!,
-        ),
+        _SectionData(key: _kFreeKey, title: freeLabel, rows: grouped[null]!),
       for (final slug in bundleKeys)
         _SectionData(
           key: slug!,
@@ -343,43 +341,37 @@ class _BrowseMarketplaceRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final radius = BorderRadius.circular(14);
-    return Material(
-      color: Colors.transparent,
-      borderRadius: radius,
-      child: InkWell(
-        borderRadius: radius,
-        splashColor: AppColors.lime.withValues(alpha: 0.06),
-        highlightColor: AppColors.lime.withValues(alpha: 0.04),
-        onTap: () {
-          Haptics.light();
-          context.push(AppRoute.marketplace);
-        },
-        child: Ink(
-          decoration: BoxDecoration(
-            color: AppColors.ink.withValues(alpha: 0.5),
-            borderRadius: radius,
-            border: Border.all(color: AppColors.inkOutline),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.locationsSheetBrowseMarketplace,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.paperMuted,
-                    ),
+    return GestureDetector(
+      onTap: () {
+        Haptics.light();
+        context.push(AppRoute.marketplace);
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.ink.withValues(alpha: 0.5),
+          borderRadius: radius,
+          border: Border.all(color: AppColors.inkOutline),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.locationsSheetBrowseMarketplace,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.paperMuted,
                   ),
                 ),
-                const SizedBox(width: 8),
-                const Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 18,
-                  color: AppColors.lime,
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                size: 18,
+                color: AppColors.lime,
+              ),
+            ],
           ),
         ),
       ),
@@ -452,84 +444,78 @@ class _Section extends StatelessWidget {
           // Header — tappable across the whole row to toggle expansion.
           // The bulk-toggle IconButton absorbs its own taps so it stays a
           // distinct affordance.
-          Material(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () => onToggleExpanded(sectionKey),
-              splashColor: AppColors.lime.withValues(alpha: 0.05),
-              highlightColor: AppColors.lime.withValues(alpha: 0.03),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(2, 8, 2, 8),
-                child: Row(
-                  children: [
-                    Container(width: 22, height: 2, color: AppColors.lime),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        title.toUpperCase(),
-                        style: AppTypography.mono(
-                          size: 11,
-                          weight: FontWeight.w600,
-                          letterSpacing: 2.2,
-                          color: AppColors.lime,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      l10n.locationsSheetSectionCount(enabled, rows.length),
+          GestureDetector(
+            onTap: () => onToggleExpanded(sectionKey),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(2, 8, 2, 8),
+              child: Row(
+                children: [
+                  Container(width: 22, height: 2, color: AppColors.lime),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      title.toUpperCase(),
                       style: AppTypography.mono(
                         size: 11,
                         weight: FontWeight.w600,
-                        letterSpacing: 1.2,
-                        color: AppColors.paperFaint,
+                        letterSpacing: 2.2,
+                        color: AppColors.lime,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    // Bulk toggle: tap absorbed so it doesn't expand the
-                    // section. Filled box = all on; empty = all off;
-                    // dashed-style icon = mixed.
-                    IconButton(
-                      tooltip: l10n.locationsSheetToggleAll,
-                      visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.all(6),
-                      constraints: const BoxConstraints(),
-                      onPressed: () => onToggleSection(rows),
-                      icon: Icon(
-                        enabled == rows.length
-                            ? Icons.check_box_rounded
-                            : enabled == 0
-                                ? Icons.check_box_outline_blank_rounded
-                                : Icons.indeterminate_check_box_rounded,
-                        color: allDisabled
-                            ? AppColors.paperFaint
-                            : AppColors.lime,
+                  ),
+                  Text(
+                    l10n.locationsSheetSectionCount(enabled, rows.length),
+                    style: AppTypography.mono(
+                      size: 11,
+                      weight: FontWeight.w600,
+                      letterSpacing: 1.2,
+                      color: AppColors.paperFaint,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  // Bulk toggle: tap absorbed so it doesn't expand the
+                  // section. Filled box = all on; empty = all off;
+                  // dashed-style icon = mixed.
+                  IconButton(
+                    tooltip: l10n.locationsSheetToggleAll,
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.all(6),
+                    constraints: const BoxConstraints(),
+                    onPressed: () => onToggleSection(rows),
+                    icon: Icon(
+                      enabled == rows.length
+                          ? Icons.check_box_rounded
+                          : enabled == 0
+                          ? Icons.check_box_outline_blank_rounded
+                          : Icons.indeterminate_check_box_rounded,
+                      color: allDisabled
+                          ? AppColors.paperFaint
+                          : AppColors.lime,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  // Disclosure chevron. Collapsed = ▶ (closed; "tap
+                  // to open"). Expanded = ▼ via 90° rotation. Avoids
+                  // the prior "down arrow on a closed thing" confusion
+                  // where a downward chevron on a collapsed section
+                  // read as a checkmark/done state.
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.25 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: Tooltip(
+                      message: isExpanded
+                          ? l10n.locationsSheetCollapse
+                          : l10n.locationsSheetExpand,
+                      child: const Icon(
+                        Icons.chevron_right_rounded,
                         size: 22,
+                        color: AppColors.paperMuted,
                       ),
                     ),
-                    const SizedBox(width: 2),
-                    // Disclosure chevron. Collapsed = ▶ (closed; "tap
-                    // to open"). Expanded = ▼ via 90° rotation. Avoids
-                    // the prior "down arrow on a closed thing" confusion
-                    // where a downward chevron on a collapsed section
-                    // read as a checkmark/done state.
-                    AnimatedRotation(
-                      turns: isExpanded ? 0.25 : 0,
-                      duration: const Duration(milliseconds: 180),
-                      child: Tooltip(
-                        message: isExpanded
-                            ? l10n.locationsSheetCollapse
-                            : l10n.locationsSheetExpand,
-                        child: const Icon(
-                          Icons.chevron_right_rounded,
-                          size: 22,
-                          color: AppColors.paperMuted,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -555,10 +541,8 @@ class _Section extends StatelessWidget {
                         if (i > 0)
                           Container(
                             height: 1,
-                            margin:
-                                const EdgeInsets.symmetric(horizontal: 14),
-                            color:
-                                AppColors.inkOutline.withValues(alpha: 0.5),
+                            margin: const EdgeInsets.symmetric(horizontal: 14),
+                            color: AppColors.inkOutline.withValues(alpha: 0.5),
                           ),
                         _Row(
                           location: rows[i],
@@ -592,9 +576,9 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
+    return GestureDetector(
       onTap: onToggle,
-      borderRadius: BorderRadius.circular(12),
+      behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
         child: Row(
@@ -604,8 +588,7 @@ class _Row extends StatelessWidget {
                 location.name,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: isEnabled ? AppColors.paper : AppColors.paperFaint,
-                  decoration:
-                      isEnabled ? null : TextDecoration.lineThrough,
+                  decoration: isEnabled ? null : TextDecoration.lineThrough,
                   decorationColor: AppColors.paperFaint,
                   decorationThickness: 1.4,
                 ),
@@ -642,11 +625,7 @@ class _Toggle extends StatelessWidget {
           ),
         ),
         child: value
-            ? const Icon(
-                Icons.check_rounded,
-                size: 18,
-                color: AppColors.ink,
-              )
+            ? const Icon(Icons.check_rounded, size: 18, color: AppColors.ink)
             : null,
       ),
     );

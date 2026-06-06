@@ -73,9 +73,7 @@ class _LanguageSheet extends ConsumerWidget {
                 selected: locale.languageCode == entry.code,
                 onTap: () async {
                   await Haptics.selection();
-                  await ref
-                      .read(localeProvider.notifier)
-                      .setLocale(entry.code);
+                  await ref.read(localeProvider.notifier).setLocale(entry.code);
                   if (!context.mounted) return;
                   Navigator.of(context).pop();
                 },
@@ -110,9 +108,9 @@ class _LanguageRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 18),
         child: Row(
