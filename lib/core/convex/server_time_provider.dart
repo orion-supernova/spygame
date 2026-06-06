@@ -31,23 +31,41 @@ class ServerTimeOffsetController extends Notifier<int> {
     refresh();
   }
 
+  /// Re-samples the server clock. Doubles as the post-resume reconnect
+  /// probe: after iOS suspension the WebSocket can be half-open while the
+  /// client still reads "connected", and the only fast way to surface that
+  /// is to write to the socket. The short per-attempt timeout (instead of
+  /// the package's 30 s default) plus retries means a dead socket is
+  /// detected — and the Rust SDK kicked into reconnecting — within seconds,
+  /// after which a retry lands on the fresh socket.
   Future<void> refresh() async {
     if (_refreshing != null) return _refreshing!.future;
     final completer = Completer<void>();
     _refreshing = completer;
     try {
       final client = ref.read(convexClientProvider);
-      final t0 = DateTime.now().millisecondsSinceEpoch;
-      _lastRefreshStartedAtMs = t0;
-      final raw = await client.mutation(
-        name: 'games:serverNow',
-        args: const <String, dynamic>{},
-      );
-      final t1 = DateTime.now().millisecondsSinceEpoch;
-      final serverMs = _coerceMs(raw);
-      final rtt = (t1 - t0) ~/ 2;
-      state = serverMs - (t0 + rtt);
-      _hasSynced = true;
+      for (var attempt = 0; attempt < 3; attempt++) {
+        try {
+          final t0 = DateTime.now().millisecondsSinceEpoch;
+          _lastRefreshStartedAtMs = t0;
+          final raw = await client
+              .mutation(
+                name: 'games:serverNow',
+                args: const <String, dynamic>{},
+              )
+              .timeout(const Duration(seconds: 5));
+          final t1 = DateTime.now().millisecondsSinceEpoch;
+          final serverMs = _coerceMs(raw);
+          final rtt = (t1 - t0) ~/ 2;
+          state = serverMs - (t0 + rtt);
+          _hasSynced = true;
+          return;
+        } on TimeoutException {
+          // Dead/half-open socket — the write itself nudges the SDK toward
+          // reconnecting, so the next attempt often succeeds.
+          continue;
+        }
+      }
     } catch (_) {
       // Leave previous offset in place.
     } finally {

@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:convex_flutter/convex_flutter.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/convex/convex_bootstrap.dart';
+import '../../../core/errors/app_exception.dart';
 import '../domain/bundle.dart';
 
 /// Maps a bundle's `iconKey` (server-stored) to a Material icon. Keep
@@ -35,8 +38,20 @@ class BundlesRepository {
 
   final ConvexClient _client;
 
+  /// Short timeout on one-shot queries: a half-open socket after iOS
+  /// suspension would otherwise hang for the package's 30 s default.
+  static const _queryTimeout = Duration(seconds: 5);
+
   Future<List<Bundle>> list({required String locale}) async {
-    final raw = await _client.query('bundles:list', {'locale': locale});
+    await ConvexBootstrap.ensureReady();
+    final String raw;
+    try {
+      raw = await _client
+          .query('bundles:list', {'locale': locale})
+          .timeout(_queryTimeout);
+    } on TimeoutException {
+      throw const NetworkException();
+    }
     final decoded = jsonDecode(raw);
     if (decoded is! List) return const [];
     return decoded
@@ -49,10 +64,15 @@ class BundlesRepository {
     required String slug,
     required String locale,
   }) async {
-    final raw = await _client.query(
-      'bundles:detail',
-      {'slug': slug, 'locale': locale},
-    );
+    await ConvexBootstrap.ensureReady();
+    final String raw;
+    try {
+      raw = await _client
+          .query('bundles:detail', {'slug': slug, 'locale': locale})
+          .timeout(_queryTimeout);
+    } on TimeoutException {
+      throw const NetworkException();
+    }
     final decoded = jsonDecode(raw);
     if (decoded is! Map) {
       throw StateError('bundles:detail returned non-map');
@@ -63,18 +83,19 @@ class BundlesRepository {
     if (locsRaw is List) {
       for (final l in locsRaw) {
         if (l is! Map) continue;
-        final samples = (l['sampleRoles'] as List?)
-                ?.whereType<String>()
-                .toList() ??
+        final samples =
+            (l['sampleRoles'] as List?)?.whereType<String>().toList() ??
             const [];
         final roles =
             (l['roles'] as List?)?.whereType<String>().toList() ?? samples;
-        locations.add(BundleLocation(
-          name: l['name']?.toString() ?? '',
-          sampleRoles: samples,
-          roles: roles,
-          totalRoles: (l['totalRoles'] as num?)?.toInt() ?? samples.length,
-        ));
+        locations.add(
+          BundleLocation(
+            name: l['name']?.toString() ?? '',
+            sampleRoles: samples,
+            roles: roles,
+            totalRoles: (l['totalRoles'] as num?)?.toInt() ?? samples.length,
+          ),
+        );
       }
     }
     return BundleDetail(bundle: bundle, locations: locations);

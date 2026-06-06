@@ -38,7 +38,10 @@ class _AppLifecycleHostState extends ConsumerState<AppLifecycleHost>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     ref.read(appLifecycleProvider.notifier).state = state;
     if (state == AppLifecycleState.resumed) {
-      // Refresh server-clock offset on every resume so the countdown re-syncs.
+      // Refresh server-clock offset on every resume so the countdown
+      // re-syncs. The refresh also doubles as the reconnect probe: its
+      // short-timeout write forces a half-open post-suspension socket to be
+      // detected and re-established quickly.
       // ignore: discarded_futures
       ref.read(serverTimeOffsetProvider.notifier).refresh();
     }

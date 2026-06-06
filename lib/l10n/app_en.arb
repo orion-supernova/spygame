@@ -652,6 +652,9 @@
   "errorNetwork": "Connection lost. Please retry.",
   "@errorNetwork": { "description": "Generic network failure shown to the user when the request couldn't reach the server." },
 
+  "commonRetry": "RETRY",
+  "@commonRetry": { "description": "Label on the retry button shown under a failed-to-load error message." },
+
   "errorRoomNotFound": "No room with that code. Check it and try again.",
   "@errorRoomNotFound": { "description": "Shown after a join attempt with a code the server doesn't recognize." },
 

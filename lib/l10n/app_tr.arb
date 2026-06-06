@@ -206,6 +206,7 @@
   "htpClose": "Kapat",
 
   "errorNetwork": "Bağlantı koptu. Lütfen tekrar dene.",
+  "commonRetry": "TEKRAR DENE",
   "errorRoomNotFound": "Bu kodla bir oda yok. Kontrol edip tekrar dene.",
   "errorRoomFull": "Bu oda artık yeni oyuncu kabul etmiyor.",
   "errorOnlyHost": "Bunu yalnızca kurucu yapabilir.",

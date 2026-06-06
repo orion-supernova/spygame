@@ -5,7 +5,10 @@ import 'package:convex_flutter/convex_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meta/meta.dart';
 
+import '../../../core/convex/connection_epoch_provider.dart';
+import '../../../core/convex/convex_bootstrap.dart';
 import '../../../core/convex/convex_client_provider.dart';
+import '../../../core/errors/app_exception.dart';
 import '../../../core/providers/locale_provider.dart';
 import '../../marketplace/data/marketplace_providers.dart';
 
@@ -30,14 +33,26 @@ class LocationsPickerRepository {
 
   final ConvexClient _client;
 
+  /// Short timeout on one-shot queries: a half-open socket after iOS
+  /// suspension would otherwise hang for the package's 30 s default.
+  static const _queryTimeout = Duration(seconds: 5);
+
   Future<List<PickerLocation>> list({
     required String locale,
     required List<String> ownedBundleSlugs,
   }) async {
-    final raw = await _client.query('locations:listForPicker', {
-      'locale': locale,
-      'ownedBundleSlugs': ownedBundleSlugs,
-    });
+    await ConvexBootstrap.ensureReady();
+    final String raw;
+    try {
+      raw = await _client
+          .query('locations:listForPicker', {
+            'locale': locale,
+            'ownedBundleSlugs': ownedBundleSlugs,
+          })
+          .timeout(_queryTimeout);
+    } on TimeoutException {
+      throw const NetworkException();
+    }
     final decoded = jsonDecode(raw);
     if (decoded is! List) return const [];
     return decoded.whereType<Map<Object?, Object?>>().map((m) {
@@ -102,8 +117,9 @@ class LocationsPickerRepository {
   }
 }
 
-final locationsPickerRepositoryProvider =
-    Provider<LocationsPickerRepository>((ref) {
+final locationsPickerRepositoryProvider = Provider<LocationsPickerRepository>((
+  ref,
+) {
   return LocationsPickerRepository(ref.watch(convexClientProvider));
 });
 
@@ -112,19 +128,20 @@ final locationsPickerRepositoryProvider =
 /// changes; the lobby sheet listens via `ref.watch`.
 final locationsForPickerProvider =
     FutureProvider.autoDispose<List<PickerLocation>>((ref) async {
-  final repo = ref.watch(locationsPickerRepositoryProvider);
-  final locale = ref.watch(localeProvider).languageCode;
-  final owned = ref.watch(ownedBundlesProvider).toList();
-  return repo.list(locale: locale, ownedBundleSlugs: owned);
-});
+      // Refetch when the socket reconnects (also clears a sticky error state).
+      ref.watch(connectionEpochProvider);
+      final repo = ref.watch(locationsPickerRepositoryProvider);
+      final locale = ref.watch(localeProvider).languageCode;
+      final owned = ref.watch(ownedBundlesProvider).toList();
+      return repo.list(locale: locale, ownedBundleSlugs: owned);
+    });
 
 /// Live stream of currently-enabled locations for a room. Backs the
 /// non-host read-only sheet so toggles by the host are reflected instantly.
 /// Keyed by room code; locale is read from `localeProvider`.
 final enabledLocationsForRoomProvider = StreamProvider.autoDispose
     .family<List<PickerLocation>, String>((ref, code) {
-  final repo = ref.watch(locationsPickerRepositoryProvider);
-  final locale = ref.watch(localeProvider).languageCode;
-  return repo.watchEnabled(code: code, locale: locale);
-});
-
+      final repo = ref.watch(locationsPickerRepositoryProvider);
+      final locale = ref.watch(localeProvider).languageCode;
+      return repo.watchEnabled(code: code, locale: locale);
+    });

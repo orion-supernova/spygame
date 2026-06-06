@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../../core/errors/app_exception.dart';
+import '../../../core/errors/error_messages.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
@@ -32,12 +34,14 @@ class BundleDetailScreen extends ConsumerWidget {
               loading: () => const Center(
                 child: CircularProgressIndicator(color: AppColors.lime),
               ),
-              error: (e, _) => _ErrorView(message: e.toString()),
-              data: (detail) => _DetailView(
-                detail: detail,
-                owned: owned,
-                slug: slug,
+              error: (e, _) => _ErrorView(
+                message: e is AppException
+                    ? e.localizedMessage(context)
+                    : AppLocalizations.of(context).errorUnknown,
+                onRetry: () => ref.invalidate(bundleDetailProvider(slug)),
               ),
+              data: (detail) =>
+                  _DetailView(detail: detail, owned: owned, slug: slug),
             ),
           ),
         ],
@@ -80,10 +84,7 @@ class _DetailView extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () => context.pop(),
-                icon: const Icon(
-                  Icons.close_rounded,
-                  color: AppColors.paper,
-                ),
+                icon: const Icon(Icons.close_rounded, color: AppColors.paper),
               ),
               const Spacer(),
             ],
@@ -187,8 +188,7 @@ class _LocationCardState extends State<_LocationCard> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final location = widget.location;
-    final visibleRoles =
-        _expanded ? location.roles : location.sampleRoles;
+    final visibleRoles = _expanded ? location.roles : location.sampleRoles;
     final extra = location.roles.length - location.sampleRoles.length;
 
     return GestureDetector(
@@ -339,9 +339,7 @@ class _UnlockBlockState extends ConsumerState<_UnlockBlock> {
     setState(() => _busy = true);
     await Haptics.medium();
     try {
-      await ref
-          .read(ownedBundlesProvider.notifier)
-          .purchasePackage(package);
+      await ref.read(ownedBundlesProvider.notifier).purchasePackage(package);
       // Success state is rendered via ownedBundlesProvider (the parent
       // detail screen rebuilds with _OwnedBlock).
     } catch (_) {
@@ -416,22 +414,51 @@ class _Eyebrow extends StatelessWidget {
 }
 
 class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message});
+  const _ErrorView({required this.message, required this.onRetry});
   final String message;
+  final VoidCallback onRetry;
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(28),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.cloud_off_rounded,
-              color: AppColors.signalRed, size: 36),
+          const Icon(
+            Icons.cloud_off_rounded,
+            color: AppColors.signalRed,
+            size: 36,
+          ),
           const SizedBox(height: 12),
           Text(
             message,
             textAlign: TextAlign.center,
             style: const TextStyle(color: AppColors.paperMuted),
+          ),
+          const SizedBox(height: 20),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onRetry,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.lime.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: AppColors.lime.withValues(alpha: 0.6),
+                ),
+              ),
+              child: Text(
+                l10n.commonRetry,
+                style: AppTypography.mono(
+                  size: 13,
+                  weight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                  color: AppColors.lime,
+                ),
+              ),
+            ),
           ),
         ],
       ),

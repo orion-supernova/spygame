@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../../core/convex/connection_epoch_provider.dart';
 import '../../../core/convex/convex_client_provider.dart';
 import '../../../core/providers/locale_provider.dart';
 import '../domain/bundle.dart';
@@ -18,6 +19,8 @@ final bundlesRepositoryProvider = Provider<BundlesRepository>((ref) {
 
 /// All real (server-backed) bundles, locale-projected.
 final bundlesProvider = FutureProvider.autoDispose<List<Bundle>>((ref) async {
+  // Refetch when the socket reconnects (also clears a sticky error state).
+  ref.watch(connectionEpochProvider);
   final repo = ref.watch(bundlesRepositoryProvider);
   final locale = ref.watch(localeProvider).languageCode;
   return repo.list(locale: locale);
@@ -26,10 +29,12 @@ final bundlesProvider = FutureProvider.autoDispose<List<Bundle>>((ref) async {
 /// Single bundle's detail view (locations + sample roles).
 final bundleDetailProvider = FutureProvider.autoDispose
     .family<BundleDetail, String>((ref, slug) async {
-  final repo = ref.watch(bundlesRepositoryProvider);
-  final locale = ref.watch(localeProvider).languageCode;
-  return repo.detail(slug: slug, locale: locale);
-});
+      // Refetch when the socket reconnects (also clears a sticky error state).
+      ref.watch(connectionEpochProvider);
+      final repo = ref.watch(bundlesRepositoryProvider);
+      final locale = ref.watch(localeProvider).languageCode;
+      return repo.detail(slug: slug, locale: locale);
+    });
 
 /// Boundary to RevenueCat. Singleton; the same instance backs both this
 /// provider and [OwnedBundlesNotifier] below.
@@ -100,8 +105,8 @@ class OwnedBundlesNotifier extends StateNotifier<Set<String>> {
 
 final ownedBundlesProvider =
     StateNotifierProvider<OwnedBundlesNotifier, Set<String>>(
-  (ref) => OwnedBundlesNotifier(ref.watch(iapServiceProvider)),
-);
+      (ref) => OwnedBundlesNotifier(ref.watch(iapServiceProvider)),
+    );
 
 /// Coming-soon placeholders rendered alongside real bundles to make the
 /// storefront feel populated. Pure client-side data — no server entry.

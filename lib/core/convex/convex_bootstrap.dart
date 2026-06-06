@@ -20,7 +20,7 @@ class ConvexBootstrap {
   ConvexBootstrap._();
 
   static Future<void>? _initFuture;
-  static Future<void>? _readyFuture;
+  static Future<void>? _readyInFlight;
   static bool _initialized = false;
   static bool get isInitialized => _initialized;
 
@@ -40,9 +40,14 @@ class ConvexBootstrap {
   }
 
   /// Awaits singleton initialization AND best-effort WebSocket connection
-  /// (5 s soft timeout — never throws). Idempotent and cached.
+  /// (5 s soft timeout — never throws). Not cached across calls: after iOS
+  /// suspension the socket can be half-open, and a previously-completed
+  /// ready future would wave a dead socket through. Only the in-flight wait
+  /// is shared so concurrent callers ride one connect attempt.
   static Future<void> ensureReady() {
-    return _readyFuture ??= _waitReady();
+    return _readyInFlight ??= _waitReady().whenComplete(
+      () => _readyInFlight = null,
+    );
   }
 
   static Future<void> _waitReady() async {
