@@ -166,49 +166,73 @@ class _DetailView extends StatelessWidget {
   }
 }
 
-class _LocationCard extends StatelessWidget {
+class _LocationCard extends StatefulWidget {
   const _LocationCard({required this.location});
   final BundleLocation location;
+
+  @override
+  State<_LocationCard> createState() => _LocationCardState();
+}
+
+class _LocationCardState extends State<_LocationCard> {
+  bool _expanded = false;
+
+  void _toggle() {
+    Haptics.light();
+    setState(() => _expanded = !_expanded);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final extra = location.totalRoles - location.sampleRoles.length;
+    final location = widget.location;
+    final visibleRoles =
+        _expanded ? location.roles : location.sampleRoles;
+    final extra = location.roles.length - location.sampleRoles.length;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
-      decoration: BoxDecoration(
-        color: AppColors.inkRaised,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.inkOutline),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            location.name,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: AppColors.paper,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.2,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _toggle,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+        decoration: BoxDecoration(
+          color: AppColors.inkRaised,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.inkOutline),
+        ),
+        child: AnimatedSize(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          alignment: Alignment.topCenter,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (final role in location.sampleRoles) _RoleChip(text: role),
-              if (extra > 0)
-                _RoleChip(
-                  text: l10n.marketplaceBundleRolesMore(extra),
-                  muted: true,
+              Text(
+                location.name,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: AppColors.paper,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                  height: 1.1,
                 ),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final role in visibleRoles) _RoleChip(text: role),
+                  if (!_expanded && extra > 0)
+                    _RoleChip(
+                      text: l10n.marketplaceBundleRolesMore(extra),
+                      muted: true,
+                    ),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

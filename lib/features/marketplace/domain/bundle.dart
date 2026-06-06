@@ -37,11 +37,16 @@ class BundleLocation {
   const BundleLocation({
     required this.name,
     required this.sampleRoles,
+    required this.roles,
     required this.totalRoles,
   });
 
   final String name;
   final List<String> sampleRoles;
+
+  /// Full role list (falls back to [sampleRoles] when the server doesn't
+  /// send it). Shown when the location card is expanded.
+  final List<String> roles;
   final int totalRoles;
 }
 

@@ -67,9 +67,12 @@ class BundlesRepository {
                 ?.whereType<String>()
                 .toList() ??
             const [];
+        final roles =
+            (l['roles'] as List?)?.whereType<String>().toList() ?? samples;
         locations.add(BundleLocation(
           name: l['name']?.toString() ?? '',
           sampleRoles: samples,
+          roles: roles,
           totalRoles: (l['totalRoles'] as num?)?.toInt() ?? samples.length,
         ));
       }

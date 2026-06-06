@@ -200,9 +200,9 @@ export const list = query({
 
 /**
  * Bundle detail view. Returns the bundle metadata plus the list of
- * locations with localized names and a few sample roles. Does NOT expose
- * the full role list — sample is enough for the marketplace preview and
- * keeps the response small.
+ * locations with localized names and roles. `sampleRoles` (first 4) is
+ * kept alongside the full `roles` list for backward compat with shipped
+ * clients that only know the sample field.
  */
 export const detail = query({
   args: { slug: v.string(), locale: LOCALE_VALIDATOR },
@@ -227,6 +227,7 @@ export const detail = query({
         _id: l._id,
         name: localized.name,
         sampleRoles: localized.roles.slice(0, 4),
+        roles: localized.roles,
         totalRoles: localized.roles.length,
       };
     });
