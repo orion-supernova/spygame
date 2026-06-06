@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:purchases_flutter/purchases_flutter.dart' show Offering;
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -9,6 +10,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../data/iap_service.dart';
 import '../data/marketplace_providers.dart';
 import '../domain/bundle.dart';
 import 'widgets/bundle_card.dart';
@@ -23,6 +25,12 @@ class MarketplaceScreen extends ConsumerWidget {
     final bundlesAsync = ref.watch(bundlesProvider);
     final placeholders = ref.watch(placeholderBundlesProvider);
     final owned = ref.watch(ownedBundlesProvider);
+    // RC's locale-formatted prices; cards fall back to the Convex
+    // `priceDisplay` until the offering loads (or forever, on web).
+    final offering = ref.watch(defaultOfferingProvider).maybeWhen(
+          data: (o) => o,
+          orElse: () => null,
+        );
 
     return Scaffold(
       body: Stack(
@@ -100,12 +108,14 @@ class MarketplaceScreen extends ConsumerWidget {
                         label: l10n.marketplaceSectionPopularCities,
                         bundles: cities,
                         owned: owned,
+                        offering: offering,
                       ),
                     if (themed.isNotEmpty)
                       _Section(
                         label: l10n.marketplaceSectionThemed,
                         bundles: themed,
                         owned: owned,
+                        offering: offering,
                       ),
                     const SliverToBoxAdapter(child: SizedBox(height: 40)),
                   ],
@@ -124,10 +134,12 @@ class _Section extends StatelessWidget {
     required this.label,
     required this.bundles,
     required this.owned,
+    required this.offering,
   });
   final String label;
   final List<Bundle> bundles;
   final Set<String> owned;
+  final Offering? offering;
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +168,9 @@ class _Section extends StatelessWidget {
               child: BundleCard(
                 bundle: bundle,
                 owned: owned.contains(bundle.slug),
+                priceOverride: findPackageForSlug(offering, bundle.slug)
+                    ?.storeProduct
+                    .priceString,
                 onTap: () => _onTap(context, bundle),
               ),
             );

@@ -9,6 +9,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/grain_overlay.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../data/iap_service.dart';
 import '../data/marketplace_providers.dart';
 import '../domain/bundle.dart';
 
@@ -271,7 +272,7 @@ class _UnlockBlockState extends ConsumerState<_UnlockBlock> {
     final l10n = AppLocalizations.of(context);
     final offeringAsync = ref.watch(defaultOfferingProvider);
     final package = offeringAsync.maybeWhen(
-      data: (offering) => _findPackage(offering, widget.slug),
+      data: (offering) => findPackageForSlug(offering, widget.slug),
       orElse: () => null,
     );
 
@@ -306,20 +307,6 @@ class _UnlockBlockState extends ConsumerState<_UnlockBlock> {
         ],
       ],
     );
-  }
-
-  Package? _findPackage(Offering? offering, String slug) {
-    if (offering == null) return null;
-    for (final p in offering.availablePackages) {
-      if (p.identifier == slug) return p;
-      // Fallback: match by store product ID suffix in case the RC package
-      // identifiers were left as default values rather than slugs.
-      if (p.storeProduct.identifier.endsWith('.$slug') ||
-          p.storeProduct.identifier.endsWith('_$slug')) {
-        return p;
-      }
-    }
-    return null;
   }
 
   Future<void> _onTap(Package package) async {

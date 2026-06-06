@@ -17,11 +17,16 @@ class BundleCard extends StatelessWidget {
     required this.bundle,
     required this.owned,
     required this.onTap,
+    this.priceOverride,
   });
 
   final Bundle bundle;
   final bool owned;
   final VoidCallback onTap;
+
+  /// Locale-formatted store price (RC's `priceString`); falls back to the
+  /// Convex `priceDisplay` when the offering hasn't loaded (or on web).
+  final String? priceOverride;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +112,7 @@ class BundleCard extends StatelessWidget {
                   const SizedBox(height: 18),
                   _Footer(
                     locationCount: bundle.locationCount,
-                    priceDisplay: bundle.priceDisplay,
+                    priceDisplay: priceOverride ?? bundle.priceDisplay,
                     owned: owned,
                   ),
                 ],

@@ -100,3 +100,19 @@ class IapService {
     return info.entitlements.active.keys.toSet();
   }
 }
+
+/// Resolves the RC [Package] for a bundle slug from an offering: exact
+/// package-identifier match first, then store-product-ID suffix fallback
+/// in case the RC package identifiers were left as default values rather
+/// than slugs.
+Package? findPackageForSlug(Offering? offering, String slug) {
+  if (offering == null) return null;
+  for (final p in offering.availablePackages) {
+    if (p.identifier == slug) return p;
+    if (p.storeProduct.identifier.endsWith('.$slug') ||
+        p.storeProduct.identifier.endsWith('_$slug')) {
+      return p;
+    }
+  }
+  return null;
+}
