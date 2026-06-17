@@ -1,14 +1,14 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../../core/config/dev_mode.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../core/errors/error_messages.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/grain_overlay.dart';
+import '../../../core/theme/skin_backdrop.dart';
+import '../../../core/theme/skin_context.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../data/iap_service.dart';
@@ -27,12 +27,11 @@ class BundleDetailScreen extends ConsumerWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: ColoredBox(color: AppColors.ink)),
-          const Positioned.fill(child: GrainOverlay()),
+          const Positioned.fill(child: SkinBackdrop()),
           SafeArea(
             child: detailAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.lime),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: context.skin.accent),
               ),
               error: (e, _) => _ErrorView(
                 message: e is AppException
@@ -84,7 +83,7 @@ class _DetailView extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () => context.pop(),
-                icon: const Icon(Icons.close_rounded, color: AppColors.paper),
+                icon: Icon(Icons.close_rounded, color: context.skin.paper),
               ),
               const Spacer(),
             ],
@@ -107,7 +106,7 @@ class _DetailView extends StatelessWidget {
                         style: theme.textTheme.displayMedium?.copyWith(
                           fontSize: 56,
                           height: 0.98,
-                          color: AppColors.paper,
+                          color: context.skin.paper,
                           letterSpacing: -1.2,
                         ),
                       ),
@@ -115,7 +114,7 @@ class _DetailView extends StatelessWidget {
                       Text(
                         bundle.tagline,
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: AppColors.paperMuted,
+                          color: context.skin.paperMuted,
                           fontStyle: FontStyle.italic,
                           height: 1.5,
                         ),
@@ -126,11 +125,10 @@ class _DetailView extends StatelessWidget {
                           bundle.locationCount,
                           rolesPerLocation,
                         ),
-                        style: AppTypography.mono(
+                        style: context.skin.monoStyle(
                           size: 11,
-                          weight: FontWeight.w600,
                           letterSpacing: 1.6,
-                          color: AppColors.paperFaint,
+                          color: context.skin.paperFaint,
                         ),
                       ),
                     ],
@@ -197,9 +195,9 @@ class _LocationCardState extends State<_LocationCard> {
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
         decoration: BoxDecoration(
-          color: AppColors.inkRaised,
+          color: context.skin.inkRaised,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.inkOutline),
+          border: Border.all(color: context.skin.inkOutline),
         ),
         child: AnimatedSize(
           duration: const Duration(milliseconds: 220),
@@ -211,7 +209,7 @@ class _LocationCardState extends State<_LocationCard> {
               Text(
                 location.name,
                 style: theme.textTheme.titleLarge?.copyWith(
-                  color: AppColors.paper,
+                  color: context.skin.paper,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.2,
                   height: 1.1,
@@ -252,22 +250,22 @@ class _RoleChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: muted
-            ? AppColors.lime.withValues(alpha: 0.10)
-            : AppColors.ink.withValues(alpha: 0.6),
+            ? context.skin.accent.withValues(alpha: 0.10)
+            : context.skin.ink.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: muted
-              ? AppColors.lime.withValues(alpha: 0.55)
-              : AppColors.inkOutline,
+              ? context.skin.accent.withValues(alpha: 0.55)
+              : context.skin.inkOutline,
         ),
       ),
       child: Text(
         text,
-        style: AppTypography.mono(
+        style: context.skin.monoStyle(
           size: 10,
           weight: FontWeight.w700,
           letterSpacing: muted ? 1.4 : 0.8,
-          color: muted ? AppColors.lime : AppColors.paperMuted,
+          color: muted ? context.skin.accent : context.skin.paperMuted,
         ),
       ),
     );
@@ -300,8 +298,15 @@ class _UnlockBlockState extends ConsumerState<_UnlockBlock> {
       orElse: () => null,
     );
 
+    // True in debug, or in release once runtime dev mode is unlocked.
+    final devTools = kDebugMode || ref.watch(devModeProvider);
+
     final price = package?.storeProduct.priceString ?? widget.fallbackPrice;
-    final canBuy = !kIsWeb && !_busy && package != null;
+    // With dev tools on, allow the Buy button even when no RevenueCat
+    // package resolved (the simulator has no RC config), routing the tap
+    // to a simulated purchase so the owned-gating + location-activation
+    // flow can be exercised without StoreKit / without paying.
+    final canBuy = !kIsWeb && !_busy && (package != null || devTools);
 
     final label = _busy
         ? l10n.marketplaceUnlocking
@@ -316,16 +321,29 @@ class _UnlockBlockState extends ConsumerState<_UnlockBlock> {
             child: Text(label),
           ),
         ),
+        if (devTools && package == null && !kIsWeb) ...[
+          const SizedBox(height: 8),
+          Text(
+            'DEV · simulated purchase (no StoreKit)',
+            textAlign: TextAlign.center,
+            style: context.skin.monoStyle(
+              size: 10,
+              weight: FontWeight.w500,
+              letterSpacing: 1.2,
+              color: context.skin.paperFaint,
+            ),
+          ),
+        ],
         if (kIsWeb) ...[
           const SizedBox(height: 8),
           Text(
             l10n.marketplaceWebPurchaseHint,
             textAlign: TextAlign.center,
-            style: AppTypography.mono(
+            style: context.skin.monoStyle(
               size: 10,
               weight: FontWeight.w500,
               letterSpacing: 1.2,
-              color: AppColors.paperFaint,
+              color: context.skin.paperFaint,
             ),
           ),
         ],
@@ -333,13 +351,22 @@ class _UnlockBlockState extends ConsumerState<_UnlockBlock> {
     );
   }
 
-  Future<void> _onTap(Package package) async {
+  Future<void> _onTap(Package? package) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     setState(() => _busy = true);
     await Haptics.medium();
     try {
-      await ref.read(ownedBundlesProvider.notifier).purchasePackage(package);
+      // With dev tools on, always fake the purchase so nothing is charged —
+      // covers both the simulator (no RC package) and a real App Store build
+      // in unlocked dev mode (where a real package would otherwise resolve).
+      if (package == null || devToolsEnabled) {
+        ref
+            .read(ownedBundlesProvider.notifier)
+            .debugSimulatePurchase(widget.slug);
+      } else {
+        await ref.read(ownedBundlesProvider.notifier).purchasePackage(package);
+      }
       // Success state is rendered via ownedBundlesProvider (the parent
       // detail screen rebuilds with _OwnedBlock).
     } catch (_) {
@@ -363,22 +390,22 @@ class _OwnedBlock extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       decoration: BoxDecoration(
-        color: AppColors.lime.withValues(alpha: 0.10),
+        color: context.skin.accent.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.lime.withValues(alpha: 0.6)),
+        border: Border.all(color: context.skin.accent.withValues(alpha: 0.6)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.check_rounded, color: AppColors.lime, size: 22),
+          Icon(Icons.check_rounded, color: context.skin.accent, size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               l10n.marketplaceOwnedBanner,
-              style: AppTypography.mono(
+              style: context.skin.monoStyle(
                 size: 12,
                 weight: FontWeight.w700,
                 letterSpacing: 0.4,
-                color: AppColors.lime,
+                color: context.skin.accent,
               ),
             ),
           ),
@@ -397,15 +424,14 @@ class _Eyebrow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 28, height: 2, color: AppColors.lime),
+        Container(width: 28, height: 2, color: context.skin.accent),
         const SizedBox(width: 10),
         Text(
           text,
-          style: AppTypography.mono(
+          style: context.skin.monoStyle(
             size: 11,
-            weight: FontWeight.w600,
             letterSpacing: 2.2,
-            color: AppColors.lime,
+            color: context.skin.accent,
           ),
         ),
       ],
@@ -425,16 +451,16 @@ class _ErrorView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.cloud_off_rounded,
-            color: AppColors.signalRed,
+            color: context.skin.danger,
             size: 36,
           ),
           const SizedBox(height: 12),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.paperMuted),
+            style: TextStyle(color: context.skin.paperMuted),
           ),
           const SizedBox(height: 20),
           GestureDetector(
@@ -443,19 +469,19 @@ class _ErrorView extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
               decoration: BoxDecoration(
-                color: AppColors.lime.withValues(alpha: 0.10),
+                color: context.skin.accent.withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
-                  color: AppColors.lime.withValues(alpha: 0.6),
+                  color: context.skin.accent.withValues(alpha: 0.6),
                 ),
               ),
               child: Text(
                 l10n.commonRetry,
-                style: AppTypography.mono(
+                style: context.skin.monoStyle(
                   size: 13,
                   weight: FontWeight.w700,
                   letterSpacing: 1.2,
-                  color: AppColors.lime,
+                  color: context.skin.accent,
                 ),
               ),
             ),

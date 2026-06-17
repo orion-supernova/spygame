@@ -14,9 +14,8 @@ import '../../../core/errors/error_messages.dart';
 import '../../../core/notifications/round_end_notifier.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/storage/identity_storage.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/grain_overlay.dart';
+import '../../../core/theme/skin_backdrop.dart';
+import '../../../core/theme/skin_context.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../data/room_providers.dart';
@@ -27,6 +26,7 @@ import 'widgets/locations_sheet.dart';
 import 'widgets/player_tile.dart';
 import 'widgets/ready_button.dart';
 import 'widgets/room_code_chip.dart';
+import 'widgets/theme_picker_sheet.dart';
 
 class LobbyScreen extends ConsumerStatefulWidget {
   const LobbyScreen({super.key, required this.code});
@@ -166,6 +166,17 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     await LocationsReadOnlySheet.show(context, code: widget.code);
   }
 
+  Future<void> _openThemePicker(Room room) async {
+    await Haptics.light();
+    if (!mounted) return;
+    await showThemePicker(
+      context: context,
+      ref: ref,
+      code: widget.code,
+      currentSlug: room.activeThemeSlug,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final asyncRoom = ref.watch(roomStreamProvider(widget.code));
@@ -196,12 +207,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: ColoredBox(color: AppColors.ink)),
-          const Positioned.fill(child: GrainOverlay()),
+          const Positioned.fill(child: SkinBackdrop()),
           SafeArea(
             child: asyncRoom.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.lime),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: context.skin.accent),
               ),
               error: (e, _) => _ErrorView(
                 message: e is AppException
@@ -229,6 +239,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   onShare: _share,
                   onLeave: _leave,
                   onConfigChanged: _onConfigChanged,
+                  onPickTheme: () => _openThemePicker(room),
                 );
               },
             ),
@@ -251,6 +262,7 @@ class _LobbyBody extends StatelessWidget {
     required this.onConfigChanged,
     required this.onEditLocations,
     required this.onViewLocations,
+    required this.onPickTheme,
   });
 
   final Room room;
@@ -263,6 +275,7 @@ class _LobbyBody extends StatelessWidget {
   final ValueChanged<GameConfig> onConfigChanged;
   final VoidCallback onEditLocations;
   final VoidCallback onViewLocations;
+  final VoidCallback onPickTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -292,24 +305,24 @@ class _LobbyBody extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: onLeave,
-                        icon: const Icon(Icons.close, color: AppColors.paper),
+                        icon: Icon(Icons.close, color: context.skin.paper),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         l10n.lobbyEyebrow,
-                        style: AppTypography.mono(
+                        style: context.skin.monoStyle(
                           size: 11,
                           weight: FontWeight.w600,
                           letterSpacing: 2.4,
-                          color: AppColors.paperFaint,
+                          color: context.skin.paperFaint,
                         ),
                       ),
                       const Spacer(),
                       IconButton(
                         onPressed: onShare,
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.ios_share,
-                          color: AppColors.paper,
+                          color: context.skin.paper,
                         ),
                       ),
                     ],
@@ -326,7 +339,7 @@ class _LobbyBody extends StatelessWidget {
                       Text(
                         l10n.lobbyShareHint,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.paperFaint,
+                          color: context.skin.paperFaint,
                         ),
                       ),
                     ],
@@ -340,21 +353,21 @@ class _LobbyBody extends StatelessWidget {
                     children: [
                       Text(
                         l10n.lobbyPlayersLabel,
-                        style: AppTypography.mono(
+                        style: context.skin.monoStyle(
                           size: 11,
                           weight: FontWeight.w600,
                           letterSpacing: 2,
-                          color: AppColors.paperFaint,
+                          color: context.skin.paperFaint,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         l10n.lobbyPlayersCount(room.players.length),
-                        style: AppTypography.mono(
+                        style: context.skin.monoStyle(
                           size: 11,
                           weight: FontWeight.w500,
                           letterSpacing: 1.4,
-                          color: AppColors.paperFaint,
+                          color: context.skin.paperFaint,
                         ),
                       ),
                     ],
@@ -392,6 +405,21 @@ class _LobbyBody extends StatelessWidget {
                   ),
                 ),
               ),
+              if (isOwner)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+                    child: OutlinedButton.icon(
+                      onPressed: onPickTheme,
+                      icon: Icon(
+                        Icons.palette_outlined,
+                        size: 20,
+                        color: context.skin.accent,
+                      ),
+                      label: Text(l10n.lobbyThemeButton),
+                    ),
+                  ),
+                ),
               // Spacer so the last bit of content can scroll above the
               // pinned action panel below.
               SliverToBoxAdapter(child: SizedBox(height: bottomPanelBuffer)),
@@ -409,17 +437,20 @@ class _LobbyBody extends StatelessWidget {
               IgnorePointer(
                 child: Container(
                   height: 32,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Color(0x000B0D12), AppColors.ink],
+                      colors: [
+                        context.skin.ink.withValues(alpha: 0),
+                        context.skin.ink,
+                      ],
                     ),
                   ),
                 ),
               ),
               Container(
-                color: AppColors.ink,
+                color: context.skin.ink,
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
                 child: Column(
                   children: [
@@ -444,7 +475,7 @@ class _LobbyBody extends StatelessWidget {
                             : l10n.lobbyStatusWaitingReady,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.paperFaint,
+                          color: context.skin.paperFaint,
                         ),
                       ),
                     ],
@@ -471,9 +502,9 @@ class _ErrorView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.report_gmailerrorred,
-            color: AppColors.signalRed,
+            color: context.skin.danger,
             size: 36,
           ),
           const SizedBox(height: 12),

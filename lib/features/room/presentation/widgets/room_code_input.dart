@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../core/utils/haptics.dart';
 
 /// Segmented 4-character room-code input backed by a per-slot model, so
@@ -273,11 +272,11 @@ class _CharBox extends StatelessWidget {
       height: 72,
       decoration: BoxDecoration(
         color: selected
-            ? AppColors.lime.withValues(alpha: 0.10)
-            : AppColors.inkRaised,
+            ? context.skin.accent.withValues(alpha: 0.10)
+            : context.skin.inkRaised,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: highlighted ? AppColors.lime : AppColors.inkOutline,
+          color: highlighted ? context.skin.accent : context.skin.inkOutline,
           width: highlighted ? 1.5 : 1,
         ),
       ),
@@ -285,10 +284,10 @@ class _CharBox extends StatelessWidget {
         child: char != null
             ? Text(
                 char!,
-                style: AppTypography.mono(
+                style: context.skin.monoStyle(
                   size: 32,
                   weight: FontWeight.w700,
-                  color: AppColors.paper,
+                  color: context.skin.paper,
                 ),
               )
             : active
@@ -298,7 +297,7 @@ class _CharBox extends StatelessWidget {
                   width: 2,
                   height: 30,
                   decoration: BoxDecoration(
-                    color: AppColors.lime,
+                    color: context.skin.accent,
                     borderRadius: BorderRadius.circular(1),
                   ),
                 ),

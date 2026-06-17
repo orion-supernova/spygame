@@ -343,12 +343,34 @@ if [ "$RUN_IOS" = true ]; then
             -destination 'generic/platform=iOS' \
             -allowProvisioningUpdates
 
+    # Pass the App Store Connect API key to xcodebuild so automatic signing
+    # can create/download the Apple Distribution cert + provisioning profiles
+    # WITHOUT a logged-in Xcode account. Without these flags the export dies
+    # with "No Accounts / No signing certificate iOS Distribution found" on
+    # any machine where Xcode → Settings → Accounts is empty (e.g. CI, or
+    # after an Xcode/macOS update drops the account). Falls back to plain
+    # automatic signing when the creds aren't available (e.g. --no-upload).
+    EXPORT_AUTH_FLAGS=()
+    if [ -n "${P8_FILE_PATH:-}" ] && [ -f "${P8_FILE_PATH:-}" ] \
+        && [ -n "${APP_STORE_CONNECT_KEY_ID:-}" ] \
+        && [ -n "${APP_STORE_CONNECT_ISSUER_ID:-}" ]; then
+        EXPORT_AUTH_FLAGS=(
+            -authenticationKeyPath "$P8_FILE_PATH"
+            -authenticationKeyID "$APP_STORE_CONNECT_KEY_ID"
+            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID"
+        )
+        echo "  • Export will authenticate to App Store Connect via API key (no Xcode account needed)"
+    else
+        echo "  ⚠️  No ASC API key resolved — export relies on a logged-in Xcode account"
+    fi
+
     run_with_spinner "Exporting IPA" \
         env PATH="/usr/bin:$PATH" xcodebuild -exportArchive \
             -archivePath build/Runner.xcarchive \
             -exportPath build/ios \
             -exportOptionsPlist ios/ExportOptions.plist \
-            -allowProvisioningUpdates
+            -allowProvisioningUpdates \
+            ${EXPORT_AUTH_FLAGS[@]+"${EXPORT_AUTH_FLAGS[@]}"}
 
     # The IPA is named after CFBundleName, not PRODUCT_NAME, so we glob for it
     # rather than hardcoding "Runner.ipa".

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../marketplace/data/marketplace_providers.dart';
@@ -55,9 +54,9 @@ class ConfigPanel extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.inkRaised,
+        color: context.skin.inkRaised,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.inkOutline),
+        border: Border.all(color: context.skin.inkOutline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,22 +65,22 @@ class ConfigPanel extends ConsumerWidget {
             children: [
               Text(
                 l10n.configEyebrow,
-                style: AppTypography.mono(
+                style: context.skin.monoStyle(
                   size: 11,
                   weight: FontWeight.w600,
                   letterSpacing: 2,
-                  color: AppColors.paperFaint,
+                  color: context.skin.paperFaint,
                 ),
               ),
               const SizedBox(width: 8),
               if (!editable)
                 Text(
                   l10n.configHostOnly,
-                  style: AppTypography.mono(
+                  style: context.skin.monoStyle(
                     size: 11,
                     weight: FontWeight.w500,
                     letterSpacing: 1.2,
-                    color: AppColors.paperFaint,
+                    color: context.skin.paperFaint,
                   ),
                 ),
             ],
@@ -130,28 +129,28 @@ class ConfigPanel extends ConsumerWidget {
                 : null,
           ),
           const SizedBox(height: 18),
-          Container(height: 1, color: AppColors.inkOutline),
+          Container(height: 1, color: context.skin.inkOutline),
           const SizedBox(height: 14),
           Row(
             children: [
               Text(
                 l10n.configActivePacksLabel,
-                style: AppTypography.mono(
+                style: context.skin.monoStyle(
                   size: 11,
                   weight: FontWeight.w600,
                   letterSpacing: 2,
-                  color: AppColors.paperFaint,
+                  color: context.skin.paperFaint,
                 ),
               ),
               const SizedBox(width: 8),
               if (!editable)
                 Text(
                   l10n.configActivePacksByHost,
-                  style: AppTypography.mono(
+                  style: context.skin.monoStyle(
                     size: 11,
                     weight: FontWeight.w500,
                     letterSpacing: 1.2,
-                    color: AppColors.paperFaint,
+                    color: context.skin.paperFaint,
                   ),
                 ),
             ],
@@ -197,7 +196,7 @@ class _LocationsRow extends StatelessWidget {
     final label = editable
         ? l10n.configEditLocations
         : l10n.configViewLocations;
-    final accent = editable ? AppColors.lime : AppColors.paperMuted;
+    final accent = editable ? context.skin.accent : context.skin.paperMuted;
     return GestureDetector(
       onTap: () {
         Haptics.selection();
@@ -206,9 +205,9 @@ class _LocationsRow extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.ink.withValues(alpha: 0.55),
+          color: context.skin.ink.withValues(alpha: 0.55),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.inkOutline),
+          border: Border.all(color: context.skin.inkOutline),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
@@ -217,7 +216,7 @@ class _LocationsRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: AppTypography.mono(
+                  style: context.skin.monoStyle(
                     size: 12,
                     weight: FontWeight.w700,
                     letterSpacing: 1.8,
@@ -227,18 +226,18 @@ class _LocationsRow extends StatelessWidget {
               ),
               Text(
                 total == 0 ? '—' : l10n.configLocationsCount(enabled, total),
-                style: AppTypography.mono(
+                style: context.skin.monoStyle(
                   size: 13,
                   weight: FontWeight.w600,
                   letterSpacing: 0.4,
-                  color: AppColors.paper,
+                  color: context.skin.paper,
                 ),
               ),
               const SizedBox(width: 6),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
                 size: 22,
-                color: AppColors.paperFaint,
+                color: context.skin.paperFaint,
               ),
             ],
           ),
@@ -254,7 +253,7 @@ class _PackChip extends StatelessWidget {
   final bool accent;
   @override
   Widget build(BuildContext context) {
-    final color = accent ? AppColors.lime : AppColors.paperMuted;
+    final color = accent ? context.skin.accent : context.skin.paperMuted;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -264,7 +263,7 @@ class _PackChip extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: AppTypography.mono(
+        style: context.skin.monoStyle(
           size: 11,
           weight: FontWeight.w600,
           letterSpacing: 1.2,
@@ -296,7 +295,9 @@ class _Row extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: theme.textTheme.bodyLarge?.copyWith(color: AppColors.paper),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: context.skin.paper,
+            ),
           ),
         ),
         _StepperButton(icon: Icons.remove, onTap: onMinus),
@@ -305,10 +306,10 @@ class _Row extends StatelessWidget {
           child: Center(
             child: Text(
               value,
-              style: AppTypography.mono(
+              style: context.skin.monoStyle(
                 size: 22,
                 weight: FontWeight.w700,
-                color: AppColors.paper,
+                color: context.skin.paper,
               ),
             ),
           ),
@@ -339,16 +340,18 @@ class _StepperButton extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: enabled ? AppColors.inkSurface : Colors.transparent,
+          color: enabled ? context.skin.inkSurface : Colors.transparent,
           shape: BoxShape.circle,
           border: Border.all(
-            color: enabled ? AppColors.inkOutline : AppColors.inkOutline,
+            color: enabled
+                ? context.skin.inkOutline
+                : context.skin.inkOutline,
           ),
         ),
         child: Icon(
           icon,
           size: 18,
-          color: enabled ? AppColors.paper : AppColors.paperFaint,
+          color: enabled ? context.skin.paper : context.skin.paperFaint,
         ),
       ),
     );

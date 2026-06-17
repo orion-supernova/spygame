@@ -2,13 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/app_skin.dart';
+import '../../../core/theme/skin_context.dart';
 
-Color countdownAccent(int seconds) {
-  if (seconds <= 10) return AppColors.signalRed;
-  if (seconds <= 30) return AppColors.amber;
-  return AppColors.lime;
+Color countdownAccent(AppSkin skin, int seconds) {
+  if (seconds <= 10) return skin.danger;
+  if (seconds <= 30) return skin.secondary;
+  return skin.accent;
 }
 
 String formatCountdown(int seconds) {
@@ -33,7 +33,8 @@ class CountdownRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = countdownAccent(seconds);
+    final skin = context.skin;
+    final accent = countdownAccent(skin, seconds);
     return AspectRatio(
       aspectRatio: 1,
       child: LayoutBuilder(
@@ -50,7 +51,11 @@ class CountdownRing extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               CustomPaint(
-                painter: RingPainter(progress: progress, color: accent),
+                painter: RingPainter(
+                  progress: progress,
+                  color: accent,
+                  trackColor: skin.inkOutline,
+                ),
                 size: Size.infinite,
               ),
               Column(
@@ -64,10 +69,10 @@ class CountdownRing extends StatelessWidget {
                         label,
                         maxLines: 1,
                         softWrap: false,
-                        style: AppTypography.mono(
+                        style: skin.monoStyle(
                           size: 11,
                           letterSpacing: 2.4,
-                          color: AppColors.paperFaint,
+                          color: skin.paperFaint,
                         ),
                       ),
                     ),
@@ -81,7 +86,7 @@ class CountdownRing extends StatelessWidget {
                         formatCountdown(seconds),
                         maxLines: 1,
                         softWrap: false,
-                        style: AppTypography.mono(
+                        style: skin.digitStyle(
                           size: 80,
                           weight: FontWeight.w700,
                           letterSpacing: -2,
@@ -116,13 +121,14 @@ class CountdownChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = countdownAccent(seconds);
+    final skin = context.skin;
+    final accent = countdownAccent(skin, seconds);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.inkRaised,
+        color: skin.inkRaised,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.inkOutline),
+        border: Border.all(color: skin.inkOutline),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -134,6 +140,7 @@ class CountdownChip extends StatelessWidget {
               painter: RingPainter(
                 progress: progress,
                 color: accent,
+                trackColor: skin.inkOutline,
                 strokeWidth: 4,
                 trackStrokeWidth: 3,
                 inset: 2,
@@ -143,7 +150,7 @@ class CountdownChip extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             formatCountdown(seconds),
-            style: AppTypography.mono(
+            style: skin.digitStyle(
               size: 22,
               weight: FontWeight.w700,
               letterSpacing: -0.5,
@@ -153,10 +160,10 @@ class CountdownChip extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             label,
-            style: AppTypography.mono(
+            style: skin.monoStyle(
               size: 10,
               letterSpacing: 2,
-              color: AppColors.paperFaint,
+              color: skin.paperFaint,
             ),
           ),
         ],
@@ -169,6 +176,7 @@ class RingPainter extends CustomPainter {
   RingPainter({
     required this.progress,
     required this.color,
+    required this.trackColor,
     this.strokeWidth = 10,
     this.trackStrokeWidth = 8,
     this.inset = 12,
@@ -176,6 +184,7 @@ class RingPainter extends CustomPainter {
 
   final double progress;
   final Color color;
+  final Color trackColor;
   final double strokeWidth;
   final double trackStrokeWidth;
   final double inset;
@@ -188,7 +197,7 @@ class RingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeWidth = trackStrokeWidth
-      ..color = AppColors.inkOutline;
+      ..color = trackColor;
     canvas.drawCircle(center, radius, track);
 
     final arc = Paint()
@@ -211,6 +220,7 @@ class RingPainter extends CustomPainter {
   bool shouldRepaint(covariant RingPainter old) =>
       old.progress != progress ||
       old.color != color ||
+      old.trackColor != trackColor ||
       old.strokeWidth != strokeWidth ||
       old.trackStrokeWidth != trackStrokeWidth ||
       old.inset != inset;

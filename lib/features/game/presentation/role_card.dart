@@ -1,11 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/skin_context.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../domain/role.dart';
+import 'widgets/role_card_frames.dart';
 
 /// Press-and-hold to reveal so a glance at someone else's screen doesn't leak
 /// the role. A ring around the fingerprint fills as the press registers;
@@ -121,17 +121,14 @@ class _Back extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 220,
-      decoration: BoxDecoration(
-        color: AppColors.inkRaised,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.inkOutline, width: 1.5),
-      ),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+    final skin = context.skin;
+    return RoleCardFrame(
+      isBack: true,
+      isSpy: false,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           SizedBox(
             width: 72,
             height: 72,
@@ -140,8 +137,8 @@ class _Back extends StatelessWidget {
               builder: (_, __) {
                 final t = progress.value;
                 final iconColor = Color.lerp(
-                  AppColors.paperFaint,
-                  AppColors.lime,
+                  skin.paperFaint,
+                  skin.accent,
                   t,
                 )!;
                 final scale = 1.0 + 0.12 * t;
@@ -154,8 +151,8 @@ class _Back extends StatelessWidget {
                       child: CircularProgressIndicator(
                         value: t,
                         strokeWidth: 2.5,
-                        color: AppColors.lime,
-                        backgroundColor: AppColors.inkOutline,
+                        color: skin.accent,
+                        backgroundColor: skin.inkOutline,
                       ),
                     ),
                     Transform.scale(
@@ -174,24 +171,25 @@ class _Back extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             AppLocalizations.of(context).roleBackEyebrow,
-            style: AppTypography.mono(
+            style: skin.monoStyle(
               size: 12,
               weight: FontWeight.w600,
               letterSpacing: 2.4,
-              color: AppColors.paper,
+              color: skin.paper,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             AppLocalizations.of(context).roleBackHint,
-            style: AppTypography.mono(
+            style: skin.monoStyle(
               size: 11,
               weight: FontWeight.w500,
               letterSpacing: 2.0,
-              color: AppColors.paperFaint,
+              color: skin.paperFaint,
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -204,32 +202,28 @@ class _Front extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final skin = context.skin;
     if (role == null) {
       return Container(
         height: 220,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppColors.inkRaised,
-          borderRadius: BorderRadius.circular(24),
+          color: skin.inkRaised,
+          borderRadius: BorderRadius.circular(skin.cardRadius),
         ),
-        child: const CircularProgressIndicator(color: AppColors.lime),
+        child: CircularProgressIndicator(color: skin.accent),
       );
     }
     final isSpy = role!.isSpy;
-    final accent = isSpy ? AppColors.signalRed : AppColors.lime;
-    return Container(
-      height: 220,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isSpy
-            ? AppColors.signalRed.withValues(alpha: 0.12)
-            : AppColors.inkRaised,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: accent, width: 1.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    final accent = isSpy ? skin.danger : skin.accent;
+    return RoleCardFrame(
+      isBack: false,
+      isSpy: isSpy,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Row(
             children: [
               Container(
@@ -243,7 +237,7 @@ class _Front extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 l10n.roleYourRole,
-                style: AppTypography.mono(
+                style: skin.monoStyle(
                   size: 11,
                   weight: FontWeight.w600,
                   letterSpacing: 2.2,
@@ -257,7 +251,7 @@ class _Front extends StatelessWidget {
             Text(
               l10n.roleTheSpy,
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    color: AppColors.signalRed,
+                    color: skin.danger,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1,
                   ),
@@ -268,45 +262,46 @@ class _Front extends StatelessWidget {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
-                  ?.copyWith(color: AppColors.paper),
+                  ?.copyWith(color: skin.paper),
             ),
           ] else ...[
             Text(
               role!.label,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: AppColors.paper,
+                    color: skin.paper,
                     fontWeight: FontWeight.w700,
                   ),
             ),
             const SizedBox(height: 6),
             Text(
               l10n.roleFrontAt,
-              style: AppTypography.mono(
+              style: skin.monoStyle(
                 size: 11,
                 weight: FontWeight.w600,
                 letterSpacing: 2.2,
-                color: AppColors.paperFaint,
+                color: skin.paperFaint,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               role!.locationName ?? '—',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.lime,
+                    color: skin.accent,
                   ),
             ),
           ],
           const Spacer(),
           Text(
             l10n.roleReleaseToHide,
-            style: AppTypography.mono(
+            style: skin.monoStyle(
               size: 10,
               weight: FontWeight.w500,
               letterSpacing: 1.4,
-              color: AppColors.paperFaint,
+              color: skin.paperFaint,
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

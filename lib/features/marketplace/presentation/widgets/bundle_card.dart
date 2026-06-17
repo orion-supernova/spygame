@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/bundle.dart';
 
@@ -38,31 +37,32 @@ class BundleCard extends StatelessWidget {
     final Color eyebrowColor;
     if (isPlaceholder) {
       eyebrowText = l10n.marketplaceComingSoon;
-      eyebrowColor = AppColors.paperFaint;
+      eyebrowColor = context.skin.paperFaint;
     } else if (owned) {
       eyebrowText = l10n.marketplaceOwnedBadge;
-      eyebrowColor = AppColors.lime;
+      eyebrowColor = context.skin.accent;
     } else {
       eyebrowText = bundle.category == BundleCategory.city
           ? l10n.marketplaceCategoryCity
           : l10n.marketplaceCategoryTheme;
-      eyebrowColor = AppColors.lime;
+      eyebrowColor = context.skin.accent;
     }
 
     final Color borderColor;
     final double borderWidth;
     if (owned) {
-      borderColor = AppColors.lime.withValues(alpha: 0.7);
+      borderColor = context.skin.accent.withValues(alpha: 0.7);
       borderWidth = 1.5;
     } else if (isPlaceholder) {
-      borderColor = AppColors.inkOutline.withValues(alpha: 0.5);
+      borderColor = context.skin.inkOutline.withValues(alpha: 0.5);
       borderWidth = 1;
     } else {
-      borderColor = AppColors.inkOutline;
+      borderColor = context.skin.inkOutline;
       borderWidth = 1;
     }
 
-    final titleColor = isPlaceholder ? AppColors.paperMuted : AppColors.paper;
+    final titleColor =
+        isPlaceholder ? context.skin.paperMuted : context.skin.paper;
     final radius = BorderRadius.circular(22);
 
     return GestureDetector(
@@ -70,7 +70,7 @@ class BundleCard extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.inkRaised,
+          color: context.skin.inkRaised,
           borderRadius: radius,
           border: Border.all(color: borderColor, width: borderWidth),
         ),
@@ -97,8 +97,8 @@ class BundleCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: isPlaceholder
-                      ? AppColors.paperFaint
-                      : AppColors.paperMuted,
+                      ? context.skin.paperFaint
+                      : context.skin.paperMuted,
                   fontStyle: FontStyle.italic,
                   height: 1.4,
                 ),
@@ -132,9 +132,8 @@ class _Eyebrow extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           text,
-          style: AppTypography.mono(
+          style: context.skin.monoStyle(
             size: 11,
-            weight: FontWeight.w600,
             letterSpacing: 2.2,
             color: color,
           ),
@@ -163,24 +162,24 @@ class _Footer extends StatelessWidget {
         Expanded(
           child: Text(
             l10n.marketplaceLocationCount(locationCount),
-            style: AppTypography.mono(
+            style: context.skin.monoStyle(
               size: 11,
               weight: FontWeight.w500,
               letterSpacing: 1.6,
-              color: AppColors.paperFaint,
+              color: context.skin.paperFaint,
             ),
           ),
         ),
         if (owned)
-          const Icon(Icons.check_rounded, size: 18, color: AppColors.lime)
+          Icon(Icons.check_rounded, size: 18, color: context.skin.accent)
         else
           Text(
             priceDisplay,
-            style: AppTypography.mono(
+            style: context.skin.monoStyle(
               size: 14,
               weight: FontWeight.w700,
               letterSpacing: 0.4,
-              color: AppColors.paper,
+              color: context.skin.paper,
             ),
           ),
       ],

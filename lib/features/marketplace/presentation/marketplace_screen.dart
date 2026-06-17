@@ -5,9 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' show Offering;
 
 import '../../../core/router/app_router.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/grain_overlay.dart';
+import '../../../core/theme/skin_backdrop.dart';
+import '../../../core/theme/skin_context.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../data/iap_service.dart';
@@ -35,12 +34,11 @@ class MarketplaceScreen extends ConsumerWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: ColoredBox(color: AppColors.ink)),
-          const Positioned.fill(child: GrainOverlay()),
+          const Positioned.fill(child: SkinBackdrop()),
           SafeArea(
             child: bundlesAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.lime),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: context.skin.accent),
               ),
               error: (e, _) => _ErrorView(message: e.toString()),
               data: (bundles) {
@@ -65,9 +63,9 @@ class MarketplaceScreen extends ConsumerWidget {
                           children: [
                             IconButton(
                               onPressed: () => context.pop(),
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.close_rounded,
-                                color: AppColors.paper,
+                                color: context.skin.paper,
                               ),
                             ),
                             const Spacer(),
@@ -89,14 +87,14 @@ class MarketplaceScreen extends ConsumerWidget {
                               style: theme.textTheme.displayLarge?.copyWith(
                                 fontSize: 60,
                                 height: 0.95,
-                                color: AppColors.paper,
+                                color: context.skin.paper,
                               ),
                             ),
                             const SizedBox(height: 22),
                             Text(
                               l10n.marketplaceSubtitle,
                               style: theme.textTheme.bodyLarge?.copyWith(
-                                color: AppColors.paperMuted,
+                                color: context.skin.paperMuted,
                               ),
                             ),
                           ],
@@ -153,11 +151,10 @@ class _Section extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(0, 8, 0, 18),
                 child: Text(
                   label,
-                  style: AppTypography.mono(
+                  style: context.skin.monoStyle(
                     size: 11,
-                    weight: FontWeight.w600,
                     letterSpacing: 2.4,
-                    color: AppColors.paperFaint,
+                    color: context.skin.paperFaint,
                   ),
                 ),
               );
@@ -194,7 +191,7 @@ class _Section extends StatelessWidget {
     final theme = Theme.of(context);
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.inkRaised,
+      backgroundColor: context.skin.inkRaised,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -209,7 +206,7 @@ class _Section extends StatelessWidget {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.inkOutline,
+                  color: context.skin.inkOutline,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -220,7 +217,7 @@ class _Section extends StatelessWidget {
             Text(
               bundle.title,
               style: theme.textTheme.displaySmall?.copyWith(
-                color: AppColors.paper,
+                color: context.skin.paper,
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.6,
                 height: 1.05,
@@ -230,7 +227,7 @@ class _Section extends StatelessWidget {
             Text(
               bundle.tagline,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: AppColors.paperMuted,
+                color: context.skin.paperMuted,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -238,7 +235,7 @@ class _Section extends StatelessWidget {
             Text(
               l10n.marketplaceComingSoonBody,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.paperMuted,
+                color: context.skin.paperMuted,
                 height: 1.5,
               ),
             ),
@@ -258,15 +255,14 @@ class _Eyebrow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 28, height: 2, color: AppColors.lime),
+        Container(width: 28, height: 2, color: context.skin.accent),
         const SizedBox(width: 10),
         Text(
           text,
-          style: AppTypography.mono(
+          style: context.skin.monoStyle(
             size: 11,
-            weight: FontWeight.w600,
             letterSpacing: 2.2,
-            color: AppColors.lime,
+            color: context.skin.accent,
           ),
         ),
       ],
@@ -295,11 +291,11 @@ class _RestoreOrWebHintState extends ConsumerState<_RestoreOrWebHint> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Text(
           l10n.marketplaceWebPurchaseHint,
-          style: AppTypography.mono(
+          style: context.skin.monoStyle(
             size: 10,
             weight: FontWeight.w500,
             letterSpacing: 1.2,
-            color: AppColors.paperFaint,
+            color: context.skin.paperFaint,
           ),
         ),
       );
@@ -307,16 +303,16 @@ class _RestoreOrWebHintState extends ConsumerState<_RestoreOrWebHint> {
     return TextButton(
       onPressed: _busy ? null : _onTap,
       style: TextButton.styleFrom(
-        foregroundColor: AppColors.lime,
+        foregroundColor: context.skin.accent,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       ),
       child: Text(
         _busy ? l10n.marketplaceRestoring : l10n.marketplaceRestore,
-        style: AppTypography.mono(
+        style: context.skin.monoStyle(
           size: 11,
           weight: FontWeight.w700,
           letterSpacing: 1.4,
-          color: _busy ? AppColors.paperFaint : AppColors.lime,
+          color: _busy ? context.skin.paperFaint : context.skin.accent,
         ),
       ),
     );
@@ -361,16 +357,16 @@ class _ErrorView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.cloud_off_rounded,
-            color: AppColors.signalRed,
+            color: context.skin.danger,
             size: 36,
           ),
           const SizedBox(height: 12),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.paperMuted),
+            style: TextStyle(color: context.skin.paperMuted),
           ),
         ],
       ),

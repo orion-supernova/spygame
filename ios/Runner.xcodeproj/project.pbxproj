@@ -62,6 +62,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		097F1D905CBCCB59C75A2507 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		0FC66446B2748744CB3D8DF2 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		105807A968DC02F0C06512DF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1164213FD05B526F26EF928A /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
@@ -79,11 +80,13 @@
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		38AA1A130FE098BB90B34F10 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		4006A1795E10B57C7AA6EAB3 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		49093B087A25F06DEFDA6CD8 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		51030E0C8BAB3377B3F0A298 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		545446C62FAE59450039DC61 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		54B41B482FAD40030087624A /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		550244D1AD2D38D1C02B09CF /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
+		56F6BCDF97D433F39DF50D8E /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		58A4D2E39BAC9C3A9929734F /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		5C33E8BC9BC497E36FE99B44 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		5D312411531119689AEA81B9 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,6 +94,7 @@
 		6617191C970C4F6DBEB9C41A /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		66D3C1E75F1C243FB576FAAF /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		6D2DF14EBE25144308CE3773 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F9E1B9BD482CC90267BA5A2 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		72D86B04760329612A363624 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		743CCAB2C92A8B3FEAC81675 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -100,6 +104,7 @@
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		8C88B9D54F549E43220327A2 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
+		8F8997BA616191FDDAF96355 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,6 +117,7 @@
 		A69123C20B679892D92DBFB2 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ABB15A4D7304F7992CADDFB4 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		B0C33750D2B81CF059D093ED /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
+		B259AAD4503C169BB0DE6DA7 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		C06CE4920E6DCCB9AD7A037B /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		CE5BFDEE146DCF9FB5FA9C38 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		D16B814B806E85835A836E3D /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
@@ -119,6 +125,7 @@
 		E632952D12046AC82F017684 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoundActivityAttributes.swift; sourceTree = "<group>"; };
 		EBA28483A2FB5E89066676C2 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		EF408D55826487F45359D014 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		F919639FEFF1D6E5A4161444 /* RoundActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoundActivityAttributes.swift; path = ../Runner/RoundActivityAttributes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -262,6 +269,13 @@
 				319F0D9A6A281BC01155CDE6 /* RoundActivityAttributes.swift */,
 				72D86B04760329612A363624 /* RoundActivityAttributes.swift */,
 				66D3C1E75F1C243FB576FAAF /* RoundActivityAttributes.swift */,
+				097F1D905CBCCB59C75A2507 /* RoundActivityAttributes.swift */,
+				8F8997BA616191FDDAF96355 /* RoundActivityAttributes.swift */,
+				B259AAD4503C169BB0DE6DA7 /* RoundActivityAttributes.swift */,
+				4006A1795E10B57C7AA6EAB3 /* RoundActivityAttributes.swift */,
+				F919639FEFF1D6E5A4161444 /* RoundActivityAttributes.swift */,
+				6F9E1B9BD482CC90267BA5A2 /* RoundActivityAttributes.swift */,
+				56F6BCDF97D433F39DF50D8E /* RoundActivityAttributes.swift */,
 			);
 			path = SpygameLiveActivity;
 			sourceTree = "<group>";
@@ -587,7 +601,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = "";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 37TC2VKVJ6;
 				INFOPLIST_FILE = SpygameLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Spygame Live Activity";
@@ -598,7 +612,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.13;
+				MARKETING_VERSION = 1.0.14;
 				PRODUCT_BUNDLE_IDENTIFIER = com.walhallaa.spygame.v02202404.LiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -740,7 +754,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = "";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 37TC2VKVJ6;
 				INFOPLIST_FILE = SpygameLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Spygame Live Activity";
@@ -751,7 +765,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.13;
+				MARKETING_VERSION = 1.0.14;
 				PRODUCT_BUNDLE_IDENTIFIER = com.walhallaa.spygame.v02202404.LiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -767,7 +781,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = "";
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 37TC2VKVJ6;
 				INFOPLIST_FILE = SpygameLiveActivity/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Spygame Live Activity";
@@ -778,7 +792,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.13;
+				MARKETING_VERSION = 1.0.14;
 				PRODUCT_BUNDLE_IDENTIFIER = com.walhallaa.spygame.v02202404.LiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

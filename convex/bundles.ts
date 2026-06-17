@@ -102,6 +102,150 @@ const SEED: SeedBundle[] = [
     },
   },
   {
+    slug: 'new-york',
+    category: 'city',
+    sortOrder: 50,
+    priceUsd: '$0.99',
+    accentHex: '#F7B500',
+    iconKey: 'location_city',
+    translations: {
+      en: {
+        title: 'New York',
+        tagline: 'Yellow cabs, bright lights, big rats.',
+      },
+      tr: {
+        title: 'New York',
+        tagline: 'Sarı taksiler, parlak ışıklar, koca fareler.',
+      },
+    },
+  },
+  {
+    slug: 'london',
+    category: 'city',
+    sortOrder: 60,
+    priceUsd: '$0.99',
+    accentHex: '#C8102E',
+    iconKey: 'directions_bus',
+    translations: {
+      en: {
+        title: 'London',
+        tagline: 'Fog, queues, and royal guards.',
+      },
+      tr: {
+        title: 'Londra',
+        tagline: 'Sis, kuyruklar ve kraliyet muhafızları.',
+      },
+    },
+  },
+  {
+    slug: 'rome',
+    category: 'city',
+    sortOrder: 70,
+    priceUsd: '$0.99',
+    accentHex: '#C5A35A',
+    iconKey: 'account_balance',
+    translations: {
+      en: {
+        title: 'Rome',
+        tagline: 'Ruins, gelato, and reckless Vespas.',
+      },
+      tr: {
+        title: 'Roma',
+        tagline: 'Harabeler, dondurma ve çılgın Vespalar.',
+      },
+    },
+  },
+  {
+    slug: 'cairo',
+    category: 'city',
+    sortOrder: 80,
+    priceUsd: '$0.99',
+    accentHex: '#D4A017',
+    iconKey: 'fort',
+    translations: {
+      en: {
+        title: 'Cairo',
+        tagline: 'Pyramids, bazaars, and the Nile breeze.',
+      },
+      tr: {
+        title: 'Kahire',
+        tagline: 'Piramitler, çarşılar ve Nil esintisi.',
+      },
+    },
+  },
+  {
+    slug: 'rio',
+    category: 'city',
+    sortOrder: 90,
+    priceUsd: '$0.99',
+    accentHex: '#00A859',
+    iconKey: 'sports_soccer',
+    translations: {
+      en: {
+        title: 'Rio de Janeiro',
+        tagline: 'Beaches, samba, and carnival chaos.',
+      },
+      tr: {
+        title: 'Rio de Janeiro',
+        tagline: 'Plajlar, samba ve karnaval keşmekeşi.',
+      },
+    },
+  },
+  {
+    slug: 'berlin',
+    category: 'city',
+    sortOrder: 95,
+    priceUsd: '$0.99',
+    accentHex: '#FFCE00',
+    iconKey: 'nightlife',
+    translations: {
+      en: {
+        title: 'Berlin',
+        tagline: 'Techno, currywurst, and cold history.',
+      },
+      tr: {
+        title: 'Berlin',
+        tagline: 'Tekno, currywurst ve soğuk tarih.',
+      },
+    },
+  },
+  {
+    slug: 'dubai',
+    category: 'city',
+    sortOrder: 96,
+    priceUsd: '$0.99',
+    accentHex: '#C9A227',
+    iconKey: 'apartment',
+    translations: {
+      en: {
+        title: 'Dubai',
+        tagline: 'Gold, skyscrapers, and desert heat.',
+      },
+      tr: {
+        title: 'Dubai',
+        tagline: 'Altın, gökdelenler ve çöl sıcağı.',
+      },
+    },
+  },
+  {
+    slug: 'bangkok',
+    category: 'city',
+    sortOrder: 97,
+    priceUsd: '$0.99',
+    accentHex: '#FF6F61',
+    iconKey: 'temple_buddhist',
+    translations: {
+      en: {
+        title: 'Bangkok',
+        tagline: 'Tuk-tuks, temples, and street woks.',
+      },
+      tr: {
+        title: 'Bangkok',
+        tagline: 'Tuk-tuklar, tapınaklar ve sokak wokları.',
+      },
+    },
+  },
+  {
     slug: 'cyberpunk',
     category: 'theme',
     sortOrder: 100,
@@ -116,6 +260,42 @@ const SEED: SeedBundle[] = [
       tr: {
         title: 'Cyberpunk',
         tagline: 'Neon, krom ve kötü kararlar.',
+      },
+    },
+  },
+  {
+    slug: 'victorian-1800s',
+    category: 'theme',
+    sortOrder: 110,
+    priceUsd: '$0.99',
+    accentHex: '#8C6A3F',
+    iconKey: 'auto_stories',
+    translations: {
+      en: {
+        title: 'Victorian London',
+        tagline: 'Gaslight, fog, and proper scandal.',
+      },
+      tr: {
+        title: 'Viktorya Dönemi',
+        tagline: 'Gaz lambası, sis ve usulünce skandal.',
+      },
+    },
+  },
+  {
+    slug: 'wild-west',
+    category: 'theme',
+    sortOrder: 120,
+    priceUsd: '$0.99',
+    accentHex: '#B5651D',
+    iconKey: 'local_fire_department',
+    translations: {
+      en: {
+        title: 'Wild West',
+        tagline: 'Dust, six-shooters, and wanted posters.',
+      },
+      tr: {
+        title: 'Vahşi Batı',
+        tagline: 'Toz, altıpatlarlar ve aranıyor afişleri.',
       },
     },
   },

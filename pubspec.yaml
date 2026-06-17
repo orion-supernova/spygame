@@ -1,7 +1,7 @@
 name: spygame
 description: "Where am I? — a real-time party game of bluffing and deduction."
 publish_to: 'none'
-version: 1.0.13+13
+version: 1.0.14+14
 
 environment:
   sdk: ^3.11.4

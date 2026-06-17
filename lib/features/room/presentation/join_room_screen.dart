@@ -6,9 +6,8 @@ import '../../../core/errors/app_exception.dart';
 import '../../../core/errors/error_messages.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/storage/identity_storage.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/grain_overlay.dart';
+import '../../../core/theme/skin_backdrop.dart';
+import '../../../core/theme/skin_context.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../identity/presentation/widgets/language_button.dart';
@@ -96,8 +95,7 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: ColoredBox(color: AppColors.ink)),
-          const Positioned.fill(child: GrainOverlay()),
+          const Positioned.fill(child: SkinBackdrop()),
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
@@ -123,7 +121,7 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
                                   l10n.joinScreenLoading,
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.paperFaint,
+                                    color: context.skin.paperFaint,
                                   ),
                                 ),
                               ),
@@ -133,7 +131,7 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
                                   l10n.joinScreenErrorNotFound(widget.code),
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.signalRed,
+                                    color: context.skin.danger,
                                   ),
                                 ),
                               ),
@@ -146,7 +144,7 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
                                       textAlign: TextAlign.center,
                                       style: theme.textTheme.bodyMedium
                                           ?.copyWith(
-                                            color: AppColors.signalRed,
+                                            color: context.skin.danger,
                                           ),
                                     ),
                                   );
@@ -162,14 +160,14 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
                             Text(
                               l10n.joinScreenTitle,
                               style: theme.textTheme.headlineMedium?.copyWith(
-                                color: AppColors.paper,
+                                color: context.skin.paper,
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
                               l10n.joinScreenSubtitle,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.paperFaint,
+                                color: context.skin.paperFaint,
                               ),
                             ),
                             const SizedBox(height: 18),
@@ -184,7 +182,7 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
                                 }
                               },
                               style: theme.textTheme.titleLarge?.copyWith(
-                                color: AppColors.paper,
+                                color: context.skin.paper,
                               ),
                               decoration: InputDecoration(
                                 hintText: l10n.homeCodenameHint,
@@ -207,7 +205,7 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
                                 _error!,
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.signalRed,
+                                  color: context.skin.danger,
                                 ),
                               ),
                             ],
@@ -218,11 +216,11 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
                                   : () => context.go(AppRoute.home),
                               child: Text(
                                 l10n.joinScreenCtaBackHome,
-                                style: AppTypography.mono(
+                                style: context.skin.monoStyle(
                                   size: 12,
                                   weight: FontWeight.w600,
                                   letterSpacing: 2,
-                                  color: AppColors.paperMuted,
+                                  color: context.skin.paperMuted,
                                 ),
                               ),
                             ),
@@ -252,16 +250,16 @@ class _Header extends StatelessWidget {
       children: [
         IconButton(
           onPressed: () => context.go(AppRoute.home),
-          icon: const Icon(Icons.arrow_back, color: AppColors.paper),
+          icon: Icon(Icons.arrow_back, color: context.skin.paper),
         ),
         const SizedBox(width: 4),
         Text(
           eyebrow,
-          style: AppTypography.mono(
+          style: context.skin.monoStyle(
             size: 11,
             weight: FontWeight.w600,
             letterSpacing: 2.4,
-            color: AppColors.paperMuted,
+            color: context.skin.paperMuted,
           ),
         ),
         const Spacer(),
@@ -280,9 +278,9 @@ class _PreviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.inkRaised,
+        color: context.skin.inkRaised,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.inkOutline),
+        border: Border.all(color: context.skin.inkOutline),
       ),
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 22),
       child: Column(
@@ -290,11 +288,11 @@ class _PreviewCard extends StatelessWidget {
           Text(
             code,
             textAlign: TextAlign.center,
-            style: AppTypography.mono(
+            style: context.skin.monoStyle(
               size: 38,
               weight: FontWeight.w700,
               letterSpacing: 14,
-              color: AppColors.paper,
+              color: context.skin.paper,
             ),
           ),
           const SizedBox(height: 14),
@@ -322,14 +320,14 @@ class _RoomDetails extends StatelessWidget {
         Text(
           hostLine,
           textAlign: TextAlign.center,
-          style: theme.textTheme.titleMedium?.copyWith(color: AppColors.paper),
+          style: theme.textTheme.titleMedium?.copyWith(color: context.skin.paper),
         ),
         const SizedBox(height: 4),
         Text(
           l10n.joinScreenPlayerCount(room.players.length),
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.paperFaint,
+            color: context.skin.paperFaint,
           ),
         ),
         const SizedBox(height: 12),
@@ -347,9 +345,9 @@ class _StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, color) = switch (status) {
-      RoomStatus.lobby => (l10n.joinScreenStatusLobby, AppColors.lime),
-      RoomStatus.inGame => (l10n.joinScreenStatusInGame, AppColors.amber),
-      RoomStatus.ended => (l10n.joinScreenStatusEnded, AppColors.paperFaint),
+      RoomStatus.lobby => (l10n.joinScreenStatusLobby, context.skin.accent),
+      RoomStatus.inGame => (l10n.joinScreenStatusInGame, context.skin.secondary),
+      RoomStatus.ended => (l10n.joinScreenStatusEnded, context.skin.paperFaint),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -360,7 +358,7 @@ class _StatusPill extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: AppTypography.mono(
+        style: context.skin.monoStyle(
           size: 10,
           weight: FontWeight.w700,
           letterSpacing: 2,
@@ -442,7 +440,7 @@ class _JoinCta extends StatelessWidget {
             footnote,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.paperFaint,
+              color: context.skin.paperFaint,
             ),
           ),
         ],

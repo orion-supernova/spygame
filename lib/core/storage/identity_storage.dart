@@ -12,11 +12,13 @@ class IdentityStorage {
   static const _kTokenKey = 'whereami.clientToken';
   static const _kNameKey = 'whereami.lastDisplayName';
   static const _kLanguageKey = 'whereami.languageCode';
+  static const _kDevModeKey = 'whereami.devMode';
 
   late SharedPreferences _prefs;
   late String _clientToken;
   String? _lastDisplayName;
   String? _languageCode;
+  bool _devMode = false;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -29,11 +31,17 @@ class IdentityStorage {
     }
     _lastDisplayName = _prefs.getString(_kNameKey);
     _languageCode = _prefs.getString(_kLanguageKey);
+    _devMode = _prefs.getBool(_kDevModeKey) ?? false;
   }
 
   String get clientToken => _clientToken;
   String? get lastDisplayName => _lastDisplayName;
   String? get languageCode => _languageCode;
+
+  /// Whether the hidden runtime developer mode has been unlocked on this
+  /// device (10-tap version gesture + server-verified code). Persists across
+  /// launches so the unlock survives a relaunch; clears on reinstall.
+  bool get devModeEnabled => _devMode;
 
   Future<void> setLastDisplayName(String name) async {
     final trimmed = name.trim();
@@ -46,5 +54,10 @@ class IdentityStorage {
     if (code != 'en' && code != 'tr') return;
     _languageCode = code;
     await _prefs.setString(_kLanguageKey, code);
+  }
+
+  Future<void> setDevMode(bool enabled) async {
+    _devMode = enabled;
+    await _prefs.setBool(_kDevModeKey, enabled);
   }
 }

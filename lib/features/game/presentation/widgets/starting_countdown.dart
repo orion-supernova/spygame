@@ -3,8 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/convex/server_time_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 
@@ -76,29 +75,33 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
     }
 
     final theme = Theme.of(context);
+    final skin = context.skin;
     final l10n = AppLocalizations.of(context);
+    final reduceMotion = MediaQuery.of(context).disableAnimations ||
+        MediaQuery.of(context).accessibleNavigation;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
       decoration: BoxDecoration(
-        color: AppColors.inkRaised,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.lime, width: 1.5),
+        color: skin.inkRaised,
+        borderRadius: BorderRadius.circular(skin.cardRadius),
+        border: Border.all(color: skin.accent, width: skin.cardBorderWidth),
       ),
       child: Column(
         children: [
           Text(
             l10n.gameRoundStartsIn(widget.roundIndex),
-            style: AppTypography.mono(
+            style: skin.monoStyle(
               size: 11,
               weight: FontWeight.w600,
               letterSpacing: 2.4,
-              color: AppColors.lime,
+              color: skin.accent,
             ),
           ),
           const SizedBox(height: 14),
           AnimatedSwitcher(
-            duration: const Duration(milliseconds: 220),
+            duration:
+                reduceMotion ? Duration.zero : const Duration(milliseconds: 220),
             transitionBuilder: (child, anim) => ScaleTransition(
               scale: Tween<double>(begin: 0.7, end: 1).animate(anim),
               child: FadeTransition(opacity: anim, child: child),
@@ -106,10 +109,10 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
             child: Text(
               seconds == 0 ? l10n.gameStartingGo : '$seconds',
               key: ValueKey<int>(seconds),
-              style: AppTypography.mono(
+              style: skin.digitStyle(
                 size: 96,
                 weight: FontWeight.w700,
-                color: AppColors.lime,
+                color: skin.accent,
               ),
             ),
           ),
@@ -117,7 +120,7 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
           Text(
             l10n.gameStartingGetReady,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.paperMuted,
+              color: skin.paperMuted,
             ),
           ),
         ],

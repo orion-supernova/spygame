@@ -115,6 +115,7 @@ class Room {
     required this.freePackActive,
     required this.enabledLocationCount,
     required this.totalLocationCount,
+    required this.activeThemeSlug,
     required this.players,
     required this.currentGame,
     required this.currentRound,
@@ -150,6 +151,10 @@ class Room {
   /// disabled list). Pairs with `enabledLocationCount` for the "X / Y"
   /// progress badge.
   final int totalLocationCount;
+  /// Slug of the theme pack the host has selected to skin the room, or null
+  /// for the default noir look. Synced to all players so the whole table
+  /// shares the visual theme for the duration it's enabled.
+  final String? activeThemeSlug;
   final List<Player> players;
   final GameSnapshot? currentGame;
   final RoundSnapshot? currentRound;

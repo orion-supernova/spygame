@@ -167,6 +167,27 @@ class ConvexRoomRepository implements RoomRepository {
   }
 
   @override
+  Future<void> setRoomTheme({
+    required String code,
+    required String? slug,
+  }) async {
+    try {
+      await ConvexBootstrap.ensureReady();
+      await _client.mutation(
+        name: 'rooms:setRoomTheme',
+        args: {
+          'code': code,
+          'clientToken': _identity.clientToken,
+          // Omit slug to clear back to the default noir look.
+          'slug': ?slug,
+        },
+      );
+    } catch (e) {
+      throw _mapError(e);
+    }
+  }
+
+  @override
   Future<void> heartbeat({required String code}) async {
     try {
       await ConvexBootstrap.ensureReady();

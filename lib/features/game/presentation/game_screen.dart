@@ -12,9 +12,8 @@ import '../../../core/notifications/push_token_service.dart';
 import '../../../core/notifications/round_end_notifier.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/storage/identity_storage.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/grain_overlay.dart';
+import '../../../core/theme/skin_backdrop.dart';
+import '../../../core/theme/skin_context.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../room/data/room_providers.dart';
@@ -199,13 +198,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: ColoredBox(color: AppColors.ink)),
-          const Positioned.fill(child: GrainOverlay()),
+          const Positioned.fill(child: SkinBackdrop()),
           SafeArea(
             bottom: false,
             child: asyncRoom.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.lime),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: context.skin.accent),
               ),
               error: (e, _) => Center(
                 child: Padding(
@@ -233,7 +231,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               .textTheme
                               .displaySmall
                               ?.copyWith(
-                                color: AppColors.paper,
+                                color: context.skin.paper,
                                 fontWeight: FontWeight.w700,
                               ),
                         ),
@@ -336,10 +334,10 @@ class _GameBody extends ConsumerWidget {
         const SizedBox(height: 24),
         Text(
           l10n.gameLocationsEyebrow,
-          style: AppTypography.mono(
+          style: context.skin.monoStyle(
             size: 11,
             letterSpacing: 2,
-            color: AppColors.paperFaint,
+            color: context.skin.paperFaint,
           ),
         ),
         const SizedBox(height: 8),
@@ -347,14 +345,14 @@ class _GameBody extends ConsumerWidget {
           l10n.gameLocationsHint,
           style: Theme.of(
             context,
-          ).textTheme.bodySmall?.copyWith(color: AppColors.paperFaint),
+          ).textTheme.bodySmall?.copyWith(color: context.skin.paperFaint),
         ),
         const SizedBox(height: 14),
         asyncBoard.when(
-          loading: () => const SizedBox(
+          loading: () => SizedBox(
             height: 180,
             child: Center(
-              child: CircularProgressIndicator(color: AppColors.lime),
+              child: CircularProgressIndicator(color: context.skin.accent),
             ),
           ),
           error: (_, _) => Text(
@@ -415,15 +413,15 @@ class _TopBar extends ConsumerWidget {
             if (!context.mounted) return;
             context.go(AppRoute.home);
           },
-          icon: const Icon(Icons.close, color: AppColors.paper),
+          icon: Icon(Icons.close, color: context.skin.paper),
         ),
         const SizedBox(width: 4),
         Text(
           label,
-          style: AppTypography.mono(
+          style: context.skin.monoStyle(
             size: 11,
             letterSpacing: 2.2,
-            color: AppColors.paperFaint,
+            color: context.skin.paperFaint,
           ),
         ),
       ],
@@ -546,10 +544,10 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
             child: Column(
               children: [
                 asyncRole.when(
-                  loading: () => const SizedBox(
+                  loading: () => SizedBox(
                     height: 220,
                     child: Center(
-                      child: CircularProgressIndicator(color: AppColors.lime),
+                      child: CircularProgressIndicator(color: context.skin.accent),
                     ),
                   ),
                   error: (_, _) => const RoleCard(role: null),
@@ -589,10 +587,10 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
               children: [
                 Text(
                   l10n.gameLocationsEyebrow,
-                  style: AppTypography.mono(
+                  style: context.skin.monoStyle(
                     size: 11,
                     letterSpacing: 2,
-                    color: AppColors.paperFaint,
+                    color: context.skin.paperFaint,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -601,18 +599,18 @@ class _PlayingScreenState extends ConsumerState<_PlayingScreen> {
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
-                      ?.copyWith(color: AppColors.paperFaint),
+                      ?.copyWith(color: context.skin.paperFaint),
                 ),
               ],
             ),
           ),
         ),
         asyncBoard.when(
-          loading: () => const SliverToBoxAdapter(
+          loading: () => SliverToBoxAdapter(
             child: SizedBox(
               height: 180,
               child: Center(
-                child: CircularProgressIndicator(color: AppColors.lime),
+                child: CircularProgressIndicator(color: context.skin.accent),
               ),
             ),
           ),
@@ -643,7 +641,7 @@ Future<bool> _confirmLeave(
   final result = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      backgroundColor: AppColors.inkRaised,
+      backgroundColor: ctx.skin.inkRaised,
       title: Text(l10n.gameLeaveDialogTitle),
       content: Text(
         isOwner
@@ -657,7 +655,7 @@ Future<bool> _confirmLeave(
         ),
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(true),
-          style: TextButton.styleFrom(foregroundColor: AppColors.signalRed),
+          style: TextButton.styleFrom(foregroundColor: ctx.skin.danger),
           child: Text(l10n.gameLeaveLeave),
         ),
       ],

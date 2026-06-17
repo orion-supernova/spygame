@@ -9,6 +9,7 @@ import 'core/lifecycle/app_lifecycle_observer.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/skin_providers.dart';
 import 'l10n/generated/app_localizations.dart';
 
 class WhereAmIApp extends ConsumerStatefulWidget {
@@ -58,12 +59,14 @@ class _WhereAmIAppState extends ConsumerState<WhereAmIApp> {
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(localeProvider);
+    final skin = ref.watch(activeSkinProvider);
+    final theme = AppTheme.fromSkin(skin);
     return AppLifecycleHost(
       child: MaterialApp.router(
         title: 'Where am I?',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.dark(),
-        darkTheme: AppTheme.dark(),
+        theme: theme,
+        darkTheme: theme,
         themeMode: ThemeMode.dark,
         locale: locale,
         supportedLocales: AppLocalizations.supportedLocales,

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../marketplace/data/marketplace_providers.dart';
 import '../../data/locations_picker_repository.dart';
@@ -19,7 +18,7 @@ class LocationsReadOnlySheet extends ConsumerStatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.inkRaised,
+      backgroundColor: context.skin.inkRaised,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -84,7 +83,7 @@ class _LocationsReadOnlySheetState
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.inkOutline,
+              color: context.skin.inkOutline,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -97,7 +96,7 @@ class _LocationsReadOnlySheetState
                 Text(
                   l10n.locationsReadOnlySheetTitle,
                   style: theme.textTheme.displaySmall?.copyWith(
-                    color: AppColors.paper,
+                    color: context.skin.paper,
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.6,
                     height: 1.05,
@@ -107,7 +106,7 @@ class _LocationsReadOnlySheetState
                 Text(
                   l10n.locationsReadOnlySheetSubtitle,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.paperMuted,
+                    color: context.skin.paperMuted,
                     height: 1.5,
                   ),
                 ),
@@ -116,15 +115,15 @@ class _LocationsReadOnlySheetState
           ),
           Expanded(
             child: enabledAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.lime),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: context.skin.accent),
               ),
               error: (e, _) => Padding(
                 padding: const EdgeInsets.all(28),
                 child: Text(
                   e.toString(),
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.signalRed,
+                    color: context.skin.danger,
                   ),
                 ),
               ),
@@ -248,36 +247,36 @@ class _Section extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(2, 8, 2, 8),
               child: Row(
                 children: [
-                  Container(width: 22, height: 2, color: AppColors.lime),
+                  Container(width: 22, height: 2, color: context.skin.accent),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       title.toUpperCase(),
-                      style: AppTypography.mono(
+                      style: context.skin.monoStyle(
                         size: 11,
                         weight: FontWeight.w600,
                         letterSpacing: 2.2,
-                        color: AppColors.lime,
+                        color: context.skin.accent,
                       ),
                     ),
                   ),
                   Text(
                     '${rows.length}',
-                    style: AppTypography.mono(
+                    style: context.skin.monoStyle(
                       size: 11,
                       weight: FontWeight.w600,
                       letterSpacing: 1.2,
-                      color: AppColors.paperFaint,
+                      color: context.skin.paperFaint,
                     ),
                   ),
                   const SizedBox(width: 6),
                   AnimatedRotation(
                     turns: isExpanded ? 0.25 : 0,
                     duration: const Duration(milliseconds: 180),
-                    child: const Icon(
+                    child: Icon(
                       Icons.chevron_right_rounded,
                       size: 22,
-                      color: AppColors.paperMuted,
+                      color: context.skin.paperMuted,
                     ),
                   ),
                 ],
@@ -294,9 +293,9 @@ class _Section extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 6),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.ink.withValues(alpha: 0.5),
+                    color: context.skin.ink.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.inkOutline),
+                    border: Border.all(color: context.skin.inkOutline),
                   ),
                   child: Column(
                     children: [
@@ -305,14 +304,15 @@ class _Section extends StatelessWidget {
                           Container(
                             height: 1,
                             margin: const EdgeInsets.symmetric(horizontal: 14),
-                            color: AppColors.inkOutline.withValues(alpha: 0.5),
+                            color: context.skin.inkOutline
+                                .withValues(alpha: 0.5),
                           ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                           child: Text(
                             rows[i].name,
                             style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(color: AppColors.paper),
+                                ?.copyWith(color: context.skin.paper),
                           ),
                         ),
                       ],

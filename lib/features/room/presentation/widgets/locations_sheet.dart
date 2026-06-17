@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../marketplace/data/marketplace_providers.dart';
@@ -37,7 +36,7 @@ class LocationsSheet extends ConsumerStatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.inkRaised,
+      backgroundColor: context.skin.inkRaised,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -144,7 +143,7 @@ class _LocationsSheetState extends ConsumerState<LocationsSheet> {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.inkOutline,
+              color: context.skin.inkOutline,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -157,7 +156,7 @@ class _LocationsSheetState extends ConsumerState<LocationsSheet> {
                 Text(
                   l10n.locationsSheetTitle,
                   style: theme.textTheme.displaySmall?.copyWith(
-                    color: AppColors.paper,
+                    color: context.skin.paper,
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.6,
                     height: 1.05,
@@ -167,7 +166,7 @@ class _LocationsSheetState extends ConsumerState<LocationsSheet> {
                 Text(
                   l10n.locationsSheetSubtitle,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.paperMuted,
+                    color: context.skin.paperMuted,
                     height: 1.5,
                   ),
                 ),
@@ -187,15 +186,15 @@ class _LocationsSheetState extends ConsumerState<LocationsSheet> {
           ),
           Expanded(
             child: picker.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.lime),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: context.skin.accent),
               ),
               error: (e, _) => Padding(
                 padding: const EdgeInsets.all(28),
                 child: Text(
                   e.toString(),
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.signalRed,
+                    color: context.skin.danger,
                   ),
                 ),
               ),
@@ -349,9 +348,9 @@ class _BrowseMarketplaceRow extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.ink.withValues(alpha: 0.5),
+          color: context.skin.ink.withValues(alpha: 0.5),
           borderRadius: radius,
-          border: Border.all(color: AppColors.inkOutline),
+          border: Border.all(color: context.skin.inkOutline),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
@@ -361,15 +360,15 @@ class _BrowseMarketplaceRow extends StatelessWidget {
                 child: Text(
                   l10n.locationsSheetBrowseMarketplace,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.paperMuted,
+                    color: context.skin.paperMuted,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_rounded,
                 size: 18,
-                color: AppColors.lime,
+                color: context.skin.accent,
               ),
             ],
           ),
@@ -388,7 +387,7 @@ class _TotalBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final allOff = enabled == 0 && total > 0;
-    final color = allOff ? AppColors.signalRed : AppColors.lime;
+    final color = allOff ? context.skin.danger : context.skin.accent;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -398,7 +397,7 @@ class _TotalBadge extends StatelessWidget {
       ),
       child: Text(
         l10n.locationsSheetTotalEnabled(enabled, total),
-        style: AppTypography.mono(
+        style: context.skin.monoStyle(
           size: 11,
           weight: FontWeight.w700,
           letterSpacing: 1.6,
@@ -451,26 +450,26 @@ class _Section extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(2, 8, 2, 8),
               child: Row(
                 children: [
-                  Container(width: 22, height: 2, color: AppColors.lime),
+                  Container(width: 22, height: 2, color: context.skin.accent),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       title.toUpperCase(),
-                      style: AppTypography.mono(
+                      style: context.skin.monoStyle(
                         size: 11,
                         weight: FontWeight.w600,
                         letterSpacing: 2.2,
-                        color: AppColors.lime,
+                        color: context.skin.accent,
                       ),
                     ),
                   ),
                   Text(
                     l10n.locationsSheetSectionCount(enabled, rows.length),
-                    style: AppTypography.mono(
+                    style: context.skin.monoStyle(
                       size: 11,
                       weight: FontWeight.w600,
                       letterSpacing: 1.2,
-                      color: AppColors.paperFaint,
+                      color: context.skin.paperFaint,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -490,8 +489,8 @@ class _Section extends StatelessWidget {
                           ? Icons.check_box_outline_blank_rounded
                           : Icons.indeterminate_check_box_rounded,
                       color: allDisabled
-                          ? AppColors.paperFaint
-                          : AppColors.lime,
+                          ? context.skin.paperFaint
+                          : context.skin.accent,
                       size: 22,
                     ),
                   ),
@@ -508,10 +507,10 @@ class _Section extends StatelessWidget {
                       message: isExpanded
                           ? l10n.locationsSheetCollapse
                           : l10n.locationsSheetExpand,
-                      child: const Icon(
+                      child: Icon(
                         Icons.chevron_right_rounded,
                         size: 22,
-                        color: AppColors.paperMuted,
+                        color: context.skin.paperMuted,
                       ),
                     ),
                   ),
@@ -531,9 +530,9 @@ class _Section extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 6),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.ink.withValues(alpha: 0.5),
+                    color: context.skin.ink.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.inkOutline),
+                    border: Border.all(color: context.skin.inkOutline),
                   ),
                   child: Column(
                     children: [
@@ -542,7 +541,8 @@ class _Section extends StatelessWidget {
                           Container(
                             height: 1,
                             margin: const EdgeInsets.symmetric(horizontal: 14),
-                            color: AppColors.inkOutline.withValues(alpha: 0.5),
+                            color: context.skin.inkOutline
+                                .withValues(alpha: 0.5),
                           ),
                         _Row(
                           location: rows[i],
@@ -587,9 +587,11 @@ class _Row extends StatelessWidget {
               child: Text(
                 location.name,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: isEnabled ? AppColors.paper : AppColors.paperFaint,
+                  color: isEnabled
+                      ? context.skin.paper
+                      : context.skin.paperFaint,
                   decoration: isEnabled ? null : TextDecoration.lineThrough,
-                  decorationColor: AppColors.paperFaint,
+                  decorationColor: context.skin.paperFaint,
                   decorationThickness: 1.4,
                 ),
               ),
@@ -617,15 +619,15 @@ class _Toggle extends StatelessWidget {
         width: 24,
         height: 24,
         decoration: BoxDecoration(
-          color: value ? AppColors.lime : Colors.transparent,
+          color: value ? context.skin.accent : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: value ? AppColors.lime : AppColors.inkOutline,
+            color: value ? context.skin.accent : context.skin.inkOutline,
             width: 1.5,
           ),
         ),
         child: value
-            ? const Icon(Icons.check_rounded, size: 18, color: AppColors.ink)
+            ? Icon(Icons.check_rounded, size: 18, color: context.skin.ink)
             : null,
       ),
     );

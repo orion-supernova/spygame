@@ -104,6 +104,12 @@
   "lobbyErrorRoomGone": "Bu oda artık yok.",
   "lobbyCtaGoHome": "ANA EKRANA DÖN",
 
+  "lobbyThemeButton": "ODA TEMASI",
+  "lobbyThemeSheetTitle": "Oda teması",
+  "lobbyThemeSheetSubtitle": "Açıkken tüm odayı herkes için temalandırır.",
+  "lobbyThemeDefault": "Klasik",
+  "lobbyThemeNoneOwned": "Odanı temalandırmak için Mağaza’dan bir tema paketi al.",
+
   "readyYes": "HAZIRIM",
   "readyNo": "HAZIR OLUNCA DOKUN",
 
@@ -188,9 +194,13 @@
   "htpHeading4": "Birbirinize\nsorular sorun.",
   "htpBody4": "Tur başına birkaç dakika. Casusu yoklayacak kadar belirgin, mekânı kaptırmayacak kadar üstü kapalı sorular.",
 
-  "htpStep5": "ADIM 05 · KARAR",
-  "htpHeading5": "Tartışıp\nkarar verin.",
-  "htpBody5": "Süre doldu — birlikte tartışın. Uygulama içi oylama yok, sadece konuşma. Casus saklı kalırsa kazanır. Onu açığa çıkarırsanız diğer herkes kazanır.",
+  "htpStep5": "ADIM 05 · CASUSUN HAMLESİ",
+  "htpHeading5": "Eminsen\nsöyle.",
+  "htpBody5": "Süre bitmeden casus her an kendini açıklayabilir — \"Casus benim!\" — ve mekân için tek bir tahmin hakkı vardır. Bilirse casus kazanır. Bilemezse diğer herkes.",
+
+  "htpStep6": "ADIM 06 · OYLAMA",
+  "htpHeading6": "Oylayıp\neleyin.",
+  "htpBody6": "Birinden eminseniz oylayıp eleyin — istediğiniz an ya da süre bitince. Casusu yakalarsanız ekip kazanır. Yanlış kişiyi elerseniz gerçek casus, oyunu çalmak için mekâna dair iki tahmin hakkı kazanır.",
 
   "htpSkip": "GEÇ",
   "htpNext": "İLERİ",
@@ -201,8 +211,17 @@
   "htpVisualRoleExample": "Barmen",
   "htpVisualLocationExample": "Tiki Bar",
   "htpVisualPerRound": "TUR BAŞINA",
-  "htpVisualNoVote": "OYLAMA YOK",
-  "htpVisualJustTalk": "SADECE KONUŞ",
+  "htpVisualSpyCall": "Casus benim — tahmin ediyorum!",
+  "htpVisualOneGuess": "TEK TAHMİN",
+  "htpVisualWhoIsSpy": "CASUS KİM?",
+  "htpVisualWrongPick": "YANLIŞ SEÇİM = CASUSA 2 TAHMİN",
+  "htpAskNamePlayer": "OYUNCU 3",
+  "htpAskNameYou": "SEN",
+  "htpAskNameSpy": "CASUS?",
+  "htpAskQ1": "Buraya ne sıklıkla geliyorsun?",
+  "htpAskA1": "Sadece vardiyamda.",
+  "htpAskQ2": "Burada mı çalışıyorsun?",
+  "htpAskA2": "Şey… bazen?",
   "htpClose": "Kapat",
 
   "errorNetwork": "Bağlantı koptu. Lütfen tekrar dene.",

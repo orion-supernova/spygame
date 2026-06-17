@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../../core/config/dev_mode.dart';
 import '../../../core/convex/connection_epoch_provider.dart';
 import '../../../core/convex/convex_client_provider.dart';
 import '../../../core/providers/locale_provider.dart';
@@ -94,6 +95,26 @@ class OwnedBundlesNotifier extends StateNotifier<Set<String>> {
     final updated = await _iap.restore();
     if (mounted) state = updated;
     return updated;
+  }
+
+  /// Dev-only: simulate a successful purchase without going through
+  /// StoreKit / RevenueCat, so the owned-gating UI and location
+  /// activation can be exercised without paying — in the simulator (where
+  /// RC is not configured and Apple's payment sheet never appears) or on an
+  /// App Store build once runtime dev mode is unlocked. Gated on
+  /// [devToolsEnabled] (always on in debug; runtime-unlockable in release).
+  /// In-memory only — fakes reset on app relaunch, which is fine for
+  /// smoke-testing. On a device with RC configured, a real CustomerInfo
+  /// update would overwrite this set anyway.
+  void debugSimulatePurchase(String slug) {
+    if (!devToolsEnabled) return;
+    if (mounted) state = {...state, slug};
+  }
+
+  /// Dev-only: drop all simulated purchases to re-test the locked flow.
+  void debugClearPurchases() {
+    if (!devToolsEnabled) return;
+    if (mounted) state = const <String>{};
   }
 
   @override

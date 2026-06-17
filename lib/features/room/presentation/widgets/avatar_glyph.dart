@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/skin_context.dart';
 
 /// Deterministic, asset-free avatar derived from the player's name. Renders
 /// a 4×4 grid of pseudo-random dots with the user's accent hue. Same name
@@ -25,9 +25,9 @@ class AvatarGlyph extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.inkSurface,
+        color: context.skin.inkSurface,
         borderRadius: BorderRadius.circular(size * 0.28),
-        border: Border.all(color: AppColors.inkOutline),
+        border: Border.all(color: context.skin.inkOutline),
       ),
       clipBehavior: Clip.antiAlias,
       child: CustomPaint(

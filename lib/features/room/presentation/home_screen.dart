@@ -6,9 +6,8 @@ import '../../../core/errors/app_exception.dart';
 import '../../../core/errors/error_messages.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/storage/identity_storage.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/grain_overlay.dart';
+import '../../../core/theme/skin_backdrop.dart';
+import '../../../core/theme/skin_context.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../identity/presentation/widgets/language_button.dart';
@@ -110,8 +109,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: ColoredBox(color: AppColors.ink)),
-          const Positioned.fill(child: GrainOverlay()),
+          const Positioned.fill(child: SkinBackdrop()),
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
@@ -132,16 +130,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               children: [
                                 IconButton(
                                   onPressed: () => context.go(AppRoute.welcome),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.arrow_back,
-                                    color: AppColors.paper,
+                                    color: context.skin.paper,
                                   ),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   l10n.homeAppName,
                                   style: theme.textTheme.titleMedium?.copyWith(
-                                    color: AppColors.paperMuted,
+                                    color: context.skin.paperMuted,
                                     letterSpacing: 0.4,
                                   ),
                                 ),
@@ -153,14 +151,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             Text(
                               l10n.homeCodenameTitle,
                               style: theme.textTheme.headlineMedium?.copyWith(
-                                color: AppColors.paper,
+                                color: context.skin.paper,
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
                               l10n.homeCodenameSubtitle,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.paperFaint,
+                                color: context.skin.paperFaint,
                               ),
                             ),
                             const SizedBox(height: 18),
@@ -169,7 +167,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               maxLength: 24,
                               textInputAction: TextInputAction.next,
                               style: theme.textTheme.titleLarge?.copyWith(
-                                color: AppColors.paper,
+                                color: context.skin.paper,
                               ),
                               decoration: InputDecoration(
                                 hintText: l10n.homeCodenameHint,
@@ -203,11 +201,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                   child: Text(
                                     l10n.homeDividerOrJoin,
-                                    style: AppTypography.mono(
+                                    style: context.skin.monoStyle(
                                       size: 11,
                                       weight: FontWeight.w600,
                                       letterSpacing: 2,
-                                      color: AppColors.paperFaint,
+                                      color: context.skin.paperFaint,
                                     ),
                                   ),
                                 ),
@@ -227,7 +225,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   l10n.homeHintNeedCodename,
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.paperFaint,
+                                    color: context.skin.paperFaint,
                                   ),
                                 ),
                               ),
@@ -254,7 +252,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 _error!,
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.signalRed,
+                                  color: context.skin.danger,
                                 ),
                               ),
                             ],

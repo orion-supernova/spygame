@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/skin_context.dart';
 import '../domain/role.dart';
 
 const _kLocationGridDelegate = SliverGridDelegateWithFixedCrossAxisCount(
@@ -59,18 +58,22 @@ class _LocationCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = context.skin;
+    final reduceMotion = MediaQuery.of(context).disableAnimations ||
+        MediaQuery.of(context).accessibleNavigation;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: played ? 1 : 0, end: played ? 1 : 0),
-      duration: const Duration(milliseconds: 350),
+      duration:
+          reduceMotion ? Duration.zero : const Duration(milliseconds: 350),
       curve: Curves.easeOutCubic,
       builder: (context, t, child) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: AppColors.inkRaised,
-            borderRadius: BorderRadius.circular(12),
+            color: skin.inkRaised,
+            borderRadius: BorderRadius.circular(skin.cardRadius.clamp(2, 14)),
             border: Border.all(
-              color: AppColors.inkOutline,
+              color: skin.inkOutline,
             ),
           ),
           alignment: Alignment.centerLeft,
@@ -80,13 +83,13 @@ class _LocationCell extends StatelessWidget {
               Text(
                 name,
                 overflow: TextOverflow.ellipsis,
-                style: AppTypography.mono(
+                style: skin.monoStyle(
                   size: 13,
                   weight: FontWeight.w500,
                   letterSpacing: 0.4,
                   color: played
-                      ? AppColors.paperFaint
-                      : AppColors.paper,
+                      ? skin.paperFaint
+                      : skin.paper,
                 ),
               ),
               // Strikethrough that draws in.
@@ -98,7 +101,7 @@ class _LocationCell extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Container(
                     height: 1.6,
-                    color: AppColors.signalRed.withValues(alpha: 0.85),
+                    color: skin.danger.withValues(alpha: 0.85),
                   ),
                 ),
               ),

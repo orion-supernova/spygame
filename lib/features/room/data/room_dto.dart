@@ -23,6 +23,9 @@ class RoomMapper {
       freePackActive: json['freePackActive'] == true,
       enabledLocationCount: _asInt(json['enabledLocationCount'], 0),
       totalLocationCount: _asInt(json['totalLocationCount'], 0),
+      activeThemeSlug: (json['activeThemeSlug'] == null)
+          ? null
+          : json['activeThemeSlug'].toString(),
       players: _playersFromJson(json['players']),
       currentGame: _gameFromJson(json['currentGame']),
       currentRound: _roundFromJson(json['currentRound']),

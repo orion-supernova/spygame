@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/room.dart';
 import 'avatar_glyph.dart';
@@ -24,12 +23,12 @@ class PlayerTile extends StatelessWidget {
       curve: Curves.easeOutCubic,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.inkRaised,
+        color: context.skin.inkRaised,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: player.isReady
-              ? AppColors.lime.withValues(alpha: 0.6)
-              : AppColors.inkOutline,
+              ? context.skin.accent.withValues(alpha: 0.6)
+              : context.skin.inkOutline,
           width: 1.2,
         ),
       ),
@@ -50,7 +49,7 @@ class PlayerTile extends StatelessWidget {
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium
-                            ?.copyWith(color: AppColors.paper),
+                            ?.copyWith(color: context.skin.paper),
                       ),
                     ),
                     if (player.isOwner) ...[
@@ -61,16 +60,16 @@ class PlayerTile extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.lime.withValues(alpha: 0.15),
+                          color: context.skin.accent.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           l10n.playerHostBadge,
-                          style: AppTypography.mono(
+                          style: context.skin.monoStyle(
                             size: 9,
                             weight: FontWeight.w700,
                             letterSpacing: 1.4,
-                            color: AppColors.lime,
+                            color: context.skin.accent,
                           ),
                         ),
                       ),
@@ -79,11 +78,11 @@ class PlayerTile extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         l10n.playerSelfBadge,
-                        style: AppTypography.mono(
+                        style: context.skin.monoStyle(
                           size: 9,
                           weight: FontWeight.w700,
                           letterSpacing: 1.4,
-                          color: AppColors.paperFaint,
+                          color: context.skin.paperFaint,
                         ),
                       ),
                     ],
@@ -92,13 +91,13 @@ class PlayerTile extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   player.isReady ? l10n.playerReady : l10n.playerStandby,
-                  style: AppTypography.mono(
+                  style: context.skin.monoStyle(
                     size: 11,
                     weight: FontWeight.w500,
                     letterSpacing: 0.8,
                     color: player.isReady
-                        ? AppColors.lime
-                        : AppColors.paperFaint,
+                        ? context.skin.accent
+                        : context.skin.paperFaint,
                   ),
                 ),
               ],
@@ -123,14 +122,14 @@ class _ReadyDot extends StatelessWidget {
       height: 24,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: ready ? AppColors.lime : Colors.transparent,
+        color: ready ? context.skin.accent : Colors.transparent,
         border: Border.all(
-          color: ready ? AppColors.lime : AppColors.inkOutline,
+          color: ready ? context.skin.accent : context.skin.inkOutline,
           width: 1.6,
         ),
       ),
       child: ready
-          ? const Icon(Icons.check, size: 16, color: AppColors.ink)
+          ? Icon(Icons.check, size: 16, color: context.skin.ink)
           : null,
     );
   }

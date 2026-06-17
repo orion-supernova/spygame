@@ -14,6 +14,9 @@ abstract interface class RoomRepository {
     required String code,
     required List<String> slugs,
   });
+  /// Host-only. Selects the theme pack that skins the room (null clears it
+  /// back to the default noir look).
+  Future<void> setRoomTheme({required String code, required String? slug});
   Future<void> heartbeat({required String code});
   Future<void> startGame({
     required String code,

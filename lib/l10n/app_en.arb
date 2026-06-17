@@ -352,6 +352,21 @@
   "lobbyCtaGoHome": "GO HOME",
   "@lobbyCtaGoHome": { "description": "Outlined button on the lobby error view that returns to the home screen. All-caps." },
 
+  "lobbyThemeButton": "ROOM THEME",
+  "@lobbyThemeButton": { "description": "Host-only lobby button that opens the room theme picker. Mono caps." },
+
+  "lobbyThemeSheetTitle": "Room theme",
+  "@lobbyThemeSheetTitle": { "description": "Title of the theme picker bottom sheet." },
+
+  "lobbyThemeSheetSubtitle": "Skins the whole room for everyone while it's on.",
+  "@lobbyThemeSheetSubtitle": { "description": "Subtitle explaining the room theme applies to all players." },
+
+  "lobbyThemeDefault": "Classic",
+  "@lobbyThemeDefault": { "description": "Name of the default (no theme pack) look in the theme picker." },
+
+  "lobbyThemeNoneOwned": "Unlock a theme pack in the Store to skin your room.",
+  "@lobbyThemeNoneOwned": { "description": "Hint shown in the theme picker when the host owns no theme packs." },
+
   "readyYes": "I'M READY",
   "@readyYes": { "description": "Big toggle button label when the player has marked themself ready. All-caps." },
 
@@ -609,12 +624,19 @@
   "htpBody4": "A few minutes per round. Specific enough to test the spy, vague enough not to hand them the location.",
   "@htpBody4": { "description": "Tutorial card 4 body. The art of asking good questions." },
 
-  "htpStep5": "STEP 05 · CALLING IT",
-  "@htpStep5": { "description": "Tutorial card 5 step label." },
-  "htpHeading5": "Argue\nit out.",
-  "@htpHeading5": { "description": "Tutorial card 5 heading. Casual, two lines." },
-  "htpBody5": "Time's up — debate together. No in-app vote, just talk. Spy wins by staying hidden. Everyone else wins by exposing them.",
-  "@htpBody5": { "description": "Tutorial card 5 body. Resolution. Note: the app deliberately has no voting flow — the players debate themselves." },
+  "htpStep5": "STEP 05 · THE GAMBIT",
+  "@htpStep5": { "description": "Tutorial card 5 step label. The spy's self-reveal gamble." },
+  "htpHeading5": "Sure?\nCall it.",
+  "@htpHeading5": { "description": "Tutorial card 5 heading. Addressed to the spy, two lines." },
+  "htpBody5": "Any time before the timer ends, the spy can come clean — \"I'm the spy!\" — and take one shot at the location. Right: the spy wins. Wrong: everyone else does.",
+  "@htpBody5": { "description": "Tutorial card 5 body. The spy's gambit: self-reveal before time runs out for a single location guess that decides the game." },
+
+  "htpStep6": "STEP 06 · THE VOTE",
+  "@htpStep6": { "description": "Tutorial card 6 step label." },
+  "htpHeading6": "Vote\nthem out.",
+  "@htpHeading6": { "description": "Tutorial card 6 heading. Two lines." },
+  "htpBody6": "Sure about someone? Vote them out — any time, or when the timer runs out. Catch the spy and the crew wins. Pick wrong and the real spy gets two guesses at the location to steal the game.",
+  "@htpBody6": { "description": "Tutorial card 6 body. The vote can be called at any moment, not just when the timer ends; eliminating a non-spy hands the real spy two location guesses." },
 
   "htpSkip": "SKIP",
   "@htpSkip": { "description": "Top-right button on tutorial cards 1–4. All-caps." },
@@ -626,7 +648,7 @@
   "@htpSwipe": { "description": "Bottom-left hint on tutorial cards 1–4 with an animated chevron. All-caps." },
 
   "htpDone": "GOT IT",
-  "@htpDone": { "description": "Final tutorial CTA on card 5. All-caps. Dismisses the tutorial." },
+  "@htpDone": { "description": "Final tutorial CTA on the last card. All-caps. Dismisses the tutorial." },
 
   "htpVisualLocationUnknown": "Location: unknown.",
   "@htpVisualLocationUnknown": { "description": "Text shown inside the mock spy role card on tutorial card 3." },
@@ -640,11 +662,38 @@
   "htpVisualPerRound": "PER ROUND",
   "@htpVisualPerRound": { "description": "Caption inside the timer ring on tutorial card 4. Mono caps." },
 
-  "htpVisualNoVote": "NO VOTE",
-  "@htpVisualNoVote": { "description": "Big mono caps text on tutorial card 5 visual. Emphasizes there's no voting flow." },
+  "htpVisualSpyCall": "I'm the spy — I'm guessing!",
+  "@htpVisualSpyCall": { "description": "Speech-bubble text on tutorial card 5 visual: the spy announcing their self-reveal gambit." },
 
-  "htpVisualJustTalk": "JUST TALK",
-  "@htpVisualJustTalk": { "description": "Big mono caps text on tutorial card 5 visual. The resolution is conversation." },
+  "htpVisualOneGuess": "ONE GUESS",
+  "@htpVisualOneGuess": { "description": "Mono caps chip under the spy-call bubble on tutorial card 5. The gambit allows exactly one location guess." },
+
+  "htpVisualWhoIsSpy": "WHO'S THE SPY?",
+  "@htpVisualWhoIsSpy": { "description": "Mono caps caption above the vote crowd on tutorial card 6 visual." },
+
+  "htpVisualWrongPick": "WRONG PICK = 2 SPY GUESSES",
+  "@htpVisualWrongPick": { "description": "Faint mono caps caption below the vote crowd on tutorial card 6. A wrong accusation gives the real spy two location guesses." },
+
+  "htpAskNamePlayer": "PLAYER 3",
+  "@htpAskNamePlayer": { "description": "Mono caps name label above the asker's question bubble in the card-4 chat demo. A generic other player." },
+
+  "htpAskNameYou": "YOU",
+  "@htpAskNameYou": { "description": "Mono caps name label above the confident in-character answer bubble in the card-4 chat demo." },
+
+  "htpAskNameSpy": "SPY?",
+  "@htpAskNameSpy": { "description": "Mono caps name label above the suspicious answer bubble in the card-4 chat demo. The question mark hints this answer gives the spy away." },
+
+  "htpAskQ1": "How often do you come here?",
+  "@htpAskQ1": { "description": "First example question in the card-4 chat demo. A natural Spyfall-style question that tests local knowledge." },
+
+  "htpAskA1": "Only when I'm on shift.",
+  "@htpAskA1": { "description": "Confident in-character answer to htpAskQ1. Shows a civilian answering well — fits the Bartender / Tiki Bar example role." },
+
+  "htpAskQ2": "Do you work here?",
+  "@htpAskQ2": { "description": "Second example question in the card-4 chat demo." },
+
+  "htpAskA2": "Uh… sometimes?",
+  "@htpAskA2": { "description": "Vague, hesitant answer to htpAskQ2. Demonstrates how a spy gives themselves away." },
 
   "htpClose": "Close",
   "@htpClose": { "description": "Tooltip for the close icon on the last tutorial card." },

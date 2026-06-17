@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../room/domain/room.dart';
 import '../../../room/presentation/widgets/player_tile.dart';
@@ -31,6 +30,7 @@ class IntermissionPanel extends StatelessWidget {
     final me = room.playerFor(myToken);
     final readyCount = room.players.where((p) => p.isReady).length;
     final theme = Theme.of(context);
+    final skin = context.skin;
     final l10n = AppLocalizations.of(context);
     final shownTotal = totalRounds > 0 ? totalRounds : lastRoundIndex + 1;
 
@@ -38,62 +38,62 @@ class IntermissionPanel extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.inkRaised,
+        color: skin.inkRaised,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.inkOutline),
+        border: Border.all(color: skin.inkOutline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             l10n.intermissionRoundDone(lastRoundIndex),
-            style: AppTypography.mono(
+            style: skin.monoStyle(
               size: 11,
               weight: FontWeight.w600,
               letterSpacing: 2.4,
-              color: AppColors.lime,
+              color: skin.accent,
             ),
           ),
           const SizedBox(height: 10),
           Text(
             l10n.intermissionHeadline,
             style: theme.textTheme.headlineSmall
-                ?.copyWith(color: AppColors.paper, fontWeight: FontWeight.w700),
+                ?.copyWith(color: skin.paper, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
           Text(
             l10n.intermissionPrompt(lastRoundIndex + 1, shownTotal),
             style: theme.textTheme.bodyMedium
-                ?.copyWith(color: AppColors.paperMuted),
+                ?.copyWith(color: skin.paperMuted),
           ),
           const SizedBox(height: 18),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.ink,
+              color: skin.ink,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.inkOutline),
+              border: Border.all(color: skin.inkOutline),
             ),
             child: Row(
               children: [
                 Text(
                   l10n.intermissionReadyLabel,
-                  style: AppTypography.mono(
+                  style: skin.monoStyle(
                     size: 10,
                     weight: FontWeight.w600,
                     letterSpacing: 2,
-                    color: AppColors.paperFaint,
+                    color: skin.paperFaint,
                   ),
                 ),
                 const Spacer(),
                 Text(
                   '$readyCount / ${room.players.length}',
-                  style: AppTypography.mono(
+                  style: skin.monoStyle(
                     size: 18,
                     weight: FontWeight.w700,
                     color: readyCount == room.players.length
-                        ? AppColors.lime
-                        : AppColors.paper,
+                        ? skin.accent
+                        : skin.paper,
                   ),
                 ),
               ],

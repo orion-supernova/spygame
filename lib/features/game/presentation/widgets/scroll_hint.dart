@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 
 /// A bouncing chevron + label nudging the user to scroll for the locations.
 /// Wraps a tap callback and respects an externally-driven [opacity] so it can
@@ -42,6 +41,7 @@ class _ScrollHintState extends State<ScrollHint>
 
   @override
   Widget build(BuildContext context) {
+    final skin = context.skin;
     return IgnorePointer(
       ignoring: widget.opacity < 0.05,
       child: Opacity(
@@ -56,10 +56,10 @@ class _ScrollHintState extends State<ScrollHint>
               children: [
                 Text(
                   widget.label.toUpperCase(),
-                  style: AppTypography.mono(
+                  style: skin.monoStyle(
                     size: 11,
                     letterSpacing: 2.4,
-                    color: AppColors.paperFaint,
+                    color: skin.paperFaint,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -69,9 +69,9 @@ class _ScrollHintState extends State<ScrollHint>
                     final dy = _bobCurve.value * 4;
                     return Transform.translate(
                       offset: Offset(0, dy),
-                      child: const Icon(
+                      child: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.paperFaint,
+                        color: skin.paperFaint,
                         size: 26,
                       ),
                     );

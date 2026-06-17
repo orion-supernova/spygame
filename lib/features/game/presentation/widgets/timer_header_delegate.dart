@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../countdown_ring.dart';
+import '../../../../core/theme/skin_context.dart';
+import 'countdown_display.dart';
 
-/// Pinned header that morphs from a full [CountdownRing] (hero) to a compact
-/// [CountdownChip] (chip) as the user scrolls.
+/// Pinned header that morphs from a full hero timer to a compact chip as the
+/// user scrolls. The actual timer form (ring / digital / flip-clock /
+/// pocket-watch) is chosen per theme by [CountdownDisplay]/[CountdownCompact].
 class TimerHeaderDelegate extends SliverPersistentHeaderDelegate {
   TimerHeaderDelegate({
     required this.progress,
@@ -38,8 +40,8 @@ class TimerHeaderDelegate extends SliverPersistentHeaderDelegate {
 
     return ClipRect(
       child: Container(
-        // Solid background so the chip reads cleanly over scrolling content.
-        color: const Color(0xFF0B0D12),
+        // Solid, skin-aware background so the chip reads over scrolling content.
+        color: context.skin.ink,
         child: Stack(
           alignment: Alignment.topCenter,
           children: [
@@ -50,7 +52,7 @@ class TimerHeaderDelegate extends SliverPersistentHeaderDelegate {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Center(
-                      child: CountdownRing(
+                      child: CountdownDisplay(
                         progress: progress,
                         seconds: seconds,
                         totalSeconds: totalSeconds,
@@ -69,7 +71,7 @@ class TimerHeaderDelegate extends SliverPersistentHeaderDelegate {
                 child: Opacity(
                   opacity: chipOpacity,
                   child: Center(
-                    child: CountdownChip(
+                    child: CountdownCompact(
                       progress: progress,
                       seconds: seconds,
                       label: label,

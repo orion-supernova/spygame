@@ -3,8 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 
@@ -56,18 +55,33 @@ class _SpyRevealDialogState extends State<SpyRevealDialog>
     if (_revealed) return;
     setState(() => _revealed = true);
     Haptics.heavy();
-    _reveal.forward();
+    final reduce = MediaQuery.of(context).disableAnimations ||
+        MediaQuery.of(context).accessibleNavigation;
+    if (reduce) {
+      _reveal.value = 1; // Skip the dust dispersal; show the name at once.
+    } else {
+      _reveal.forward();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduce = MediaQuery.of(context).disableAnimations ||
+        MediaQuery.of(context).accessibleNavigation;
+    if (reduce && _ticker.isActive) _ticker.stop();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final skin = context.skin;
     final spyName = Text(
       widget.spyName,
       textAlign: TextAlign.center,
       style: theme.textTheme.displaySmall?.copyWith(
-        color: AppColors.paper,
+        color: skin.paper,
         fontWeight: FontWeight.w700,
         letterSpacing: -1,
       ),
@@ -86,12 +100,12 @@ class _SpyRevealDialogState extends State<SpyRevealDialog>
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Color.lerp(
-              AppColors.inkRaised,
-              AppColors.signalRed,
+              skin.inkRaised,
+              skin.danger,
               0.18,
             ),
-            border: Border.all(color: AppColors.signalRed, width: 1.5),
-            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: skin.danger, width: skin.cardBorderWidth),
+            borderRadius: BorderRadius.circular(skin.cardRadius),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,18 +115,18 @@ class _SpyRevealDialogState extends State<SpyRevealDialog>
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.signalRed,
+                      color: skin.danger,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     l10n.spyRevealRoundEyebrow(widget.roundIndex),
-                    style: AppTypography.mono(
+                    style: skin.monoStyle(
                       size: 11,
                       letterSpacing: 2.2,
-                      color: AppColors.signalRed,
+                      color: skin.danger,
                     ),
                   ),
                 ],
@@ -122,19 +136,28 @@ class _SpyRevealDialogState extends State<SpyRevealDialog>
                 child: Text(
                   l10n.spyRevealNameEyebrow,
                   textAlign: TextAlign.center,
-                  style: AppTypography.mono(
+                  style: skin.monoStyle(
                     size: 28,
                     weight: FontWeight.w800,
                     letterSpacing: 6,
-                    color: AppColors.signalRed,
+                    color: skin.danger,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               Center(
                 child: _SpoilerCover(
-                  drift: _driftSec,
+                  drift: (MediaQuery.of(context).disableAnimations ||
+                          MediaQuery.of(context).accessibleNavigation)
+                      ? 0
+                      : _driftSec,
                   reveal: _reveal,
+                  washColor: Color.lerp(
+                    skin.inkRaised,
+                    skin.danger,
+                    0.18,
+                  )!,
+                  particleColor: skin.paper,
                   child: spyName,
                 ),
               ),
@@ -149,7 +172,7 @@ class _SpyRevealDialogState extends State<SpyRevealDialog>
                             key: const ValueKey('continue'),
                             onPressed: () => Navigator.of(context).pop(),
                             style: TextButton.styleFrom(
-                              foregroundColor: AppColors.lime,
+                              foregroundColor: skin.accent,
                               textStyle: const TextStyle(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -159,10 +182,10 @@ class _SpyRevealDialogState extends State<SpyRevealDialog>
                         : Text(
                             l10n.spyRevealTapHint,
                             key: const ValueKey('tap-hint'),
-                            style: AppTypography.mono(
+                            style: skin.monoStyle(
                               size: 12,
                               letterSpacing: 2.4,
-                              color: AppColors.signalRed,
+                              color: skin.danger,
                             ),
                           ),
                   ),
@@ -182,11 +205,15 @@ class _SpoilerCover extends StatelessWidget {
   const _SpoilerCover({
     required this.drift,
     required this.reveal,
+    required this.washColor,
+    required this.particleColor,
     required this.child,
   });
 
   final double drift;
   final Animation<double> reveal;
+  final Color washColor;
+  final Color particleColor;
   final Widget child;
 
   @override
@@ -202,6 +229,8 @@ class _SpoilerCover extends StatelessWidget {
                 painter: _SpoilerPainter(
                   drift: drift,
                   reveal: reveal.value,
+                  washColor: washColor,
+                  particleColor: particleColor,
                 ),
               ),
             ),
@@ -237,10 +266,17 @@ class _Particle {
 }
 
 class _SpoilerPainter extends CustomPainter {
-  _SpoilerPainter({required this.drift, required this.reveal});
+  _SpoilerPainter({
+    required this.drift,
+    required this.reveal,
+    required this.washColor,
+    required this.particleColor,
+  });
 
   final double drift;
   final double reveal;
+  final Color washColor;
+  final Color particleColor;
 
   static List<_Particle>? _cached;
   static Size? _cachedSize;
@@ -276,11 +312,6 @@ class _SpoilerPainter extends CustomPainter {
 
     // Cover wash matches the card's solid background so the text
     // disappears into the card itself rather than into a visible bar.
-    final washColor = Color.lerp(
-      AppColors.inkRaised,
-      AppColors.signalRed,
-      0.18,
-    )!;
     final washAlpha = (1 - reveal).clamp(0.0, 1.0);
     if (washAlpha > 0) {
       canvas.drawRect(
@@ -314,7 +345,7 @@ class _SpoilerPainter extends CustomPainter {
         }
       }
 
-      paint.color = AppColors.paper
+      paint.color = particleColor
           .withValues(alpha: p.baseAlpha * particleAlpha);
       canvas.drawCircle(Offset(px, py), p.radius, paint);
     }
@@ -322,5 +353,8 @@ class _SpoilerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _SpoilerPainter old) =>
-      old.drift != drift || old.reveal != reveal;
+      old.drift != drift ||
+      old.reveal != reveal ||
+      old.washColor != washColor ||
+      old.particleColor != particleColor;
 }

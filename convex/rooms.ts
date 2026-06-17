@@ -328,6 +328,46 @@ export const setHostOwnedBundleSlugs = mutation({
 });
 
 /**
+ * Host-only. Selects the theme pack that skins the whole room's UI, or
+ * clears it (empty/absent slug → default noir look). Validates the slug is
+ * a known `category: 'theme'` bundle the host owns. Purely cosmetic; synced
+ * to every player through `watchRoom.activeThemeSlug`. Allowed in lobby and
+ * mid-game so the host can change the vibe at any time.
+ */
+export const setRoomTheme = mutation({
+  args: {
+    code: v.string(),
+    clientToken: v.string(),
+    slug: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const code = normalizeCode(args.code);
+    const room = await findRoomByCode(ctx, code);
+    if (!room) throw new ConvexError('Room not found.');
+    if (room.ownerToken !== args.clientToken) {
+      throw new ConvexError('Only the host can change the theme.');
+    }
+    const slug = args.slug;
+    if (!slug) {
+      await ctx.db.patch(room._id, { activeThemeSlug: undefined });
+      return;
+    }
+    const bundle = await ctx.db
+      .query('bundles')
+      .withIndex('by_slug', (q) => q.eq('slug', slug))
+      .first();
+    if (!bundle || bundle.category !== 'theme') {
+      throw new ConvexError('Unknown theme pack.');
+    }
+    const owned = new Set(room.hostOwnedBundleSlugs ?? []);
+    if (!owned.has(slug)) {
+      throw new ConvexError('Host does not own this theme pack.');
+    }
+    await ctx.db.patch(room._id, { activeThemeSlug: slug });
+  },
+});
+
+/**
  * Idempotent. Stores per-player push tokens used by the round-end fan-out
  * action (`internal.notifications.dispatchRoundEndedPush`).
  *
@@ -543,6 +583,7 @@ export const watchRoom = query({
       freePackActive,
       enabledLocationCount,
       totalLocationCount,
+      activeThemeSlug: room.activeThemeSlug ?? null,
       players: players
         .map((p) => ({
           _id: p._id,

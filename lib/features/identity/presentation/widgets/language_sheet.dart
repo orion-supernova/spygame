@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/locale_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/skin_context.dart';
 import '../../../../core/utils/haptics.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 
 Future<void> showLanguageSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
-    backgroundColor: AppColors.inkRaised,
+    backgroundColor: context.skin.inkRaised,
     isScrollControlled: false,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -45,7 +44,7 @@ class _LanguageSheet extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.inkOutline,
+                  color: context.skin.inkOutline,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -53,15 +52,15 @@ class _LanguageSheet extends ConsumerWidget {
             const SizedBox(height: 18),
             Row(
               children: [
-                Container(width: 28, height: 2, color: AppColors.lime),
+                Container(width: 28, height: 2, color: context.skin.accent),
                 const SizedBox(width: 10),
                 Text(
                   l10n.langSelectorLabel,
-                  style: AppTypography.mono(
+                  style: context.skin.monoStyle(
                     size: 11,
                     weight: FontWeight.w600,
                     letterSpacing: 2.2,
-                    color: AppColors.lime,
+                    color: context.skin.accent,
                   ),
                 ),
               ],
@@ -79,7 +78,7 @@ class _LanguageSheet extends ConsumerWidget {
                 },
               ),
               if (entry != entries.last)
-                const Divider(height: 1, color: AppColors.inkOutline),
+                Divider(height: 1, color: context.skin.inkOutline),
             ],
           ],
         ),
@@ -119,7 +118,7 @@ class _LanguageRow extends StatelessWidget {
               child: Text(
                 entry.name,
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: selected ? AppColors.paper : AppColors.paperMuted,
+                  color: selected ? context.skin.paper : context.skin.paperMuted,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
@@ -131,14 +130,14 @@ class _LanguageRow extends StatelessWidget {
               height: 22,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: selected ? AppColors.lime : Colors.transparent,
+                color: selected ? context.skin.accent : Colors.transparent,
                 border: Border.all(
-                  color: selected ? AppColors.lime : AppColors.inkOutline,
+                  color: selected ? context.skin.accent : context.skin.inkOutline,
                   width: 1.6,
                 ),
               ),
               child: selected
-                  ? const Icon(Icons.check, size: 14, color: AppColors.ink)
+                  ? Icon(Icons.check, size: 14, color: context.skin.ink)
                   : null,
             ),
           ],

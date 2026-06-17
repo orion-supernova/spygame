@@ -40,6 +40,11 @@ export default defineSchema({
     // their device. The authoritative startGame snapshot still comes
     // from the host's `startGame` args, not this field.
     hostOwnedBundleSlugs: v.optional(v.array(v.string())),
+    // Slug of the theme pack the host has selected to skin the room's UI
+    // (a `category: 'theme'` bundle), or undefined for the default look.
+    // Purely cosmetic and synced to every player so the whole table shares
+    // the visual theme. Independent of which locations are enabled.
+    activeThemeSlug: v.optional(v.string()),
     createdAt: v.number(),
   })
     .index('by_code', ['code']),
