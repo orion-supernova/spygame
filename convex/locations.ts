@@ -847,7 +847,7 @@ const STOCKHOLM: SeedLocation[] = [
 const NEW_YORK: SeedLocation[] = [
   {
     name: 'Times Square',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Costumed Character', 'Street Performer', 'Billboard Operator', 'Tourist', 'Hot Dog Vendor', 'Police Officer', 'Souvenir Seller', 'Bike Tour Guide', 'News Reporter', 'Pickpocket', 'Confused Out-of-Towner'],
     translations: {
       tr: {
@@ -858,7 +858,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Brooklyn Bridge',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Maintenance Worker', 'Cyclist', 'Jogger', 'Tourist', 'Street Artist', 'Photographer', 'Pretzel Vendor', 'Park Ranger', 'Engineer', 'Marriage Proposer', 'Lost Tour Group'],
     translations: {
       tr: {
@@ -869,7 +869,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Museum of Modern Art',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Curator', 'Tour Guide', 'Security Guard', 'Art Student', 'Gift Shop Clerk', 'Restorer', 'Docent', 'Wealthy Collector', 'Photographer', 'Coat Check Attendant', 'Confused Modern Art Critic'],
     translations: {
       tr: {
@@ -880,7 +880,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Wall Street Trading Floor',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Stock Trader', 'Broker', 'Financial Analyst', 'Compliance Officer', 'Intern', 'IT Technician', 'Floor Manager', 'Investor', 'Risk Manager', 'Janitor', 'Panicking Day Trader'],
     translations: {
       tr: {
@@ -891,7 +891,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Yellow Cab',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Taxi Driver', 'Passenger', 'Dispatcher', 'Mechanic', 'Tourist', 'Late Commuter', 'Backseat Navigator', 'Meter Inspector', 'Lost Wallet Owner', 'Chatty Rider', 'Carsick Visitor'],
     translations: {
       tr: {
@@ -902,7 +902,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Central Park',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Park Ranger', 'Dog Walker', 'Hot Dog Vendor', 'Jogger', 'Street Musician', 'Carriage Driver', 'Picnicker', 'Birdwatcher', 'Rollerblader', 'Tourist', 'Squirrel Whisperer'],
     translations: {
       tr: {
@@ -913,7 +913,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Broadway Theater',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Lead Actor', 'Director', 'Usher', 'Stagehand', 'Ticket Seller', 'Costume Designer', 'Orchestra Conductor', 'Theater Critic', 'Spotlight Operator', 'Playwright', 'Actor Who Forgot His Lines'],
     translations: {
       tr: {
@@ -924,7 +924,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Coney Island',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Ride Operator', 'Lifeguard', 'Hot Dog Eating Champion', 'Carnival Barker', 'Fortune Teller', 'Boardwalk Vendor', 'Roller Coaster Mechanic', 'Beachgoer', 'Arcade Attendant', 'Tourist', 'Queasy Funnel Cake Eater'],
     translations: {
       tr: {
@@ -935,7 +935,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Subway Car',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Train Conductor', 'Commuter', 'Busker', 'Transit Officer', 'Pole Dancer Performer', 'Sleeping Passenger', 'Tourist', 'Newspaper Reader', 'Maintenance Worker', 'Panhandler', 'Person Who Missed Their Stop'],
     translations: {
       tr: {
@@ -946,7 +946,7 @@ const NEW_YORK: SeedLocation[] = [
   },
   {
     name: 'Statue of Liberty Ferry',
-    bundleSlug: 'new-york',
+    bundleSlug: 'newyork',
     roles: ['Ferry Captain', 'Deckhand', 'Tour Guide', 'Souvenir Vendor', 'Photographer', 'Park Ranger', 'Ticket Inspector', 'Tourist', 'Seagull Feeder', 'History Buff', 'Seasick Passenger'],
     translations: {
       tr: {
@@ -1751,7 +1751,7 @@ const BANGKOK: SeedLocation[] = [
 const VICTORIAN: SeedLocation[] = [
   {
     name: "Gentlemen's Club",
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Club Steward', 'Aristocrat Member', 'Brandy Connoisseur', 'Cigar Attendant', 'Retired Colonel', 'Card Player', 'Newspaper Reader', 'Club Secretary', 'Visiting Diplomat', 'Hat-Check Boy', 'Snoring Old Earl'],
     translations: {
       tr: {
@@ -1762,7 +1762,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Opium Den',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Den Keeper', 'Lascar Attendant', 'Addicted Poet', 'Wealthy Patron', 'Pipe Tender', 'Undercover Inspector', 'Fallen Gentleman', 'Money Lender', 'Lookout Boy', 'Distressed Wife', 'Hallucinating Sailor'],
     translations: {
       tr: {
@@ -1773,7 +1773,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Royal Opera House',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Prima Donna', 'Conductor', 'Box Usher', 'Opera Critic', 'Stage Carpenter', 'Costume Mistress', 'Wealthy Patroness', 'Orchestra Violinist', 'Stage Door Keeper', 'Aspiring Tenor', 'Sobbing Theatre Ghost'],
     translations: {
       tr: {
@@ -1784,7 +1784,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Steam Locomotive',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Engine Driver', 'Fireman Stoker', 'Ticket Conductor', 'First-Class Passenger', 'Telegraph Boy', 'Station Master', 'Luggage Porter', 'Dining Car Waiter', 'Railway Engineer', 'Stowaway Urchin', 'Seasick Duchess'],
     translations: {
       tr: {
@@ -1795,7 +1795,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Foggy Docks',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Dockworker', 'Ship Captain', 'Customs Officer', 'Fishmonger', 'Smuggler', 'Lamplighter', 'Net Mender', 'Harbour Master', 'Press-Gang Recruiter', 'Lost Tourist', 'One-Legged Old Sailor'],
     translations: {
       tr: {
@@ -1806,7 +1806,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Scotland Yard',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Inspector', 'Constable', 'Detective', 'Pickpocket', 'Forensic Photographer', 'Magistrate', 'Street Informant', 'Coroner', 'Desk Sergeant', 'Falsely Accused Gentleman', 'Nervous Witness'],
     translations: {
       tr: {
@@ -1817,7 +1817,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Apothecary',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Apothecary', 'Herbalist', 'Sickly Customer', 'Leech Collector', 'Pharmacy Apprentice', 'Travelling Quack', 'Worried Mother', 'Tincture Mixer', 'Tooth Puller', 'Curious Chemist', 'Hypochondriac Lord'],
     translations: {
       tr: {
@@ -1828,7 +1828,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Grand Ballroom',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Debutante', 'Master of Ceremonies', 'Waltz Partner', 'Chaperone', 'String Quartet Player', 'Champagne Footman', 'Matchmaking Dowager', 'Eligible Bachelor', 'Gossiping Countess', 'Dance Card Keeper', 'Clumsy Wallflower'],
     translations: {
       tr: {
@@ -1839,7 +1839,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Workhouse',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Workhouse Master', 'Matron', 'Orphan Child', 'Oakum Picker', 'Parish Beadle', 'Pauper Widow', 'Gruel Cook', 'Infirmary Nurse', 'Debt-Ridden Labourer', 'Charity Inspector', 'Porridge-Stealing Scamp'],
     translations: {
       tr: {
@@ -1850,7 +1850,7 @@ const VICTORIAN: SeedLocation[] = [
   },
   {
     name: 'Séance Parlour',
-    bundleSlug: 'victorian-1800s',
+    bundleSlug: 'victorian1800s',
     roles: ['Spirit Medium', 'Grieving Widow', 'Skeptical Investigator', 'Table-Rapping Assistant', 'Gullible Heiress', 'Crystal Gazer', 'Hidden Trickster', 'Devoted Believer', 'Ectoplasm Faker', 'Curious Journalist', 'Terrified Maid'],
     translations: {
       tr: {
@@ -1864,7 +1864,7 @@ const VICTORIAN: SeedLocation[] = [
 const WILD_WEST: SeedLocation[] = [
   {
     name: 'Saloon',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Bartender', 'Saloon Singer', 'Card Sharp', 'Gunslinger', 'Sheriff', 'Piano Player', 'Drunk Cowboy', 'Bounty Hunter', 'Bar Maid', 'Traveling Salesman', 'Town Drunk'],
     translations: {
       tr: {
@@ -1875,7 +1875,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: 'Gold Mine',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Prospector', 'Mine Foreman', 'Dynamite Handler', 'Claim Jumper', 'Pickaxe Miner', 'Assayer', 'Mule Driver', 'Mine Owner', 'Canary Keeper', 'Greedy Investor', 'Lucky Old Coot'],
     translations: {
       tr: {
@@ -1886,7 +1886,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: 'Stagecoach',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Stagecoach Driver', 'Shotgun Guard', 'Wealthy Passenger', 'Mail Courier', 'Masked Bandit', 'Nervous Schoolteacher', 'Cattle Baron', 'Runaway Bride', 'Whip Cracker', 'Snake Oil Peddler', 'Travel-Sick Greenhorn'],
     translations: {
       tr: {
@@ -1897,7 +1897,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: "Sheriff's Office",
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Town Sheriff', 'Loyal Deputy', 'Jailed Outlaw', 'Wanted Poster Artist', 'Visiting Marshal', 'Frightened Townsfolk', 'Gun Cleaner', 'Bail Bondsman', 'Telegraph Operator', 'Snitching Prisoner', 'Sleepy Old Jailer'],
     translations: {
       tr: {
@@ -1908,7 +1908,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: 'Cattle Ranch',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Ranch Owner', 'Cowhand', 'Branding Iron Man', 'Cattle Rustler', 'Ranch Cook', 'Horse Wrangler', 'Fence Mender', 'Trail Boss', 'Lasso Roper', 'Hired Gun', 'Spooked Greenhorn'],
     translations: {
       tr: {
@@ -1919,7 +1919,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: 'Train Robbery',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Outlaw Leader', 'Dynamite Bandit', 'Train Engineer', 'Armed Express Guard', 'Panicked Passenger', 'Pinkerton Detective', 'Safe Cracker', 'Horse Holder', 'Lookout Rider', 'Hidden Federal Agent', 'Fainting Heiress'],
     translations: {
       tr: {
@@ -1930,7 +1930,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: 'Frontier Bank',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Bank Manager', 'Teller Clerk', 'Armed Guard', 'Masked Robber', 'Wealthy Depositor', 'Vault Keeper', 'Loan Officer', 'Nervous Customer', 'Gold Weigher', 'Undercover Lawman', 'Forgetful Old Rancher'],
     translations: {
       tr: {
@@ -1941,7 +1941,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: 'Trading Post',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['General Storekeeper', 'Fur Trapper', 'Native Trader', 'Wagon Pioneer', 'Supply Clerk', 'Gunsmith', 'Penny-Pinching Widow', 'Pack Mule Owner', 'Whiskey Trader', 'Wandering Drifter', 'Pickle-Barrel Loiterer'],
     translations: {
       tr: {
@@ -1952,7 +1952,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: 'Gambling Hall',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Faro Dealer', 'High-Stakes Gambler', 'Roulette Croupier', 'Cheating Cardsharp', 'House Pit Boss', 'Lucky Drifter', 'Cigar Girl', 'Loan Shark', 'Sore Loser', 'Whiskey Server', 'Superstitious Old Gambler'],
     translations: {
       tr: {
@@ -1963,7 +1963,7 @@ const WILD_WEST: SeedLocation[] = [
   },
   {
     name: 'Boomtown Jail',
-    bundleSlug: 'wild-west',
+    bundleSlug: 'wildwest',
     roles: ['Jailer', 'Convicted Cattle Thief', 'Hanging Judge', 'Visiting Preacher', 'Drunk Disorderly', 'Lynch Mob Leader', 'Prison Cook', 'Defense Lawyer', 'Escape Plotter', 'Worried Sweetheart', 'Harmonica-Playing Prisoner'],
     translations: {
       tr: {

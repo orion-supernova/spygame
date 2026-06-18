@@ -9,8 +9,8 @@ import 'app_skin.dart';
 /// Unknown/null slugs fall back to the default noir look.
 SkinId skinIdFromSlug(String? slug) => switch (slug) {
       'cyberpunk' => SkinId.cyberpunk,
-      'victorian-1800s' => SkinId.victorian,
-      'wild-west' => SkinId.wildWest,
+      'victorian1800s' => SkinId.victorian,
+      'wildwest' => SkinId.wildWest,
       _ => SkinId.noir,
     };
 

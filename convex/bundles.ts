@@ -102,7 +102,7 @@ const SEED: SeedBundle[] = [
     },
   },
   {
-    slug: 'new-york',
+    slug: 'newyork',
     category: 'city',
     sortOrder: 50,
     priceUsd: '$0.99',
@@ -264,7 +264,7 @@ const SEED: SeedBundle[] = [
     },
   },
   {
-    slug: 'victorian-1800s',
+    slug: 'victorian1800s',
     category: 'theme',
     sortOrder: 110,
     priceUsd: '$0.99',
@@ -282,7 +282,7 @@ const SEED: SeedBundle[] = [
     },
   },
   {
-    slug: 'wild-west',
+    slug: 'wildwest',
     category: 'theme',
     sortOrder: 120,
     priceUsd: '$0.99',
@@ -354,6 +354,50 @@ export const seed = mutation({
       }
     }
     return { inserted, patched };
+  },
+});
+
+/**
+ * One-shot migration. App Store / Play product IDs allow only
+ * alphanumerics, periods, and underscores, and our entitlement IDs must
+ * equal the slug — so the multi-word slugs were collapsed to a single
+ * alphanumeric token (no separator). Renames the existing bundle rows and
+ * repoints their locations' `bundleSlug`. Idempotent: a no-op once the old
+ * slugs are gone (handles both the original hyphen and interim underscore
+ * forms). Safe to delete after it has run in production.
+ */
+export const canonicalizeSlugs = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const RENAMES: Array<[string, string]> = [
+      ['new-york', 'newyork'],
+      ['new_york', 'newyork'],
+      ['victorian-1800s', 'victorian1800s'],
+      ['victorian_1800s', 'victorian1800s'],
+      ['wild-west', 'wildwest'],
+      ['wild_west', 'wildwest'],
+    ];
+    let bundles = 0;
+    let locations = 0;
+    for (const [from, to] of RENAMES) {
+      const bundle = await ctx.db
+        .query('bundles')
+        .withIndex('by_slug', (q) => q.eq('slug', from))
+        .first();
+      if (bundle) {
+        await ctx.db.patch(bundle._id, { slug: to });
+        bundles++;
+      }
+      const locs = await ctx.db
+        .query('locations')
+        .withIndex('by_bundle', (q) => q.eq('bundleSlug', from))
+        .collect();
+      for (const l of locs) {
+        await ctx.db.patch(l._id, { bundleSlug: to });
+        locations++;
+      }
+    }
+    return { bundles, locations };
   },
 });
 
