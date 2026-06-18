@@ -10,7 +10,6 @@ Future<void> showLanguageSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
     backgroundColor: context.skin.inkRaised,
-    isScrollControlled: false,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
@@ -58,7 +57,6 @@ class _LanguageSheet extends ConsumerWidget {
                   l10n.langSelectorLabel,
                   style: context.skin.monoStyle(
                     size: 11,
-                    weight: FontWeight.w600,
                     letterSpacing: 2.2,
                     color: context.skin.accent,
                   ),

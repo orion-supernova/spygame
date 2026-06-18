@@ -51,7 +51,6 @@ class _RoomCodeChipState extends State<RoomCodeChip>
               l10n.roomCodeLabel,
               style: context.skin.monoStyle(
                 size: 11,
-                weight: FontWeight.w600,
                 letterSpacing: 2.5,
                 color: context.skin.paperFaint,
               ),
@@ -81,7 +80,6 @@ class _RoomCodeChipState extends State<RoomCodeChip>
                           l10n.roomCodeCopied,
                           style: context.skin.monoStyle(
                             size: 11,
-                            weight: FontWeight.w600,
                             letterSpacing: 1.6,
                             color: context.skin.accent,
                           ),
@@ -99,7 +97,6 @@ class _RoomCodeChipState extends State<RoomCodeChip>
                           l10n.roomCodeCopyHint,
                           style: context.skin.monoStyle(
                             size: 11,
-                            weight: FontWeight.w600,
                             letterSpacing: 1.6,
                             color: context.skin.paperFaint,
                           ),

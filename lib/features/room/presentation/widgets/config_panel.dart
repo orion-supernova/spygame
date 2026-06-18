@@ -67,7 +67,6 @@ class ConfigPanel extends ConsumerWidget {
                 l10n.configEyebrow,
                 style: context.skin.monoStyle(
                   size: 11,
-                  weight: FontWeight.w600,
                   letterSpacing: 2,
                   color: context.skin.paperFaint,
                 ),
@@ -137,7 +136,6 @@ class ConfigPanel extends ConsumerWidget {
                 l10n.configActivePacksLabel,
                 style: context.skin.monoStyle(
                   size: 11,
-                  weight: FontWeight.w600,
                   letterSpacing: 2,
                   color: context.skin.paperFaint,
                 ),
@@ -228,7 +226,6 @@ class _LocationsRow extends StatelessWidget {
                 total == 0 ? '—' : l10n.configLocationsCount(enabled, total),
                 style: context.skin.monoStyle(
                   size: 13,
-                  weight: FontWeight.w600,
                   letterSpacing: 0.4,
                   color: context.skin.paper,
                 ),
@@ -265,7 +262,6 @@ class _PackChip extends StatelessWidget {
         text,
         style: context.skin.monoStyle(
           size: 11,
-          weight: FontWeight.w600,
           letterSpacing: 1.2,
           color: color,
         ),

@@ -45,7 +45,7 @@ void main() {
           histogram[ch] = (histogram[ch] ?? 0) + 1;
         }
       }
-      final expected = (samples * 4) / roomCodeAlphabet.length;
+      const expected = (samples * 4) / roomCodeAlphabet.length;
       for (final entry in histogram.entries) {
         expect(
           (entry.value - expected).abs() / expected,

@@ -27,7 +27,7 @@ class LocationsReadOnlySheet extends ConsumerStatefulWidget {
         minChildSize: 0.5,
         maxChildSize: 0.95,
         expand: false,
-        builder: (_, __) => LocationsReadOnlySheet(code: code),
+        builder: (_, _) => LocationsReadOnlySheet(code: code),
       ),
     );
   }
@@ -254,7 +254,6 @@ class _Section extends StatelessWidget {
                       title.toUpperCase(),
                       style: context.skin.monoStyle(
                         size: 11,
-                        weight: FontWeight.w600,
                         letterSpacing: 2.2,
                         color: context.skin.accent,
                       ),
@@ -264,7 +263,6 @@ class _Section extends StatelessWidget {
                     '${rows.length}',
                     style: context.skin.monoStyle(
                       size: 11,
-                      weight: FontWeight.w600,
                       letterSpacing: 1.2,
                       color: context.skin.paperFaint,
                     ),

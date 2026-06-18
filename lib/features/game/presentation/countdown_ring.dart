@@ -88,7 +88,6 @@ class CountdownRing extends StatelessWidget {
                         softWrap: false,
                         style: skin.digitStyle(
                           size: 80,
-                          weight: FontWeight.w700,
                           letterSpacing: -2,
                           color: accent,
                         ).copyWith(height: 1),
@@ -152,7 +151,6 @@ class CountdownChip extends StatelessWidget {
             formatCountdown(seconds),
             style: skin.digitStyle(
               size: 22,
-              weight: FontWeight.w700,
               letterSpacing: -0.5,
               color: accent,
             ).copyWith(height: 1),

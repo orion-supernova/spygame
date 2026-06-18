@@ -57,7 +57,7 @@ class PocketWatchCountdown extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               formatCountdown(seconds),
-              style: skin.digitStyle(size: 22, weight: FontWeight.w700, color: accent),
+              style: skin.digitStyle(size: 22, color: accent),
             ),
             const SizedBox(width: 12),
             Text(

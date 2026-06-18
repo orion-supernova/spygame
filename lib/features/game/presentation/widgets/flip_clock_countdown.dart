@@ -31,7 +31,6 @@ class FlipClockCountdown extends StatelessWidget {
 
     final cards = Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         for (final ch in text.characters)
           if (ch == ':')
@@ -39,7 +38,7 @@ class FlipClockCountdown extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: w * 0.12),
               child: Text(
                 ':',
-                style: skin.digitStyle(size: h * 0.5, weight: FontWeight.w700, color: accent),
+                style: skin.digitStyle(size: h * 0.5, color: accent),
               ),
             )
           else
@@ -158,7 +157,7 @@ class _FlipDigitState extends State<_FlipDigit>
   BoxDecoration get _cardDeco => BoxDecoration(
         color: widget.skin.inkSurface,
         borderRadius: BorderRadius.circular(3),
-        border: Border.all(color: widget.skin.accentMuted, width: 1),
+        border: Border.all(color: widget.skin.accentMuted),
       );
 
   Widget _face(String char) => Container(
@@ -169,7 +168,7 @@ class _FlipDigitState extends State<_FlipDigit>
         child: Text(
           char,
           style: widget.skin
-              .digitStyle(size: widget.height * 0.62, weight: FontWeight.w700, color: widget.digitColor),
+              .digitStyle(size: widget.height * 0.62, color: widget.digitColor),
         ),
       );
 

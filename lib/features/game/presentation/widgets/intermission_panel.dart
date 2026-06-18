@@ -49,7 +49,6 @@ class IntermissionPanel extends StatelessWidget {
             l10n.intermissionRoundDone(lastRoundIndex),
             style: skin.monoStyle(
               size: 11,
-              weight: FontWeight.w600,
               letterSpacing: 2.4,
               color: skin.accent,
             ),
@@ -80,7 +79,6 @@ class IntermissionPanel extends StatelessWidget {
                   l10n.intermissionReadyLabel,
                   style: skin.monoStyle(
                     size: 10,
-                    weight: FontWeight.w600,
                     letterSpacing: 2,
                     color: skin.paperFaint,
                   ),

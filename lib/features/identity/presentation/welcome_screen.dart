@@ -56,7 +56,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _Eyebrow(text: l10n.welcomeEyebrow),
                       const LanguageButton(),
@@ -113,7 +112,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                                 l10n.welcomeCtaHowToPlay,
                                 style: context.skin.monoStyle(
                                   size: 11,
-                                  weight: FontWeight.w600,
                                   letterSpacing: 2.2,
                                   color: context.skin.accent,
                                 ),
@@ -133,7 +131,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                                 l10n.welcomeCtaMarketplace,
                                 style: context.skin.monoStyle(
                                   size: 11,
-                                  weight: FontWeight.w600,
                                   letterSpacing: 2.2,
                                   color: context.skin.secondary,
                                 ),
@@ -184,7 +181,6 @@ class _Eyebrow extends StatelessWidget {
           text,
           style: context.skin.monoStyle(
             size: 11,
-            weight: FontWeight.w600,
             letterSpacing: 2.2,
             color: context.skin.accent,
           ),
@@ -272,6 +268,7 @@ class _VersionLabelState extends ConsumerState<_VersionLabel> {
     final controller = TextEditingController();
     return showDialog<String>(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: const Text('Developer mode'),
         content: TextField(
@@ -299,6 +296,7 @@ class _VersionLabelState extends ConsumerState<_VersionLabel> {
   Future<bool?> _confirmDisable() {
     return showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: const Text('Developer mode'),
         content: const Text('Dev mode is on. Turn it off?'),
@@ -388,7 +386,6 @@ class _ConfigBanner extends StatelessWidget {
                 l10n.welcomeConfigBannerTitle,
                 style: context.skin.monoStyle(
                   size: 12,
-                  weight: FontWeight.w600,
                   letterSpacing: 1.2,
                   color: context.skin.secondary,
                 ),

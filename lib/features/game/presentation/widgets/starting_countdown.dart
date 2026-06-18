@@ -93,7 +93,6 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
             l10n.gameRoundStartsIn(widget.roundIndex),
             style: skin.monoStyle(
               size: 11,
-              weight: FontWeight.w600,
               letterSpacing: 2.4,
               color: skin.accent,
             ),
@@ -111,7 +110,6 @@ class _StartingCountdownState extends ConsumerState<StartingCountdown>
               key: ValueKey<int>(seconds),
               style: skin.digitStyle(
                 size: 96,
-                weight: FontWeight.w700,
                 color: skin.accent,
               ),
             ),

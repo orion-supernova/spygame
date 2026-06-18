@@ -457,7 +457,6 @@ class _Section extends StatelessWidget {
                       title.toUpperCase(),
                       style: context.skin.monoStyle(
                         size: 11,
-                        weight: FontWeight.w600,
                         letterSpacing: 2.2,
                         color: context.skin.accent,
                       ),
@@ -467,7 +466,6 @@ class _Section extends StatelessWidget {
                     l10n.locationsSheetSectionCount(enabled, rows.length),
                     style: context.skin.monoStyle(
                       size: 11,
-                      weight: FontWeight.w600,
                       letterSpacing: 1.2,
                       color: context.skin.paperFaint,
                     ),

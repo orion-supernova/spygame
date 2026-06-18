@@ -315,7 +315,6 @@ class _TopBar extends StatelessWidget {
                 AppLocalizations.of(context).htpSkip,
                 style: context.skin.monoStyle(
                   size: 11,
-                  weight: FontWeight.w600,
                   letterSpacing: 2.2,
                   color: context.skin.paperMuted,
                 ),
@@ -408,7 +407,6 @@ class _BottomBar extends StatelessWidget {
                             AppLocalizations.of(context).htpNext,
                             style: context.skin.monoStyle(
                               size: 11,
-                              weight: FontWeight.w600,
                               letterSpacing: 2.2,
                               color: context.skin.accent,
                             ),
@@ -499,7 +497,6 @@ class _Eyebrow extends StatelessWidget {
           text,
           style: context.skin.monoStyle(
             size: 11,
-            weight: FontWeight.w600,
             letterSpacing: 2.2,
             color: context.skin.accent,
           ),
@@ -686,7 +683,6 @@ class _MockRoleCardState extends State<_MockRoleCard>
                     l10n.roleYourRole,
                     style: context.skin.monoStyle(
                       size: 11,
-                      weight: FontWeight.w600,
                       letterSpacing: 2.2,
                       color: accent,
                     ),
@@ -728,7 +724,6 @@ class _MockRoleCardState extends State<_MockRoleCard>
                   l10n.roleFrontAt,
                   style: context.skin.monoStyle(
                     size: 11,
-                    weight: FontWeight.w600,
                     letterSpacing: 2.2,
                     color: context.skin.paperFaint,
                   ),
@@ -1034,7 +1029,6 @@ class _Bubble extends StatelessWidget {
                 name,
                 style: context.skin.monoStyle(
                   size: 9,
-                  weight: FontWeight.w600,
                   letterSpacing: 2,
                   color: labelColor,
                 ),
@@ -1358,7 +1352,6 @@ class _VoteVisualState extends State<_VoteVisual>
                 l10n.htpVisualWrongPick,
                 style: context.skin.monoStyle(
                   size: 10,
-                  weight: FontWeight.w600,
                   letterSpacing: 1.8,
                   color: context.skin.paperFaint,
                 ),

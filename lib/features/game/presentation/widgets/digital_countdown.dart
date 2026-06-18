@@ -159,7 +159,7 @@ class _DigitCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final isColon = char == ':';
     final ghostChar = isColon ? ':' : '8';
-    final base = skin.digitStyle(size: size, weight: FontWeight.w700);
+    final base = skin.digitStyle(size: size);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isColon ? size * 0.02 : size * 0.04),
       child: Stack(

@@ -92,7 +92,7 @@ class _RoleCardState extends State<RoleCard> with TickerProviderStateMixin {
       },
       child: AnimatedBuilder(
         animation: _flip,
-        builder: (_, __) {
+        builder: (_, _) {
           final t = _flip.value;
           final angle = t * 3.14159; // pi
           final showFront = t > 0.5;
@@ -134,7 +134,7 @@ class _Back extends StatelessWidget {
             height: 72,
             child: AnimatedBuilder(
               animation: progress,
-              builder: (_, __) {
+              builder: (_, _) {
                 final t = progress.value;
                 final iconColor = Color.lerp(
                   skin.paperFaint,
@@ -173,7 +173,6 @@ class _Back extends StatelessWidget {
             AppLocalizations.of(context).roleBackEyebrow,
             style: skin.monoStyle(
               size: 12,
-              weight: FontWeight.w600,
               letterSpacing: 2.4,
               color: skin.paper,
             ),
@@ -239,7 +238,6 @@ class _Front extends StatelessWidget {
                 l10n.roleYourRole,
                 style: skin.monoStyle(
                   size: 11,
-                  weight: FontWeight.w600,
                   letterSpacing: 2.2,
                   color: accent,
                 ),
@@ -277,7 +275,6 @@ class _Front extends StatelessWidget {
               l10n.roleFrontAt,
               style: skin.monoStyle(
                 size: 11,
-                weight: FontWeight.w600,
                 letterSpacing: 2.2,
                 color: skin.paperFaint,
               ),

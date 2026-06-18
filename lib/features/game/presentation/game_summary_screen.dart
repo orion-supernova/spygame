@@ -31,7 +31,6 @@ class GameSummaryScreen extends ConsumerWidget {
                     l10n.summaryEyebrow,
                     style: skin.monoStyle(
                       size: 11,
-                      weight: FontWeight.w600,
                       letterSpacing: 2.4,
                       color: skin.paperFaint,
                     ),
@@ -55,7 +54,7 @@ class GameSummaryScreen extends ConsumerWidget {
                   const Spacer(),
                   asyncRoom.when(
                     loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
+                    error: (_, _) => const SizedBox.shrink(),
                     data: (_) => const SizedBox.shrink(),
                   ),
                   ElevatedButton(

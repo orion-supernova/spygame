@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,7 +40,7 @@ Future<void> showThemePicker({
   }
 
   Future<void> select(String? slug) async {
-    Haptics.selection();
+    unawaited(Haptics.selection());
     Navigator.of(context).pop();
     await ref
         .read(roomRepositoryProvider)

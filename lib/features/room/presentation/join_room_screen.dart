@@ -218,7 +218,6 @@ class _JoinRoomScreenState extends ConsumerState<JoinRoomScreen> {
                                 l10n.joinScreenCtaBackHome,
                                 style: context.skin.monoStyle(
                                   size: 12,
-                                  weight: FontWeight.w600,
                                   letterSpacing: 2,
                                   color: context.skin.paperMuted,
                                 ),
@@ -257,7 +256,6 @@ class _Header extends StatelessWidget {
           eyebrow,
           style: context.skin.monoStyle(
             size: 11,
-            weight: FontWeight.w600,
             letterSpacing: 2.4,
             color: context.skin.paperMuted,
           ),

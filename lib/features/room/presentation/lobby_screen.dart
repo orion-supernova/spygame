@@ -312,7 +312,6 @@ class _LobbyBody extends StatelessWidget {
                         l10n.lobbyEyebrow,
                         style: context.skin.monoStyle(
                           size: 11,
-                          weight: FontWeight.w600,
                           letterSpacing: 2.4,
                           color: context.skin.paperFaint,
                         ),
@@ -355,7 +354,6 @@ class _LobbyBody extends StatelessWidget {
                         l10n.lobbyPlayersLabel,
                         style: context.skin.monoStyle(
                           size: 11,
-                          weight: FontWeight.w600,
                           letterSpacing: 2,
                           color: context.skin.paperFaint,
                         ),
@@ -385,7 +383,7 @@ class _LobbyBody extends StatelessWidget {
                       isSelf: p.clientToken == myToken,
                     );
                   },
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemCount: room.players.length,
                 ),
               ),

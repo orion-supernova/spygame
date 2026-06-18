@@ -203,7 +203,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     l10n.homeDividerOrJoin,
                                     style: context.skin.monoStyle(
                                       size: 11,
-                                      weight: FontWeight.w600,
                                       letterSpacing: 2,
                                       color: context.skin.paperFaint,
                                     ),
