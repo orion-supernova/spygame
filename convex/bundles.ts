@@ -458,6 +458,7 @@ export const detail = query({
 
     return {
       ...project(bundle, args.locale),
+      locationCount: locations.length,
       locations,
     };
   },
