@@ -1,6 +1,39 @@
 # App Store / Play Store listing
 
-Copy/paste-ready metadata for App Store Connect and Google Play Console. All character counts are within both stores' limits. Fill the same values into Play Console where field names overlap.
+Copy/paste-ready metadata for App Store Connect and Google Play Console. All character counts are within both stores' limits.
+
+> **The LIVE App Store Connect listing is the source of truth, not this file.**
+> As of 1.0.17 the live copy differs from the older text below: it uses
+> `info@walhallaa.com` (not `muratcankoc@gmail.com`), carries a privacy-policy
+> link line instead of a "PRIVACY-FIRST" section, and shortens the Live
+> Activity bullet to just "• Live Activity". Check the live page before reusing
+> anything here.
+
+## Two Play-specific rewrites
+
+Google Play is **not** a straight copy of the App Store text:
+
+1. **"• Live Activity" is Apple terminology** — meaningless to an Android
+   reader. Replace with: *"A live countdown in your notification shade — the
+   round stays visible while you debate, even with the screen off."* This is
+   accurate: `live_timer_controller.dart:15-19` posts an ongoing notification
+   with a system chronometer that ticks autonomously, no push required.
+2. **Pack count.** `convex/bundles.ts` seeds **15** bundles — 12 cities
+   (istanbul, paris, tokyo, stockholm, newyork, london, rome, cairo, rio,
+   berlin, dubai, bangkok) + 3 themes (cyberpunk, wildwest, victorian1800s) —
+   totalling 150 paid locations on top of the 24 free ones. The live listings
+   name only 5. Under-listing is **not** a metadata violation (only
+   over-claiming is), so this is a marketing gap, not a compliance risk. Prefer
+   examples over an exhaustive list: *"15 optional packs (one-time purchase) —
+   cities like Istanbul, Paris and Tokyo, plus full-game themes like Cyberpunk,
+   Wild West and Victorian London."*
+
+Play release notes cap at **500 characters** — far shorter than App Store's
+"What's New", so that text cannot be reused verbatim.
+
+⚠️ **15 in-app products are needed in Play Console, not 5.** `docs/iap-setup.md`
+still describes 5 — verify how many exist in App Store Connect too, since any
+pack visible in-app without a matching store product cannot be purchased.
 
 ---
 
@@ -270,9 +303,9 @@ Most fields mirror App Store Connect. Play-specific fields:
 | Short description (max 80 chars) | `Find the spy hiding in your circle. A real-time party game for 3–12 friends.` (76 chars) |
 | Full description | Same as App Store description above |
 | Short description (TR) | `Aranızdaki casusu bul. 3–12 arkadaş için gerçek zamanlı parti oyunu.` (68 chars) |
-| App category | `Card` (closest fit; Spyfall is a social deduction card-style game) |
-| Content rating | Everyone (complete the IARC questionnaire — no violence, no chat, no UGC moderation needed) |
-| Tags | `Card`, `Party`, `Family`, `Friends` |
+| App category | `Board` — Play's tag taxonomy maps `Party games` under the Board parent. NOT `Card` (no cards in the game) and never `Casino` (the `Casino Floor` location would file you beside slot machines and invite gambling-policy scrutiny) |
+| Content rating | Completed 2026-07-31 — PEGI 3 / ESRB Everyone. See `play-store-launch.md` §3 for the full questionnaire answers |
+| Tags | `Party games`, `Board`, `Casual` — only 3 of the allowed 5 on purpose: tags set the peer group your retention and rating stats are benchmarked against, so padding with `Trivia`/`Brain teaser` would compare you against games with different session patterns |
 | Contact email | `muratcankoc@gmail.com` |
 | Contact website | `https://walhallaa.com` |
 | Privacy policy URL | `https://walhallaa.com/whereami-privacy-terms` |

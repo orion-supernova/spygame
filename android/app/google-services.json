@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "202422623909",
+    "project_id": "whereami-ea329",
+    "storage_bucket": "whereami-ea329.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:202422623909:android:9724607dd8391033cc374c",
+        "android_client_info": {
+          "package_name": "com.walhallaa.spygame.v02202404"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkiqj01g0FBJMXlw3VHxCEWaFXNm55zxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

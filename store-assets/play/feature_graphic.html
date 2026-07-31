@@ -1,0 +1,191 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Where am I? — Play feature graphic</title>
+<style>
+  /* 1024x500 Google Play feature graphic.
+     Concept: a redacted case file — the spy's card, with location and role
+     blacked out. Palette straight from lib/core/theme/app_colors.dart. */
+  @page { size: 1024px 500px; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink:        #0B0D12;
+    --ink-raised: #14171F;
+    --ink-surf:   #1B1F2A;
+    --ink-line:   #2B3140;
+    --paper:      #F4F2EC;
+    --paper-mute: #B8B5A8;
+    --lime:       #C6FF4D;
+    --amber:      #FFB547;
+    --red:        #FF5A5F;
+  }
+
+  html, body { width: 1024px; height: 500px; overflow: hidden; }
+
+  body {
+    position: relative;
+    background: var(--ink);
+    font-family: 'Futura', 'Avenir Next', 'Gill Sans', sans-serif;
+    display: flex;
+    align-items: center;
+  }
+
+  /* atmosphere: cool pool of light behind the type, vignette at the corners */
+  .glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(760px 460px at 26% 34%, rgba(198,255,77,.10), transparent 62%),
+      radial-gradient(620px 420px at 78% 78%, rgba(255,90,95,.10), transparent 60%),
+      radial-gradient(900px 620px at 50% 50%, var(--ink-surf), var(--ink) 72%);
+  }
+  /* surveillance grid, barely there */
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(244,242,236,.030) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(90deg, rgba(244,242,236,.030) 0 1px, transparent 1px 34px);
+    mask-image: radial-gradient(700px 500px at 40% 50%, #000 30%, transparent 78%);
+  }
+  .vignette {
+    position: absolute; inset: 0;
+    background: radial-gradient(120% 100% at 50% 50%, transparent 52%, rgba(0,0,0,.72));
+  }
+  .grain {
+    position: absolute; inset: 0; opacity: .16; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- left: the type ---------- */
+  .copy {
+    position: relative;
+    padding: 0 0 0 62px;
+    width: 620px;
+  }
+
+  .eyebrow {
+    font-family: 'American Typewriter', 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: 4.2px;
+    color: var(--lime);
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 22px;
+  }
+  .eyebrow::before {
+    content: ''; width: 26px; height: 2px; background: var(--lime);
+  }
+
+  h1 {
+    font-size: 104px;
+    line-height: .84;
+    letter-spacing: -3.5px;
+    color: var(--paper);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  h1 .q { color: var(--lime); }
+
+  .rule {
+    width: 92px; height: 3px; background: var(--amber);
+    margin: 30px 0 22px;
+  }
+
+  .tag {
+    font-size: 26px;
+    letter-spacing: .6px;
+    color: var(--paper-mute);
+    text-transform: uppercase;
+  }
+  .tag b { color: var(--paper); font-weight: 500; }
+  .tag .hot { color: var(--red); font-weight: 500; }
+
+  /* ---------- right: the redacted card ---------- */
+  .stage { position: relative; flex: 1; height: 100%; }
+
+  .card {
+    position: absolute;
+    top: 74px; left: 34px;
+    width: 286px; height: 352px;
+    background: linear-gradient(160deg, var(--ink-raised), #0E1116);
+    border: 1px solid var(--ink-line);
+    border-radius: 14px;
+    padding: 26px 24px;
+    transform: rotate(6.5deg);
+    box-shadow: 0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(244,242,236,.04) inset;
+  }
+  /* the second card peeking behind, for depth */
+  .card.behind {
+    top: 92px; left: 8px;
+    transform: rotate(-6deg);
+    opacity: .4;
+    box-shadow: 0 30px 60px rgba(0,0,0,.5);
+  }
+
+  .field {
+    font-family: 'American Typewriter', 'Courier New', monospace;
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--paper-mute);
+    margin-bottom: 9px;
+  }
+  .bar {
+    height: 42px; border-radius: 4px;
+    background: repeating-linear-gradient(135deg, #05070A 0 8px, #0A0D12 8px 16px);
+    border: 1px solid #000;
+    margin-bottom: 26px;
+    box-shadow: 0 2px 0 rgba(244,242,236,.05) inset;
+  }
+  .bar.short { width: 68%; }
+
+  .known {
+    font-size: 25px; letter-spacing: -.4px;
+    color: var(--lime);
+    margin-bottom: 26px;
+  }
+
+  .stamp {
+    position: absolute;
+    right: 96px; bottom: 84px;
+    font-family: 'American Typewriter', 'Courier New', monospace;
+    font-size: 20px; letter-spacing: 5px;
+    color: var(--red);
+    border: 3px solid var(--red);
+    padding: 8px 14px;
+    border-radius: 3px;
+    transform: rotate(-13deg);
+    opacity: .92;
+    text-shadow: 0 0 18px rgba(255,90,95,.35);
+    box-shadow: 0 0 22px rgba(255,90,95,.16);
+  }
+</style>
+
+<div class="glow"></div>
+<div class="grid"></div>
+
+<div class="copy">
+  <div class="eyebrow">SOCIAL DEDUCTION &middot; 3&ndash;12 PLAYERS</div>
+  <h1>Where<br>am I<span class="q">?</span></h1>
+  <div class="rule"></div>
+  <div class="tag"><b>Find the spy.</b> Or <span class="hot">be one.</span></div>
+</div>
+
+<div class="stage">
+  <div class="card behind">
+    <div class="field">LOCATION</div>
+    <div class="known">Coastal Beach</div>
+    <div class="field">YOUR ROLE</div>
+    <div class="known">Lifeguard</div>
+  </div>
+
+  <div class="card">
+    <div class="field">LOCATION</div>
+    <div class="bar"></div>
+    <div class="field">YOUR ROLE</div>
+    <div class="bar short"></div>
+    <div class="field">STATUS</div>
+    <div class="known">You don&rsquo;t know.</div>
+  </div>
+
+  <div class="stamp">CLASSIFIED</div>
+</div>
+
+<div class="vignette"></div>
+<div class="grain"></div>

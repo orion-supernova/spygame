@@ -101,87 +101,13 @@ echo "  • Git commit/push:  $([ "$RUN_GIT" = true ] && echo yes || echo no)"
 [ "$DRY_RUN" = true ] && echo "  • Mode: DRY (no side effects)"
 echo ""
 
-# ----- spinner helpers -----
-function finish { tput cnorm 2>/dev/null || true; }
-trap finish EXIT
-
-spinner() {
-    local pid=$1
-    local message="$2"
-    local delay=0.1
-    local spinstr='|/-\'
-    tput civis 2>/dev/null || true
-    while kill -0 "$pid" 2>/dev/null; do
-        for i in $(seq 0 $((${#spinstr} - 1))); do
-            tput sc 2>/dev/null
-            tput cup $(($(tput lines) - 1)) 0 2>/dev/null
-            printf "%s %s" "${spinstr:$i:1}" "$message"
-            tput rc 2>/dev/null
-            sleep "$delay"
-        done
-    done
-    tput sc 2>/dev/null
-    tput cup $(($(tput lines) - 1)) 0 2>/dev/null
-    printf "   %s\n" "$message"
-    tput rc 2>/dev/null
-    tput cnorm 2>/dev/null || true
-}
-
-run_with_spinner() {
-    local description="$1"
-    shift
-    echo "$description..."
-    "$@" &
-    local pid=$!
-    spinner "$pid" "$description"
-    wait "$pid"
-    local exit_code=$?
-    if [ $exit_code -eq 0 ]; then
-        echo "  ✅ $description"
-    else
-        echo "  ❌ $description failed (exit $exit_code)"
-        exit $exit_code
-    fi
-}
-
-# Load a dotenv file into the environment without running values through bash
-# command interpretation. `source .env.local` chokes on values containing
-# unquoted '|', '&', ';', '$()' etc. — common in keys/secrets. This loader:
-#   - skips blanks and # comments
-#   - strips matched surrounding "..." or '...'
-#   - expands $VAR / ${VAR} / ${VAR:-default} (so $HOME paths still work)
-#   - neutralizes command substitution and backticks
-load_env_file() {
-    local file="$1"
-    [ -f "$file" ] || return 1
-    local line key value stripped first last safe
-    while IFS= read -r line || [ -n "$line" ]; do
-        line="${line%$'\r'}"
-        stripped="${line#"${line%%[![:space:]]*}"}"
-        [ -z "$stripped" ] && continue
-        [ "${stripped:0:1}" = "#" ] && continue
-        [[ "$line" != *=* ]] && continue
-        key="${line%%=*}"
-        value="${line#*=}"
-        key="${key//[[:space:]]/}"
-        key="${key#export}"
-        [ -z "$key" ] && continue
-        if [ ${#value} -ge 2 ]; then
-            first="${value:0:1}"
-            last="${value: -1}"
-            if { [ "$first" = '"' ] && [ "$last" = '"' ]; } || \
-               { [ "$first" = "'" ] && [ "$last" = "'" ]; }; then
-                value="${value:1:${#value}-2}"
-            fi
-        fi
-        safe="${value//\\/\\\\}"
-        safe="${safe//\"/\\\"}"
-        safe="${safe//\`/\\\`}"
-        safe="${safe//\$(/\\\$(}"
-        eval "value=\"$safe\""
-        export "$key=$value"
-    done < "$file"
-}
+# ----- shared helpers -----
+# Spinner + dotenv loader live in scripts/lib/ so build_ios.sh and the upload
+# scripts behave identically when run standalone.
+# shellcheck source=scripts/lib/ui.sh
+source "$SCRIPT_DIR/scripts/lib/ui.sh"
+# shellcheck source=scripts/lib/dotenv.sh
+source "$SCRIPT_DIR/scripts/lib/dotenv.sh"
 
 # ----- environment validation -----
 validate_environment() {
@@ -225,9 +151,7 @@ validate_environment() {
         # Directory holding the .p8. Override APP_STORE_CONNECT_KEY_DIR in
         # .env.local if your key isn't at the default path (e.g. when juggling
         # keys across multiple Apple Developer teams).
-        local key_dir="${APP_STORE_CONNECT_KEY_DIR:-$HOME/.appstoreconnect/private_keys}"
-        P8_FILE_PATH="$key_dir/AuthKey_$APP_STORE_CONNECT_KEY_ID.p8"
-        if [ ! -f "$P8_FILE_PATH" ]; then
+        if ! resolve_asc_key; then
             echo "❌ App Store Connect API key not found at:"
             echo "   $P8_FILE_PATH"
             echo "   Download the .p8 from App Store Connect → Users and Access → Keys"
@@ -296,106 +220,30 @@ else
 fi
 
 # ----- iOS build -----
+# Delegates to ./build_ios.sh and scripts/upload_appstore.sh so the same code
+# path runs whether you ship via deploy.sh or build/upload the two halves by
+# hand — mirroring build_android.sh + scripts/upload_play.sh on Android.
 IOS_BUILD_TIME=0
 IPA_PATH=""
 IOS_SUCCESS=false
 if [ "$RUN_IOS" = true ]; then
     IOS_START_TIME=$(date +%s)
-    echo "🍎 Starting iOS build..."
 
-    echo "  • CocoaPods install"
-    (
-        cd ios
-        pod install >/tmp/spygame_pod_install.log 2>&1
-        POD_STATUS=$?
-        if [ $POD_STATUS -ne 0 ]; then
-            echo "  ⚠️  pod install failed, retrying after 'pod repo update'..."
-            pod repo update >/tmp/spygame_pod_repo_update.log 2>&1
-            pod install >/tmp/spygame_pod_install_retry.log 2>&1
-            POD_STATUS=$?
-        fi
-        if [ $POD_STATUS -ne 0 ]; then
-            echo "❌ CocoaPods install failed. Logs:"
-            echo "   /tmp/spygame_pod_install.log"
-            echo "   /tmp/spygame_pod_repo_update.log"
-            echo "   /tmp/spygame_pod_install_retry.log"
-            exit 1
-        fi
-    )
-    echo "  ✅ Pods installed"
+    ./build_ios.sh || exit $?
 
-    # Refreshes Generated.xcconfig with the current pubspec version — this is what
-    # fixes "Xcode archived the old version after I bumped pubspec".
-    # RevenueCat SDK keys come from .env.local (already loaded above); only the
-    # iOS key is consumed at runtime on iOS, but pass both so a missing
-    # variable surfaces here instead of crashing later.
-    run_with_spinner "Building Flutter for iOS (release)" \
-        flutter build ios --release --no-codesign \
-            --dart-define=REVENUECAT_IOS_KEY="${REVENUECAT_IOS_KEY:-}" \
-            --dart-define=REVENUECAT_ANDROID_KEY="${REVENUECAT_ANDROID_KEY:-}"
-
-    run_with_spinner "Creating Xcode archive" \
-        xcodebuild -workspace ios/Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath build/Runner.xcarchive \
-            archive \
-            -destination 'generic/platform=iOS' \
-            -allowProvisioningUpdates
-
-    # Pass the App Store Connect API key to xcodebuild so automatic signing
-    # can create/download the Apple Distribution cert + provisioning profiles
-    # WITHOUT a logged-in Xcode account. Without these flags the export dies
-    # with "No Accounts / No signing certificate iOS Distribution found" on
-    # any machine where Xcode → Settings → Accounts is empty (e.g. CI, or
-    # after an Xcode/macOS update drops the account). Falls back to plain
-    # automatic signing when the creds aren't available (e.g. --no-upload).
-    EXPORT_AUTH_FLAGS=()
-    if [ -n "${P8_FILE_PATH:-}" ] && [ -f "${P8_FILE_PATH:-}" ] \
-        && [ -n "${APP_STORE_CONNECT_KEY_ID:-}" ] \
-        && [ -n "${APP_STORE_CONNECT_ISSUER_ID:-}" ]; then
-        EXPORT_AUTH_FLAGS=(
-            -authenticationKeyPath "$P8_FILE_PATH"
-            -authenticationKeyID "$APP_STORE_CONNECT_KEY_ID"
-            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID"
-        )
-        echo "  • Export will authenticate to App Store Connect via API key (no Xcode account needed)"
-    else
-        echo "  ⚠️  No ASC API key resolved — export relies on a logged-in Xcode account"
-    fi
-
-    run_with_spinner "Exporting IPA" \
-        env PATH="/usr/bin:$PATH" xcodebuild -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportPath build/ios \
-            -exportOptionsPlist ios/ExportOptions.plist \
-            -allowProvisioningUpdates \
-            ${EXPORT_AUTH_FLAGS[@]+"${EXPORT_AUTH_FLAGS[@]}"}
-
-    # The IPA is named after CFBundleName, not PRODUCT_NAME, so we glob for it
-    # rather than hardcoding "Runner.ipa".
     IPA_PATH="$(find build/ios -maxdepth 1 -type f -name '*.ipa' | head -n 1)"
     if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
-        echo "❌ No .ipa found in build/ios/ after export"
-        ls -la build/ios/ || true
+        echo "❌ No .ipa found in build/ios/ after build_ios.sh"
         exit 1
     fi
-    echo "  ✅ IPA at $IPA_PATH"
 
-    # ----- Upload -----
     if [ "$RUN_UPLOAD" = true ]; then
         run_with_spinner "Uploading to App Store Connect" \
-            xcrun altool --upload-app \
-                --type ios \
-                --file "$IPA_PATH" \
-                --apiKey "$APP_STORE_CONNECT_KEY_ID" \
-                --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
-                --apiKeyPath "$P8_FILE_PATH"
-        IOS_SUCCESS=true
+            scripts/upload_appstore.sh --ipa "$IPA_PATH"
     else
         echo "⏭️  Skipping App Store Connect upload (--no-upload)"
-        IOS_SUCCESS=true
     fi
+    IOS_SUCCESS=true
 
     IOS_END_TIME=$(date +%s)
     IOS_BUILD_TIME=$((IOS_END_TIME - IOS_START_TIME))
