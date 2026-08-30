@@ -1,105 +1,103 @@
+<div align="center">
+
 # Where am I?
 
-A Spyfall-style mobile party game. One of you is the spy. Everyone else
-shares a secret location. Ask careful questions, blend in, and figure out
-who doesn't belong.
+**Everyone shares a secret location. One of you doesn't.**
 
-- 3–12 players, no accounts, pass-and-play friendly.
-- 4-character room codes (no ambiguous glyphs).
-- Configurable spies (1–3), round length (1–15 min), and round count (1–10).
-- Server-authoritative countdown — locking the screen or backgrounding the
-  app does not desync the timer.
-- Local notifications fire when a round ends, even if the app is suspended.
+A real-time party game of bluffing and deduction for 3–12 people in the same room.
+No accounts. No ads. No app deciding who won — just you, your friends, and a ticking clock.
 
-## Stack
+[![App Store](https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/idAPP_STORE_ID)
+[![Google Play](https://img.shields.io/badge/Google_Play-Download-414141?style=for-the-badge&logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.walhallaa.spygame.v02202404)
 
-- Flutter + Riverpod + go_router (clean architecture: data / domain / presentation)
-- Convex backend (`convex_flutter` — websocket subscriptions, mutations, scheduler)
-- Hand-typed Convex DTOs (no Dart codegen for Convex yet)
+<img src="docs/media/hero.gif" alt="Naming yourself, creating a room, and sharing the four-letter code" width="280">
 
-## First-time setup
+</div>
 
-The Flutter app ships with the hosted deployment URL baked in
-(`https://spyfall-api.walhallaa.dpdns.org`), so the simplest path is:
+---
+
+## How it plays
+
+Somebody creates a room and shares a 4-letter code. Everyone joins from their own phone.
+
+Each round, you secretly see **where you are** and **who you are** there — Trauma Ward, Night Shift Surgeon. Everybody sees the same location. Except one player, who sees nothing but *"you don't know."* That's the spy.
+
+Then you just… talk. Ask each other questions. Answer too vaguely and people get suspicious. Answer too specifically and you hand the spy the location. When the timer runs out, argue it out. The spy wins by staying invisible. Everyone else wins by pointing at the right person.
+
+The app never votes for you. It just deals the cards and runs the clock.
+
+<div align="center">
+<table>
+<tr>
+<td align="center"><img src="docs/media/role.gif" alt="Press and hold to reveal your role" width="220"><br><sub><b>Press and hold</b><br>Your location and your role.<br>Or, if you're unlucky, neither.</sub></td>
+<td align="center"><img src="docs/media/themes.gif" alt="Switching room themes" width="220"><br><sub><b>Reskin the whole room</b><br>Classic, Cyberpunk,<br>Victorian London, Wild West</sub></td>
+<td align="center"><img src="docs/media/reveal.gif" alt="The spy is revealed" width="220"><br><sub><b>Then the argument</b><br>Round's up. Talk it out,<br>then find out who it was.</sub></td>
+</tr>
+</table>
+</div>
+
+## Why it's good
+
+**Nobody has to babysit the timer.** The countdown lives on the server, not your phone. Lock the screen, take a call, drop off Wi-Fi and come back — everyone's clock still reads the same number.
+
+**Put the phone down and play.** On iOS the round runs as a Live Activity; on Android it's a live countdown in your notification shade. The clock stays visible while you're mid-argument with your screen off.
+
+**Zero friction to start.** No account, no email, no invite links to chase. Four letters and you're in. One phone works too — just pass it around.
+
+**Tunable.** 1–3 spies, 1–15 minute rounds, 1–10 rounds per game.
+
+**Actually private.** No ads, no analytics SDKs, no tracking. No location, contacts, camera, or mic access. The only thing stored on your device is a random ID so you can rejoin if the app dies mid-game.
+
+**English and Turkish**, right down to the role names.
+
+## Packs
+
+24 locations are free forever, each with 11 unique roles. If you want more, there are 15 optional one-time-purchase packs — 12 cities and 3 full themes.
+
+> **Cities** — Istanbul, Paris, Tokyo, Stockholm, New York, London, Rome, Cairo, Rio, Berlin, Dubai, Bangkok
+>
+> **Themes** — Cyberpunk, Wild West, Victorian London
+
+<div align="center">
+<table>
+<tr>
+<td align="center"><img src="docs/media/locations.gif" alt="Host toggling which locations are in play" width="240"><br><sub><b>Host picks the deck</b><br>Toggle any location off before you start.<br>Locked in when the game begins, so nobody<br>can shuffle the pool mid-round.</sub></td>
+<td align="center"><img src="docs/media/packs.gif" alt="The location packs store" width="240"><br><sub><b>Buy once, keep it</b><br>No subscription, no currency,<br>no timed unlocks.</sub></td>
+</tr>
+</table>
+</div>
+
+Themes aren't just extra cards. Buy Wild West and the whole app becomes a saloon — kraft paper, wanted-poster role cards, a flip-clock counting you down. Victorian London gets fog, calling cards, and a pocket watch. The host picks it; everyone in the room sees it at once.
+
+## Under the hood
+
+Flutter + Riverpod on the front, [Convex](https://convex.dev) on the back. Room state streams over websockets, so a player joining shows up on twelve phones at once with no polling and no refresh button.
+
+The interesting bits:
+
+- **Server-authoritative rounds.** Clients derive the countdown from a server timestamp instead of counting down locally, so backgrounding never desyncs anyone.
+- **Secrets stay server-side.** Your role and the location are never in the room subscription payload — they're fetched per-player, so nobody can read the answer out of the wire.
+- **Silent push to keep the widget alive.** iOS Live Activities and Android's ongoing notification are updated by silent APNs/FCM, the only way to move a chronometer while the app is fully suspended.
+- **Skins as a theme extension.** A pack swaps an `AppSkin` `ThemeExtension` — colors, fonts, textures, timer widget, role card frame — and syncs it to every device in the room.
 
 ```bash
 flutter pub get
-flutter run
-```
-
-To point at a different deployment:
-
-```bash
-flutter run --dart-define=CONVEX_URL=https://<other-deployment>
-```
-
-To run the Convex backend yourself (for development):
-
-```bash
-# from the project root (NOT from inside convex/):
-npm install
-npx convex dev                   # watches for changes & pushes
-npx convex run locations:seed    # one-time seed (in a second terminal)
-```
-
-> The `convex` CLI looks for a `convex/` subdirectory of your cwd. Always
-> run these commands from the project root; running from inside `convex/`
-> would make it create a useless nested `convex/convex/` project.
-
-## Tests
-
-```bash
+flutter run                 # ships pointed at the hosted backend
 flutter test
 ```
 
-Covered:
+Running your own backend:
 
-- 4-char code generator: alphabet purity, uniformity, ambiguity exclusion.
-- Spy + role assignment invariants.
-- Countdown derivation (background/resume scenarios).
-
-## Project layout
-
-```
-lib/
-  core/                      # theme, router, storage, convex bootstrap, lifecycle, notifications
-  features/
-    identity/                # welcome screen
-    room/                    # home (create/join), lobby
-    game/                    # round, role card, location grid, summary
-convex/
-  schema.ts                  # tables + indexes
-  rooms.ts                   # createRoom, joinRoom, leaveRoom, setReady, updateConfig, heartbeat, watchRoom
-  games.ts                   # startGame, endRoundManual, endRoundIfDue, getMyRole, watchLocations, serverNow
-  locations.ts               # seed, list (24 original generic venues)
-  maintenance.ts             # reapStaleOwners
-  crons.ts
-  helpers/code.ts            # 4-char unique-code generator
-  helpers/assign.ts          # spy + role assignment
+```bash
+npm install
+npx convex dev              # from the repo root, not from convex/
+npx convex run locations:seed
 ```
 
-## How spy secrecy is enforced
+## Say hi
 
-Convex subscriptions deliver whatever the server function returns. Public
-queries (`watchRoom`, `watchLocations`) are deliberately stripped of
-`locationId` and role data. The location for a round lives in a separate
-`roundSecrets` table, accessible only to internal Convex functions. The
-only client-visible place a location appears is `getMyRole`, which filters
-by the caller's `clientToken` — so a spy subscribing to it gets back
-`{role: "spy", location: null}` and cannot ask for someone else's role.
+Ideas for a pack, a feature, or a bug you hit — [open an issue](https://github.com/orion-supernova/spygame/issues) or email **info@walhallaa.com**. Every message gets read.
 
-## How the countdown survives backgrounding
-
-- The server stamps `endsAtMs` on every round (server clock).
-- On connect / on resume, the client calls `serverNow()` and stores
-  `offset = serverMs - localMs`.
-- The UI computes `remaining = endsAtMs - (DateTime.now() + offset)` —
-  the deadline never moves, so locking the screen and reopening yields
-  the correct number on first paint.
-- A 1Hz `Ticker` triggers re-derivation only for visual smoothness.
-- A local notification is scheduled at `endsAtMs` so the user is pinged
-  if the app is suspended.
-- Round-end is server-authoritative: Convex's `ctx.scheduler.runAfter`
-  flips the round and picks the next location. Any client whose local
-  clock has passed the deadline opportunistically calls the idempotent
-  `endRoundIfDue` mutation as a belt-and-braces safety net.
+<div align="center">
+<sub>Built by <a href="https://walhallaa.com">Murat Can Koç</a> · <a href="https://walhallaa.com/whereami-privacy-terms">Privacy & Terms</a></sub>
+</div>
