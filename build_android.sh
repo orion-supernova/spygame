@@ -24,7 +24,7 @@ REVENUECAT_ANDROID_KEY=$(extract REVENUECAT_ANDROID_KEY)
 
 if [ ! -f android/key.properties ]; then
     echo "❌ android/key.properties missing — the build would be signed with the"
-    echo "   debug key and Google Play would reject it. See docs/play-store-launch.md."
+    echo "   debug key and Google Play would reject it. See your private deploy notes."
     exit 1
 fi
 
