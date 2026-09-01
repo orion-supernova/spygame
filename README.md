@@ -8,10 +8,10 @@
 
 No accounts. No ads. No app deciding who won.
 
-[![App Store](https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/idAPP_STORE_ID)
-[![Google Play](https://img.shields.io/badge/Google_Play-Download-414141?style=for-the-badge&logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.walhallaa.spygame.v02202404)
+[![Download on the App Store](https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/us/app/where-am-i-spy-game/id6764593980)
+![Google Play — coming soon](https://img.shields.io/badge/Google_Play-Coming_soon-414141?style=for-the-badge&logo=googleplay&logoColor=8b8b8b)
 &nbsp;
-![Platform](https://img.shields.io/badge/iOS%20%2B%20Android-1c1c1c?style=for-the-badge)
+![Free](https://img.shields.io/badge/Free-1c1c1c?style=for-the-badge)
 ![Players](https://img.shields.io/badge/3–12%20players-1c1c1c?style=for-the-badge)
 
 <br>
