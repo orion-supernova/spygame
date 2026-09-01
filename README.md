@@ -9,7 +9,7 @@
 No accounts. No ads. No app deciding who won.
 
 [![Download on the App Store](https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/us/app/where-am-i-spy-game/id6764593980)
-[![Play in your browser](https://img.shields.io/badge/Play_in_browser-C6F135?style=for-the-badge&logo=googlechrome&logoColor=black)](https://whereami-ea329.web.app)
+[![Play in your browser](https://img.shields.io/badge/Play_in_browser-C6F135?style=for-the-badge&logo=googlechrome&logoColor=black)](https://whereami.walhallaa.com)
 ![Google Play — coming soon](https://img.shields.io/badge/Google_Play-Coming_soon-414141?style=for-the-badge&logo=googleplay&logoColor=8b8b8b)
 &nbsp;
 ![Free](https://img.shields.io/badge/Free-1c1c1c?style=for-the-badge)
@@ -55,7 +55,7 @@ The app never votes for you and never announces a winner. It deals the cards, ru
 
 **Put the phone down and play.** On iOS the round runs as a Live Activity, on Android as a live countdown in your notification shade. The timer stays visible while you're mid-argument with the screen off.
 
-**Nothing between you and a game.** No account, no email, no invite link to chase down. Four letters and you're in — and if someone doesn't want to install anything, [the browser version](https://whereami-ea329.web.app) puts them at the same table.
+**Nothing between you and a game.** No account, no email, no invite link to chase down. Four letters and you're in — and if someone doesn't want to install anything, [the browser version](https://whereami.walhallaa.com) puts them at the same table.
 
 **Tunable.** 1–3 spies, 1–15 minute rounds, 1–10 rounds per game.
 
@@ -96,7 +96,7 @@ No. Your location and your role are never part of what the room broadcasts — t
 <summary><b>Do we all need the app installed?</b></summary>
 <br>
 
-No. One phone passed around the table is a completely normal way to play, and anyone who'd rather not install anything can join from <a href="https://whereami-ea329.web.app">the browser</a> instead. If everyone does have the app, they join with the four-letter code and each get their own private card — which is nicer, because nobody has to look away.
+No. One phone passed around the table is a completely normal way to play, and anyone who'd rather not install anything can join from <a href="https://whereami.walhallaa.com">the browser</a> instead. If everyone does have the app, they join with the four-letter code and each get their own private card — which is nicer, because nobody has to look away.
 
 </details>
 
